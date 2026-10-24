@@ -1,0 +1,921 @@
+/* Berik POS: жаңа стиль (жаңа админ сияқты). Тек сыртқы түр, орналасу өзгермейді. */
+:root{
+	--bp-bg: #f3f3f3;
+	--bp-card: #fff;
+	--bp-line: #e7e7e7;
+	--bp-pill: #f5f5f5;
+	--bp-pill-h: #ececec;
+	--bp-text: #222;
+	--bp-muted: #8a8f98;
+	--bp-green: #10a96a;
+	--bp-green-h: #0d9660;
+	--bp-red: #e5484d;
+	--bp-red-bg: #fdeced;
+	--bp-shadow: 0 1px 3px rgba(0,0,0,.05);
+}
+
+body{ background: var(--bp-bg); }
+
+/* ---------- Жоғарғы мәзір ---------- */
+.aheader{
+	background: var(--bp-bg);
+	border-bottom: 1px solid var(--bp-line);
+}
+.alogo{ color: var(--bp-text); }
+.alogo p{
+	display: flex;
+	align-items: center;
+	height: 38px;
+	margin-right: 6px;
+	padding: 0 16px;
+	background: var(--bp-card);
+	border-radius: 40px;
+	box-shadow: var(--bp-shadow);
+	color: var(--bp-text);
+	font-size: 14px;
+	font-weight: 600;
+}
+.alogo p i{ margin-right: 8px; color: var(--bp-muted); font-size: 14px; }
+.alogo p span{ color: var(--bp-text); font-weight: 700; }
+@media (max-width: 768px){
+	.alogo p{ height: 32px; padding: 0 10px; margin-right: 4px; font-size: 12px; }
+	.mp_topc{ height: 34px; }
+	.mp_topi{ height: 28px; padding: 0 10px; font-size: 13px; }
+	.ub1_lt{ height: 34px; padding: 0 3px 0 10px; }
+	.ub1_lti{ width: 28px; height: 28px; min-height: 28px; }
+}
+
+.mp_top{ display: flex; align-items: center; }
+.mp_topc{
+	height: 38px;
+	padding: 3px;
+	background: var(--bp-card);
+	border-radius: 40px;
+	box-shadow: var(--bp-shadow);
+}
+.mp_topi{
+	height: 32px;
+	padding: 0 18px;
+	margin-right: 4px;
+	border-radius: 32px;
+	background: var(--bp-pill);
+	color: var(--bp-text);
+	font-size: 14px;
+	font-weight: 600;
+}
+.mp_topi:last-child{ margin-right: 0; }
+.mp_topi:hover{ background: var(--bp-pill-h); }
+.mp_topi_act, .mp_topi_act:hover{
+	background: var(--bp-green);
+	color: #fff;
+	font-weight: 700;
+}
+
+.ub1_lx{ margin-left: 10px; }
+.ub1_lt{
+	height: 38px;
+	padding: 0 3px 0 16px;
+	background: var(--bp-card);
+	border-radius: 40px;
+	box-shadow: var(--bp-shadow);
+}
+.ub1_ltf div{ color: var(--bp-text); font-weight: 600; }
+.ub1_lti{
+	width: 32px; height: 32px; min-height: 32px;
+	background-color: var(--bp-pill);
+	color: var(--bp-muted);
+}
+
+/* ---------- Касса беті ---------- */
+.hup_search, .hup_rct, .hup_rcb, .cash_bl1{
+	background: var(--bp-card);
+	border-radius: 12px;
+	box-shadow: var(--bp-shadow);
+}
+.hup_search .hup_search_inp{ height: 40px; padding: 0 40px 0 38px; background: #fff; border: 1px solid var(--bp-line); border-radius: 10px; box-shadow: none; }
+.hup_search .hup_search_inp:focus{ border-color: var(--bp-green); }
+
+/* Санаттар: түсі сол күйі, пішіні pill */
+.hup_rct{ flex-wrap: wrap; gap: 5px; }
+.hup_rcti{
+	height: 36px;
+	margin-right: 0;
+	padding: 0 16px;
+	border-radius: 36px;
+	font-weight: 600;
+}
+.hup_rcti:hover{ transform: none; filter: brightness(.95); }
+.hup_rcti_act{ box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--bp-green); }
+
+/* Тауар плиткалары */
+.hup_rcbi{
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	min-height: 68px;
+	padding: 10px 12px;
+	text-align: left;
+	background: var(--bp-card);
+	border: 1px solid var(--bp-line);
+	border-radius: 10px;
+	font-size: 14px;
+	line-height: 1.3;
+}
+.hup_rcbi > div:first-child{ font-weight: 600; color: var(--bp-text); }
+.hup_rcbi > div:last-child{ margin-top: 6px; font-size: 13px; color: var(--bp-muted); }
+.hup_rcbi:hover{ transform: none; border-color: var(--bp-green); }
+.hup_rcbi:active{ background: #f2fbf7; }
+
+/* Себет */
+.cash_bl1_l{ border-radius: 12px 12px 0 0; }
+.uc_uh{ border-bottom-color: var(--bp-line); }
+.uc_uh, .uc_uh div{ font-size: 12px; text-transform: uppercase; color: var(--bp-muted); font-weight: 600; letter-spacing: .3px; }
+.cash_bl1 .uc_ui{ border-bottom: 1px solid var(--bp-line); }
+
+.cash_bl1 .uc_uin_cn{
+	width: 36px; height: 36px;
+	border-radius: 10px;
+	background: var(--bp-pill);
+	color: var(--bp-text);
+}
+.cash_bl1 .uc_uin_cn:hover{ background: var(--bp-pill-h); }
+.cash_bl1 .uc_uin_cn.cashbox_remove{ background: var(--bp-red-bg); color: var(--bp-red); }
+.cash_bl1 .uc_uin_cn.cashbox_remove:hover{ background: var(--bp-red); color: #fff; }
+
+/* Төменгі жолақ */
+.cash_bl1_rb{
+	background: var(--bp-card);
+	border-top: 1px solid var(--bp-line);
+	border-left: 1px solid var(--bp-line);
+	border-top-left-radius: 12px;
+}
+.cash_bl1_rbl div{ color: var(--bp-text); }
+.cash_bl1_rblip{ color: var(--bp-text); font-weight: 800; }
+.cash_bl1_rbr .btn{
+	width: 160px;
+	border-radius: 10px;
+	background: var(--bp-green);
+	color: #fff;
+	text-transform: uppercase;
+	letter-spacing: .5px;
+}
+.cash_bl1_rbr .btn:hover{ background: var(--bp-green-h); }
+@media (max-width: 768px){
+	.cash_bl1_rbr .btn{ width: 120px; }
+}
+
+
+/* ---------- Мәзір: иконка үстінде, жазу астында (мобильді қолданба сияқты) ---------- */
+.aheader{ height: 60px; }
+.mp_topc{ height: 52px; padding: 3px; }
+.mp_topi{
+	height: 46px;
+	min-width: 96px;
+	padding: 0 14px;
+	flex-direction: column;
+	justify-content: center;
+	gap: 3px;
+	background: transparent;
+	border-radius: 40px;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--bp-text);
+}
+.mp_topi i{ font-size: 18px; line-height: 1; }
+.mp_topi:hover{ background: var(--bp-pill); }
+.mp_topi_act, .mp_topi_act:hover{
+	background: #e3f5ec;
+	color: var(--bp-green);
+	font-weight: 700;
+}
+.alogo p, .ub1_lt{ height: 44px; }
+
+/* Биік мәзірге сай беттің жоғарғы шегінісі */
+.hup_bl{ padding-top: 65px; }
+.cash_bl1{ height: calc(100vh - 60px - 10px); }
+.flex_clm_rev{ padding-top: 76px; }
+
+@media (max-width: 768px){
+	.aheader{ height: 56px; }
+	.mp_topc{ height: 48px; }
+	.mp_topi{ height: 42px; min-width: 0; padding: 0 10px; font-size: 11px; }
+	.mp_topi i{ font-size: 16px; }
+	.alogo p, .ub1_lt{ height: 36px; }
+	.hup_bl{ padding-top: 61px; }
+	.flex_clm_rev{ padding-top: 72px; }
+	.cash_bl1{ height: auto; }
+}
+
+
+/* ---------- Ауада қалқыған жоғарғы жолақ ---------- */
+.aheader{
+	top: 10px;
+	background: transparent;
+	border-bottom: 0;
+	pointer-events: none;
+}
+.aheader .alogo, .aheader .ahead{ pointer-events: auto; }
+.alogo p, .mp_topc, .ub1_lt{
+	box-shadow: 0 6px 20px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.04);
+}
+.alogo p{ margin-right: 10px; white-space: nowrap; }
+.ub1_lx{ margin-left: 12px; }
+.uc_uh .uc_uh_other, .uc_uilf1c .uc_uh_other{ font-size: 12px; }
+
+.hup_bl{ padding-top: 80px; }
+.cash_bl1{ height: calc(100vh - 80px - 10px); }
+.flex_clm_rev{ padding-top: 90px; }
+@media (max-width: 768px){
+	.aheader{ top: 6px; }
+	.hup_bl{ padding-top: 68px; }
+	.flex_clm_rev{ padding-top: 78px; }
+	.cash_bl1{ height: auto; }
+}
+
+/* «Касса» мен «Время» мүлдем керек емес */
+.alogo p{ display: none !important; }
+
+/* Мәзір мен профиль оң жақта, себеттің үстінде */
+.alogo{ display: none !important; }
+.aheader_c{ justify-content: flex-end; }
+
+/* Профиль капсуласы мәзірмен бірдей биіктікте */
+.ub1_lt{ height: 52px; padding: 0 3px 0 18px; }
+.ub1_lti{ width: 46px; height: 46px; min-height: 46px; }
+@media (max-width: 768px){
+	.ub1_lt{ height: 48px; padding: 0 3px 0 12px; }
+	.ub1_lti{ width: 42px; height: 42px; min-height: 42px; }
+}
+
+/* Мәзір қатары төбеге тақау, астындағы бөліктер соған жақын */
+.aheader{ top: 6px; height: 52px; }
+.hup_bl{ padding-top: 64px; }
+.cash_bl1{ height: calc(100vh - 64px - 6px); }
+.flex_clm_rev{ padding-top: 72px; }
+@media (max-width: 768px){
+	.aheader{ top: 4px; height: 48px; }
+	.hup_bl{ padding-top: 58px; }
+	.flex_clm_rev{ padding-top: 64px; }
+	.cash_bl1{ height: auto; }
+}
+
+/* Иконка жазудың жанында, бір қатарда */
+.mp_topi{ flex-direction: row; gap: 8px; font-size: 14px; padding: 0 18px; }
+.mp_topi i{ font-size: 16px; }
+@media (max-width: 768px){
+	.mp_topi{ gap: 6px; font-size: 12px; padding: 0 12px; }
+	.mp_topi i{ font-size: 14px; }
+}
+
+/* Бұрынғы түстерден кішкене акцент (тым аппақ болмауы үшін) */
+body{ background: var(--cl1); }                       /* бұрынғы ашық көк фон */
+.aheader{ background: transparent; }
+.hup_rcbi{ background: #fbfdfe; border-color: rgba(31,117,168,.14); }
+.hup_rcbi > div:last-child{ color: var(--cl); font-weight: 700; }  /* баға көк */
+.hup_rcbi:hover{ border-color: var(--cl); background: #fff; }
+.hup_search_icon{ color: var(--cl); opacity: .7; }
+.hup_search .hup_search_inp:focus{ border-color: var(--cl); }
+.cash_bl1 .uc_uin_cn{ background: var(--cl1); color: var(--cl); }
+.cash_bl1 .uc_uin_cn:hover{ background: var(--cl); color: #fff; }
+.cash_bl1 .uc_uin_cn.cashbox_remove{ background: var(--bp-red-bg); color: var(--bp-red); }
+.cash_bl1 .uc_uin_cn.cashbox_remove:hover{ background: var(--bp-red); color: #fff; }
+.cash_bl1_rblip{ color: var(--red); }                  /* қорытынды сома бұрынғыдай қызыл */
+.uc_uh, .uc_uh div{ color: var(--cl); opacity: .75; }
+
+/* Санат батырмалары сәл үлкенірек */
+.hup_rct{ gap: 6px; padding: 6px; }
+.hup_rcti{ height: 54px; padding: 0 22px; font-size: 15px; font-weight: 700; }
+@media (max-width: 768px){
+	.hup_rcti{ height: 54px; padding: 0 16px; font-size: 14px; }
+}
+
+/* Санаттар карусель: сыймаса көлденең жылжиды */
+.hup_rct{
+	flex-wrap: nowrap;
+	overflow-x: auto;
+	overflow-y: hidden;
+	scroll-behavior: smooth;
+	scrollbar-width: none;
+	-webkit-overflow-scrolling: touch;
+	cursor: grab;
+	padding: 8px;   /* белсенді жасыл жиек кесілмеуі үшін */
+}
+.hup_rct::-webkit-scrollbar{ display: none; }
+.hup_rct.hup_rct_drag{ cursor: grabbing; scroll-behavior: auto; }
+.hup_rct.hup_rct_drag .hup_rcti{ pointer-events: none; }
+.hup_rcti{ flex-shrink: 0; white-space: nowrap; }
+
+/* Басты фон */
+body{ background: #f6f6f6; }
+
+/* Басты батырма түсі */
+:root{ --bp-green: #0EA768; --bp-green-h: #0c8f59; }
+.btn:not([class*="btn_"]){ background: var(--bp-green); color: #fff; }
+.btn:not([class*="btn_"]):hover{ background: var(--bp-green-h); }
+
+/* Іздеу өрісі жоғарыда, мәзірмен бір қатарда (сол жақта). Стилі бұрынғыдай. */
+@media (min-width: 769px){
+	.hup_search{
+		position: relative;
+		z-index: 6920;
+		margin-top: -58px;
+		margin-bottom: 11px;
+	}
+}
+
+/* Себет бөлігі орнында қатып тұрады, тек іші айналады (компьютерде) */
+@media (min-width: 769px){
+	.hup_bl{ align-items: flex-start; }
+	.cash_bl1{
+		position: sticky;
+		top: 64px;
+		align-self: flex-start;
+		height: calc(100vh - 64px - 6px);
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+	}
+	.cash_bl1_l{ flex-shrink: 0; }
+	.cash_bl1_r{
+		flex: 1 1 auto;
+		min-height: 0;
+		overflow-y: auto;
+		overscroll-behavior: contain;
+		scrollbar-width: thin;
+	}
+	.cash_bl1_rc{ height: auto; }
+	.cash_bl1 .uc_u{ padding-bottom: 84px; }   /* төменгі «Қорытынды» жолағы жабып қалмасын */
+}
+
+/* Іздеу, санаттар және мәзір арасында көбірек бос орын */
+@media (min-width: 769px){
+	.hup_search{ margin-bottom: 16px; width: 100%; }
+	.hup_bl{ padding-top: 74px; }
+	.hup_search{ margin-top: -68px; }
+	.cash_bl1{ top: 74px; height: calc(100vh - 74px - 8px); }
+}
+.hup_rcb{ margin-top: 12px; }
+
+/* Санаттар: дөңгелек емес, бұрынғы өз стилі (бұрышы 8px) */
+.hup_rcti{ border-radius: 8px; padding: 0 18px; font-weight: 600; }
+.hup_rcti_act{ box-shadow: 0 0 0 2px var(--gr); }
+
+/* Тауарлар 4 бағанмен, әрпі үлкенірек */
+@media (min-width: 769px){
+	.hup_rcb{ grid-template-columns: repeat(4, minmax(0, 1fr)); grid-gap: 8px; }
+	.hup_rcbi{ min-height: 84px; padding: 12px 14px; }
+	.hup_rcbi > div:first-child{ font-size: 16px; }
+	.hup_rcbi > div:last-child{ font-size: 15px; }
+}
+
+/* Бұрынғы hover мен active эффектілері қайтарылды */
+.hup_rcti, .hup_rcbi{ transition: .3s; }
+.hup_rcti:hover{ transform: scale(1.05); filter: none; }
+.hup_rcbi:hover{ transform: scale(1.05); }
+.hup_rcti:active, .hup_rcbi:active{ transform: scale(.97); }
+.hup_rcti_act{ box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--bp-green); }
+
+/* «Қорытынды» жолағы оң блоктың ішінде, төменде қатып тұрады және әрқашан көрінеді */
+@media (min-width: 769px){
+	.cash_bl1 .cash_bl1_rb{
+		position: relative;
+		z-index: 2;
+		flex-shrink: 0;
+		width: 100%;
+		right: auto;
+		bottom: auto;
+		border: 0;
+		border-top: 1px solid var(--bp-line);
+		border-radius: 0 0 12px 12px;
+		padding: 0 20px;
+	}
+	.cash_bl1 .uc_u{ padding-bottom: 0; }
+}
+.cash_bl1 .cash_bl1_rb.dsp_n{ display: flex !important; }
+/* Себет бос болса «Сақтау» белсенді емес */
+.cash_bl1 .cash_bl1_rb.dsp_n .btn{ opacity: .45; pointer-events: none; }
+
+/* Сенсорлы экранға ыңғайлы: себеттегі батырмалар үлкен */
+.cash_bl1 .uc_uilf2{ width: calc(52px * 2 + 10px); }
+.cash_bl1 .uc_uilf1{ width: calc(100% - (52px * 2) - 40px); }
+.cash_bl1 .uc_uin_cn{
+	width: 52px; height: 52px;
+	border-radius: 12px;
+	font-size: 18px;
+	touch-action: manipulation;
+	-webkit-tap-highlight-color: transparent;
+	user-select: none;
+}
+.cash_bl1 .uc_uin_cn:active{ transform: scale(.92); }
+.cash_bl1 .uc_ui{ padding-top: 10px; padding-bottom: 10px; }
+/* Басқа басылатын элементтер де саусаққа ыңғайлы */
+.hup_rcti, .hup_rcbi, .mp_topi, .cash_bl1_rbr .btn{ touch-action: manipulation; -webkit-tap-highlight-color: transparent; user-select: none; }
+.cash_bl1_rbr .btn{ height: 56px; min-height: 56px; }
+
+/* Тауар плиткасы: атауы 16px, бағасы 15px */
+.hup_rcbi > div:first-child{ font-size: 16px; }
+.hup_rcbi > div:last-child{ font-size: 15px; }
+
+
+/* ================= Тапсырыстар беті (orders) ================= */
+
+/* Сүзгі жолағы: күн, точка, тип, статус, курьер, іздеу */
+.uc_ui69{ flex-wrap: wrap; gap: 10px; padding-top: 8px; }
+.uc_ui69 .uc_uin_other{ margin-right: 0; }
+.uc_ui69 select, .uc_ui69 input.form_dt, .uc_ui69 .uc_usn input{
+	min-height: 56px;
+	max-height: 56px;
+	height: 56px;
+	padding: 0 16px;
+	background: #fff;
+	border: 1px solid var(--bp-line);
+	border-radius: 10px;
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--bp-text);
+	box-shadow: var(--bp-shadow);
+	cursor: pointer;
+}
+.uc_ui69 .uc_usn input{ padding-left: 44px; cursor: text; }
+.uc_ui69 select:hover, .uc_ui69 input:hover{ border-color: #d6d6d6; }
+.uc_ui69 select:focus, .uc_ui69 input:focus{ border-color: var(--bp-green); }
+.uc_ui69 .uc_us{ height: 56px; }
+.uc_ui69 .uc_usn .form_icon{ color: var(--cl); opacity: .7; }
+
+/* Тапсырыс карточкалары */
+.bl_orm .uc_ui, .bl_ors .uc_ui{
+	background: #fff;
+	border: 1px solid var(--bp-line);
+	border-radius: 14px;
+	padding: 18px 16px;
+	box-shadow: var(--bp-shadow);
+	transition: .3s;
+}
+.bl_orm .uc_ui:hover, .bl_ors .uc_ui:hover{ box-shadow: 0 6px 20px rgba(0,0,0,.07); }
+
+.uc_uil2_nmb{
+	background: var(--bp-green);
+	border-radius: 12px;
+	font-size: 18px;
+	font-weight: 800;
+}
+.uc_uil2_raz{ border-top-color: var(--bp-line); }
+
+/* Тип, статус, курьер таңдаулары */
+.or_status, .or_type{ border-radius: 10px; }
+.or_type{ background: var(--bp-pill); }
+.or_status select, .or_type select, .uc_uil2_date1 select{
+	min-height: 40px;
+	max-height: 40px;
+	height: 40px;
+	padding: 0 12px;
+	border: 1px solid var(--bp-line);
+	border-radius: 10px;
+	font-size: 14px;
+	cursor: pointer;
+}
+.or_status select{ border-color: transparent; }
+.uc_uil2_date1 select{ background: #fff; margin-top: 8px; }
+
+/* Мәтін */
+.uc_uil2_date{ font-size: 14px; color: var(--bp-muted); }
+.uc_uil2_mi1{ font-size: 14px; color: var(--bp-muted); }
+.uc_uil2_mi2{ font-size: 15px; color: var(--bp-text); }
+.uc_uil2_raz > .uc_uil2_trt .uc_uil2_trt1,
+.uc_uil2_raz > .uc_uil2_trt .uc_uil2_trt2,
+.uc_uil2_raz > .uc_uil2_trt .uc_uil2_trt3{
+	font-size: 12px; text-transform: uppercase; color: var(--cl); opacity: .75; font-weight: 600; letter-spacing: .3px;
+}
+.uc_uil2_trb .uc_uil2_trt2, .uc_uil2_trb .uc_uil2_trt3{ border-top-color: var(--bp-line); }
+.uc_uil2_trb .uc_uil2_trt3{ color: var(--red); }
+
+/* Батырмалар: Изменить / Печать */
+.uc_uil2_mib{ gap: 10px; }
+.uc_uil2_mib .btn{
+	min-height: 48px;
+	height: 48px;
+	padding: 0 16px;
+	border-radius: 10px;
+	font-size: 15px;
+	touch-action: manipulation;
+}
+.uc_uil2_mib .btn_cl{
+	background: #fff;
+	color: var(--bp-text);
+	border: 1px solid var(--bp-line);
+}
+.uc_uil2_mib .btn_cl:hover{ border-color: var(--bp-green); color: var(--bp-green); }
+
+/* Тапсырыс карточкасы: көлеңкесі статус түсімен (жасыл, қызыл, т.б.) */
+.uc_ui.or_card{
+	border-color: color-mix(in srgb, var(--st, #e7e7e7) 40%, transparent);
+	box-shadow: 0 6px 22px -6px color-mix(in srgb, var(--st, #000) 55%, transparent);
+}
+.uc_ui.or_card:hover{
+	box-shadow: 0 10px 28px -6px color-mix(in srgb, var(--st, #000) 75%, transparent);
+}
+
+/* Мәзір мен профиль іздеу блогымен бірдей биіктікте (66px) */
+@media (min-width: 769px){
+	.aheader{ height: 66px; }
+	.mp_topc{ height: 66px; padding: 5px; }
+	.mp_topi{ height: 56px; padding: 0 24px; font-size: 16px; gap: 10px; }
+	.mp_topi i{ font-size: 18px; }
+	.ub1_lt{ height: 66px; padding: 0 5px 0 22px; }
+	.ub1_ltf div{ font-size: 15px; }
+	.ub1_lti{ width: 56px; height: 56px; min-height: 56px; }
+	.hup_search .hup_search_inp{ min-height: 56px; max-height: 56px; height: 56px; }
+	.hup_bl{ padding-top: 88px; }
+	.hup_search{ margin-top: -82px; }
+	.cash_bl1{ top: 88px; height: calc(100vh - 88px - 8px); }
+}
+
+/* Тапсырыстар беті: биік мәзірдің астында қалмауы үшін */
+@media (min-width: 769px){ .uc_ui69{ margin-top: 24px; } }
+
+/* Тапсырыс нөмірінің түсі статусқа қарай */
+.or_card .uc_uil2_nmb{ background: var(--st, var(--bp-green)); text-shadow: 0 1px 2px rgba(0,0,0,.25); }
+
+
+/* Жеткізу батырмалары (sel_dlv): менің стилім, код сіздің form_im_slo */
+.sel_dlv, .sel_type, .sel_branch{ display: flex; flex-wrap: wrap; gap: 8px; }
+.sel_dlv .form_span, .sel_type .form_span, .sel_branch .form_span{ width: 100%; }
+.sel_dlv .form_im_slo, .sel_type .form_im_slo, .sel_branch .form_im_slo{ margin: 0; width: auto; }
+.sel_dlv .form_im_slo_i, .sel_type .form_im_slo_i, .sel_branch .form_im_slo_i, .form_im_slo_i.form_im_slo_red{
+	min-width: 64px;
+	height: 54px;
+	padding: 0 14px;
+	display: flex; align-items: center; justify-content: center;
+	background: var(--bp-pill);
+	border: 1px solid var(--bp-line);
+	border-radius: 10px;
+	font-size: 15px;
+	font-weight: 700;
+	color: var(--bp-text);
+	cursor: pointer;
+	user-select: none;
+	touch-action: manipulation;
+	transition: .2s;
+}
+.sel_dlv .form_im_slo_i:hover, .sel_type .form_im_slo_i:hover, .sel_branch .form_im_slo_i:hover, .form_im_slo_i.form_im_slo_red:hover{ border-color: var(--bp-green); }
+.sel_dlv .form_im_slo_i:active, .sel_type .form_im_slo_i:active, .sel_branch .form_im_slo_i:active, .form_im_slo_i.form_im_slo_red:active{ transform: scale(.95); }
+.sel_dlv .form_im_slo_act, .sel_dlv .form_im_slo_act:hover, .sel_type .form_im_slo_act, .sel_type .form_im_slo_act:hover, .sel_branch .form_im_slo_act, .sel_branch .form_im_slo_act:hover, .form_im_slo_i.form_im_slo_red.form_im_slo_act, .form_im_slo_i.form_im_slo_red.form_im_slo_act:hover{ background: var(--bp-green); border-color: var(--bp-green); color: #fff; }
+.sel_dlv .sel_dlv_add{ min-width: 52px; font-size: 18px; color: var(--bp-green); }
+.sel_dlv .sel_dlv_add.form_im_slo_act{ color: #fff; }
+.dlv_inp{ margin-top: 10px; }
+
+/* Касса: поиск пен каталог қатып тұрады, тек тауарлар скролл болады */
+@media (min-width: 769px){
+	.hup_r{ display: flex; flex-direction: column; height: calc(100vh - 88px - 8px); min-height: 0; }
+	.hup_r > div{ flex-shrink: 0; }
+	.hup_r > div:last-child{ flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 6px 12px; margin: 0 -6px; }
+	.hup_r > div:last-child::-webkit-scrollbar{ width: 6px; }
+	.hup_r > div:last-child::-webkit-scrollbar-thumb{ background: #d5d8dc; border-radius: 6px; }
+}
+
+/* Түстер: барлық батырма көк, тек Сақтау батырмалары жасыл */
+:root{ --bp-blue: #1f75a8; --bp-blue-h: #18618b; }
+.btn:not([class*="btn_"]){ background: var(--bp-blue); }
+.btn:not([class*="btn_"]):hover{ background: var(--bp-blue-h); }
+.hup_rcti_act{ box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--bp-blue); }
+.hup_search .hup_search_inp:focus, .uc_ui69 select:focus, .uc_ui69 input:focus{ border-color: var(--bp-blue); }
+.uc_uil2_mib .btn_cl:hover{ border-color: var(--bp-blue); color: var(--bp-blue); }
+.sel_dlv .form_im_slo_i:hover, .sel_type .form_im_slo_i:hover, .sel_branch .form_im_slo_i:hover, .form_im_slo_i.form_im_slo_red:hover{ border-color: var(--bp-blue); }
+.sel_dlv .form_im_slo_act, .sel_dlv .form_im_slo_act:hover, .sel_type .form_im_slo_act, .sel_type .form_im_slo_act:hover, .sel_branch .form_im_slo_act, .sel_branch .form_im_slo_act:hover, .form_im_slo_i.form_im_slo_red.form_im_slo_act, .form_im_slo_i.form_im_slo_red.form_im_slo_act:hover{ background: var(--bp-blue); border-color: var(--bp-blue); color: #fff; }
+.sel_dlv .sel_dlv_add{ color: var(--bp-blue); }
+.sel_dlv .sel_dlv_add.form_im_slo_act{ color: #fff; }
+/* Сақтау батырмалары жасыл */
+.btn.cashbox_pay, .btn.cashbox_pay2:not(.btn_cl), .cash_bl1_rbr .btn{ background: var(--bp-green); color: #fff; }
+.btn.cashbox_pay:hover, .btn.cashbox_pay2:not(.btn_cl):hover, .cash_bl1_rbr .btn:hover{ background: var(--bp-green-h); }
+.btn.btn_cl.cashbox_pay2{ border-color: var(--bp-green); color: var(--bp-green); }
+
+/* Тауарлар: бір ақ блок, көлеңкемен, скролл ішінде */
+@media (min-width: 769px){
+	.hup_r > div:last-child{
+		margin: 12px 0 0; padding: 10px;
+		background: #fff; border-radius: 12px;
+		box-shadow: 0 4px 18px rgba(0,0,0,.08);
+	}
+	.hup_r > div:last-child .hup_rcb{ margin-top: 0; padding: 4px; background: transparent; box-shadow: none; }
+	.hup_rct{ box-shadow: 0 4px 18px rgba(0,0,0,.06); }
+}
+
+/* Каталог + тауарлар: бір ортақ ақ блок */
+@media (min-width: 769px){
+	.hup_r > div:nth-child(2){
+		position: relative; z-index: 2;
+		background: #fff; border-radius: 12px 12px 0 0;
+		padding: 10px 10px 8px;
+		border-bottom: 1px solid var(--bp-line);
+		box-shadow: 0 4px 18px rgba(0,0,0,.08);
+		clip-path: inset(-30px -30px 0 -30px);
+	}
+	.hup_r > div:nth-child(2) .hup_rct{ background: transparent; box-shadow: none; padding: 4px; margin: 0; border-radius: 0; }
+	.hup_r > div:last-child{ margin-top: 0; border-radius: 0 0 12px 12px; }
+}
+
+/* Батырмалар арасы жақынырақ */
+.sel_dlv, .sel_type, .sel_branch{ gap: 6px; }
+.sel_dlv .form_im_slo_i, .sel_type .form_im_slo_i, .sel_branch .form_im_slo_i, .form_im_slo_i.form_im_slo_red{ margin: 0; }
+.sel_dlv .form_span, .sel_type .form_span, .sel_branch .form_span{ margin-bottom: 2px; }
+
+/* Скролл бүкіл бетте: поиск, каталог, себет қатып тұрады */
+@media (min-width: 769px){
+	.hup_r{ height: auto; display: block; }
+	.hup_r > div:last-child{ overflow: visible; min-height: calc(100vh - 98px - 16px - 72px); }
+	.hup_search{ position: sticky; top: 16px; z-index: 6; box-shadow: 0 -10px 0 10px #f6f6f6; }
+	.hup_r > div:nth-child(2){
+		position: sticky; top: 98px; z-index: 5;
+		box-shadow: 0 -20px 0 6px #f6f6f6, 0 4px 18px rgba(0,0,0,.08);
+		clip-path: inset(-30px -30px 0 -30px);
+	}
+}
+.sel_dlv, .sel_type, .sel_branch, .sel_srv{ margin-bottom: 16px; }
+.form_im.sel_dlv, .form_im.sel_type, .form_im.sel_branch{ padding-bottom: 14px !important; }
+
+/* Сервис түрі батырмалары: Жеткізу батырмаларымен бірдей */
+.sel_srv{ display: flex; flex-wrap: wrap; gap: 6px; padding-bottom: 14px !important; }
+.sel_srv.dsp_n{ display: none; }
+.sel_srv .form_span{ width: 100%; margin-bottom: 2px; }
+.sel_srv .form_im_slo{ margin: 0; width: auto; }
+.sel_srv .form_im_slo_i{ min-width: 64px; height: 54px; margin: 0; padding: 0 14px; display: flex; align-items: center; justify-content: center; background: var(--bp-pill); border: 1px solid var(--bp-line); border-radius: 10px; font-size: 15px; font-weight: 700; color: var(--bp-text); cursor: pointer; user-select: none; touch-action: manipulation; transition: .2s; }
+.sel_srv .form_im_slo_i:hover{ border-color: var(--bp-blue); }
+.sel_srv .form_im_slo_i:active{ transform: scale(.95); }
+.sel_srv .form_im_slo_act, .sel_srv .form_im_slo_act:hover{ background: var(--bp-blue); border-color: var(--bp-blue); color: #fff; }
+.srv_inp{ margin-top: 0; margin-bottom: 16px; }
+
+/* Предоплата батырмалары: Жеткізумен бірдей */
+.sel_qr{ display: flex; flex-wrap: wrap; gap: 6px; padding-bottom: 14px !important; }
+.sel_qr .form_span{ width: 100%; margin-bottom: 2px; }
+.sel_qr .form_im_slo{ margin: 0; width: auto; }
+.sel_qr .form_im_slo_i{ min-width: 64px; height: 54px; margin: 0; padding: 0 14px; display: flex; align-items: center; justify-content: center; background: var(--bp-pill); border: 1px solid var(--bp-line); border-radius: 10px; font-size: 15px; font-weight: 700; color: var(--bp-text); cursor: pointer; user-select: none; touch-action: manipulation; transition: .2s; }
+.sel_qr .form_im_slo_i:hover{ border-color: var(--bp-blue); }
+.sel_qr .form_im_slo_i:active{ transform: scale(.95); }
+.sel_qr .form_im_slo_act, .sel_qr .form_im_slo_act:hover{ background: var(--bp-blue); border-color: var(--bp-blue); color: #fff; }
+.sel_qr .sel_qr_add{ min-width: 52px; font-size: 18px; color: var(--bp-blue); }
+.sel_qr .sel_qr_add.form_im_slo_act{ color: #fff; }
+.cashbox_pay_btype .qr_inp{ margin-top: 0; margin-bottom: 16px; }
+
+/* Төлем терезесі: Жалпы ақшасы → Сақтау бөлігі астында қатып тұрады */
+.cashbox_pay_block .pop_bl_cl{ padding-bottom: 0; }
+.pay_foot{
+	position: sticky; bottom: 0; z-index: 3;
+	margin: 0 -40px; padding: 14px 40px 20px;
+	background: #fff;
+	box-shadow: 0 -8px 16px -8px rgba(0,0,0,.12);
+}
+.pay_foot .cashbox_pay_btype .form_im{ margin-top: 12px; }
+.pay_foot .cashbox_pay_bsem{ margin-top: 8px; }
+@media (max-width: 500px){ .pay_foot{ margin: 0 -20px; padding: 12px 20px 16px; } }
+.cashbox_pay_block .cashbox_pay_btype{ margin-bottom: 8px; }
+.cashbox_pay_block .cashbox_pay_bsem{ margin: 0 0 12px; }
+.pay_foot .cashbox_pay_btotol + .form_im{ margin-top: 12px; }
+
+/* Заказ түрі: стандарт түр (company.type_def) бірінші тұрады */
+.sel_type .form_span{ order: -2; }
+.sel_type .sel_type_def{ order: -1; }
+
+/* Төлем терезесі: Жалпы ақшасы + Сақтау әрқашан ең астында */
+.cashbox_pay_block .pop_bl_c{ display: flex; flex-direction: column; }
+.cashbox_pay_block .pop_bl_c > .head_c{ flex-shrink: 0; }
+.cashbox_pay_block .pop_bl_cl{ flex: 1 1 auto; min-height: 0; max-height: none; display: flex; flex-direction: column; }
+.cashbox_pay_block .pop_bl_cl > .form_c{ flex: 1 0 auto; display: flex; flex-direction: column; }
+.cashbox_pay_block .pay_main{ flex: 1 0 auto; }
+.cashbox_pay_block .pay_foot{ margin-top: auto; }
+
+/* Кафе: төлем түрі батырмалары */
+.sel_given{ display: flex; flex-wrap: wrap; gap: 6px; margin-top: 0; padding-bottom: 8px !important; }
+.sel_pay{ display: flex; flex-wrap: wrap; gap: 6px; padding-bottom: 14px !important; }
+.sel_pay .form_span{ width: 100%; margin-bottom: 2px; }
+.sel_pay .form_im_slo, .sel_given .form_im_slo{ margin: 0; width: auto; }
+.sel_given .form_span{ width: 100%; margin-bottom: 2px; }
+.sel_pay .form_im_slo_i, .sel_given .form_im_slo_i{ min-width: 64px; height: 54px; margin: 0; padding: 0 14px; display: flex; align-items: center; justify-content: center; background: var(--bp-pill); border: 1px solid var(--bp-line); border-radius: 10px; font-size: 15px; font-weight: 700; color: var(--bp-text); cursor: pointer; user-select: none; touch-action: manipulation; transition: .2s; }
+.sel_pay .form_im_slo_i:hover, .sel_given .form_im_slo_i:hover{ border-color: var(--bp-blue); }
+.sel_pay .form_im_slo_i:active, .sel_given .form_im_slo_i:active{ transform: scale(.95); }
+.sel_pay .form_im_slo_act, .sel_pay .form_im_slo_act:hover, .sel_given .form_im_slo_act, .sel_given .form_im_slo_act:hover{ background: var(--bp-blue); border-color: var(--bp-blue); color: #fff; }
+.sel_pay .sel_pay_mix{ color: var(--bp-blue); }
+.sel_pay .sel_pay_mix.form_im_slo_act{ color: #fff; }
+.pay_mix .pay_mix_i{ margin-top: 10px; }
+.pay_mix_rest{ margin-top: 10px; font-size: 15px; font-weight: 700; color: var(--bp-blue); }
+.pay_mix_rest.pay_mix_over{ color: var(--bp-red, #e5484d); }
+
+/* Қолма-қол: сдача */
+.pay_cash .form_im{ margin-top: 6px; }
+.pay_change{ margin-top: 12px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; background: #eef6fb; border-radius: 10px; font-size: 16px; }
+.pay_change b{ font-size: 20px; font-weight: 800; color: var(--bp-blue); }
+.pay_change.pay_change_bad{ background: #fdecec; }
+.pay_change.pay_change_bad b{ color: var(--bp-red, #e5484d); }
+.cashbox_pay_block .pay_main{ padding-bottom: 24px; }
+.tf_paytype{ margin-bottom: 8px; }
+
+/* Предоплата немен төленді */
+.sel_qrm{ display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; padding-bottom: 8px !important; }
+.sel_qrm.dsp_n{ display: none; }
+.sel_qrm .form_span{ width: 100%; margin-bottom: 2px; }
+.sel_qrm .form_im_slo{ margin: 0; width: auto; }
+.sel_qrm .form_im_slo_i{ min-width: 64px; height: 54px; margin: 0; padding: 0 14px; display: flex; align-items: center; justify-content: center; background: var(--bp-pill); border: 1px solid var(--bp-line); border-radius: 10px; font-size: 15px; font-weight: 700; color: var(--bp-text); cursor: pointer; user-select: none; touch-action: manipulation; transition: .2s; }
+.sel_qrm .form_im_slo_i:hover{ border-color: var(--bp-blue); }
+.sel_qrm .form_im_slo_i:active{ transform: scale(.95); }
+.sel_qrm .form_im_slo_act, .sel_qrm .form_im_slo_act:hover{ background: var(--bp-blue); border-color: var(--bp-blue); color: #fff; }
+
+/* Төлем терезесі: <br> орнына бірдей аралық (16px) */
+.cashbox_pay_block .pay_main > br{ display: none; }
+.cashbox_pay_block .pay_main > *{ margin-top: 0 !important; margin-bottom: 16px !important; }
+.cashbox_pay_block .pay_main > .form_im.form_imss,
+.cashbox_pay_block .pay_main .sel_qr, .cashbox_pay_block .pay_main .sel_pay{ padding-bottom: 0 !important; }
+.cashbox_pay_block .pay_main > div > .form_im:first-child{ margin-top: 0; }
+.cashbox_pay_block .pay_main .tf_dlv .sel_dlv{ margin-bottom: 0; padding-bottom: 0 !important; }
+.cashbox_pay_block .pay_main .tf_dlv .dlv_inp,
+.cashbox_pay_block .pay_main .cashbox_pay_btype .qr_inp,
+.cashbox_pay_block .pay_main .sel_qrm{ margin-top: 10px; margin-bottom: 0; }
+.cashbox_pay_block .pay_main .cashbox_pay_btype .form_im.sel_qr{ margin-top: 0; }
+.cashbox_pay_block .pay_main .pay_cash, .cashbox_pay_block .pay_main .pay_mix{ margin-top: 12px; }
+
+/* Төлем: предоплата + қалған сома + төлем түрі бір блокта */
+.pay_box{ padding: 16px; background: #f8fafc; border: 1px solid var(--bp-line); border-radius: 14px; }
+.pay_box_h{ margin-bottom: 12px; font-size: 17px; font-weight: 800; color: var(--bp-text); }
+.pay_box > div{ margin: 0 !important; }
+.pay_box > div:not(.dsp_n) + div:not(.dsp_n){ margin-top: 14px !important; padding-top: 14px; border-top: 1px dashed var(--bp-line); }
+.pay_box .cashbox_pay_btype .form_im{ margin-top: 0; }
+.pay_box .cashbox_pay_btype .qr_inp, .pay_box .sel_qrm{ margin-top: 10px !important; }
+.pay_box .cashbox_pay_bsem .form_im{ margin: 0; }
+.pay_box .cashbox_pay_bsem .form_span, .pay_box .cashbox_pay_bsemc{ font-size: 16px; font-weight: 700; }
+.pay_box .sel_qr, .pay_box .sel_qrm, .pay_box .sel_pay{ padding-bottom: 0 !important; margin-bottom: 0; }
+.pay_box .form_im_slo_i{ background: #fff; }
+.pay_box .form_im_slo_act, .pay_box .form_im_slo_act:hover{ background: var(--bp-blue); }
+.pay_box > .pay_box_h + div{ margin-top: 0 !important; padding-top: 0; border-top: 0; }
+.pay_box > .pay_box_h{ margin-bottom: 12px !important; }
+
+.sel_qrm .sel_pay_mix2{ color: var(--bp-blue); }
+.sel_qrm .sel_pay_mix2.form_im_slo_act{ color: #fff; }
+.pay_box .qrm_mix{ margin-top: 4px; }
+
+/* Жеткізу (курьер): «Төлем» блогы сияқты бөлек блок */
+.cashbox_pay_block .tf_dlv:not(.dsp_n){ padding: 16px; background: #f8fafc; border: 1px solid var(--bp-line); border-radius: 14px; }
+.tf_dlv .sel_dlv .form_span{ margin-bottom: 6px; padding-bottom: 12px; border-bottom: 1px dashed var(--bp-line); font-size: 17px; font-weight: 800; color: var(--bp-text); }
+.tf_dlv .form_im_slo_i{ background: #fff; }
+.tf_dlv .form_im_slo_act, .tf_dlv .form_im_slo_act:hover{ background: var(--bp-blue); }
+.pay_box .cashbox_pay_btype > .form_im:first-child .form_span{ font-size: 14px; }
+
+/* Попап ені */
+.pop_bl_c{ max-width: 580px; }
+
+/* Попап: екі жанындағы шегініс 32px */
+.pop_bl2 .pop_bl_cl{ padding-left: 32px; padding-right: 32px; }
+.pop_bl2 .pop_bl_c .head_c{ padding-left: 32px; padding-right: 22px; }
+.pay_foot{ margin: 0 -32px; padding: 14px 32px 20px; }
+
+/* Қосымша өрістерді ашатын батырмалар */
+.opt_off{ display: none !important; }
+.opt_btns{ display: flex; flex-wrap: wrap; gap: 8px; }
+.opt_btn{ height: 40px; padding: 0 14px; display: inline-flex; align-items: center; gap: 8px; border: 1px dashed var(--bp-line); border-radius: 10px; background: #fff; color: var(--bp-blue); font-size: 14px; font-weight: 700; cursor: pointer; user-select: none; touch-action: manipulation; transition: .2s; }
+.opt_btn:hover{ border-color: var(--bp-blue); }
+.opt_btn_act{ background: #eef6fb; border-style: solid; border-color: var(--bp-blue); }
+.opt_btn_act i:before{ content: "\f068"; }
+
+/* Предзаказ: күн + уақыт */
+.sel_pre_day{ display: flex; flex-wrap: wrap; gap: 6px; }
+.sel_pre_day .form_span{ width: 100%; margin-bottom: 2px; }
+.sel_pre_day .form_im_slo{ margin: 0; width: auto; }
+.sel_pre_day .form_im_slo_i{ min-width: 64px; height: 54px; margin: 0; padding: 0 14px; display: flex; align-items: center; justify-content: center; background: var(--bp-pill); border: 1px solid var(--bp-line); border-radius: 10px; font-size: 15px; font-weight: 700; color: var(--bp-text); cursor: pointer; user-select: none; touch-action: manipulation; transition: .2s; }
+.sel_pre_day .form_im_slo_i:hover{ border-color: var(--bp-blue); }
+.sel_pre_day .form_im_slo_act, .sel_pre_day .form_im_slo_act:hover{ background: var(--bp-blue); border-color: var(--bp-blue); color: #fff; }
+.pre_dt_row{ display: flex; gap: 8px; margin-top: 10px; }
+.pre_dt_row .form_im{ margin: 0; flex: 1; }
+.pre_dt_row .form_txt{ height: 48px; font-size: 16px; font-weight: 700; }
+.pre_note{ margin-top: 10px; padding: 10px 12px; border-radius: 10px; background: #fff7e6; color: #8a5a00; font-size: 13px; line-height: 1.4; }
+/* Тапсырыстар: Предзаказдар батырмасы */
+.pre_tab{ height: 54px; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--bp-line); border-radius: 10px; background: #fff; color: var(--bp-text); font-weight: 700; white-space: nowrap; }
+.pre_tab b{ min-width: 22px; height: 22px; padding: 0 6px; display: inline-flex; align-items: center; justify-content: center; border-radius: 11px; background: #e9b949; color: #fff; font-size: 12px; }
+.pre_tab_act{ background: var(--bp-blue); border-color: var(--bp-blue); color: #fff; }
+.opt_btn{ height: 54px; flex: 1 1 0; justify-content: center; font-size: 15px; }
+
+/* ---------- Аккаунт мәзірі (жаңа дизайн + тіл ауыстыру) ---------- */
+.ub1_lx .menu_c.acc_menu{ top: calc(50% + 42px); }
+.menu_c.acc_menu{
+	width: 320px;
+	padding: 8px;
+	border-radius: 16px;
+	background: #fff;
+	border: 1px solid var(--bp-line);
+	box-shadow: 0 12px 40px rgba(0,0,0,.12);
+	cursor: default;
+	z-index: 50;
+}
+.menu_c.acc_menu::before{ right: 26px; top: -7px; width: 14px; height: 14px; border-radius: 3px; border-left: 1px solid var(--bp-line); border-top: 1px solid var(--bp-line); box-shadow: none; }
+.acc_hd{ display: flex; align-items: center; gap: 12px; padding: 10px 10px 14px; border-bottom: 1px solid var(--bp-line); }
+.acc_hd_av{
+	width: 44px; height: 44px; min-width: 44px; border-radius: 50%;
+	background-color: var(--bp-pill); background-size: cover; background-position: center;
+	display: flex; justify-content: center; align-items: center; color: var(--bp-muted); font-size: 18px;
+}
+.acc_hd_t{ min-width: 0; }
+.acc_hd_t div{ font-size: 16px; font-weight: 700; color: var(--bp-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.acc_hd_t span{ display: block; margin-top: 2px; font-size: 13px; color: var(--bp-muted); }
+
+.acc_lang{ padding: 12px 10px 14px; border-bottom: 1px solid var(--bp-line); }
+.acc_lang_h{ margin-bottom: 10px; font-size: 13px; font-weight: 600; color: var(--bp-muted); }
+.acc_lang_h i{ margin-right: 4px; }
+.acc_lang_c{ display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.acc_lang_i{
+	height: 54px; display: flex; justify-content: center; align-items: center;
+	border-radius: 10px; background: var(--bp-pill); color: var(--bp-text);
+	font-size: 13px; font-weight: 700; transition: .2s;
+}
+.acc_lang_i:hover{ background: var(--bp-pill-h); }
+.acc_lang_i.acc_lang_act{ background: #1f75a8; color: #fff; }
+
+.acc_list{ padding-top: 6px; }
+.acc_menu .menu_ci, .acc_menu .menu_ci:first-child, .acc_menu .menu_ci:last-child{
+	height: 54px; min-height: 54px; padding: 0 10px; border: 0; border-radius: 10px;
+}
+.acc_menu .menu_ci:hover{ background: var(--bp-pill); }
+.acc_menu .menu_cin{ width: 32px; height: 32px; font-size: 17px; color: var(--bp-muted); }
+.acc_menu .menu_cih{ width: calc(100% - 32px - 12px); margin-left: 12px; font-size: 15px; font-weight: 600; color: var(--bp-text); }
+.acc_menu .acc_exit .menu_cin, .acc_menu .acc_exit .menu_cih{ color: var(--bp-red); }
+.acc_menu .acc_exit:hover{ background: var(--bp-red-bg); }
+@media(max-width:400px){ .menu_c.acc_menu{ width: calc(100vw - 24px); } }
+
+/* ---------- Формалар батырмалармен бірдей: батырма 54, форма 56 ---------- */
+input.form_txt, select.form_txt, .pre_dt_row .form_txt{ height: 56px; min-height: 56px; max-height: 56px; border-radius: 10px; }
+.form_im .form_icon, .form_im .form_icon_pass, .form_im .form_icon_sel, .form_im .form_icon_camera{ bottom: 0; left: 4px; width: 50px; height: 56px; }
+input.form_txt{ padding-left: 54px; }
+/* Көк/жасыл батырмалар: 54px */
+.btn{ height: 54px; min-height: 54px; }
+.uc_uil2_mib .btn{ height: 54px; min-height: 54px; }
+/* Жоғарғы мәзір: дөңгелек емес, басқа батырмалармен бірдей бұрыш */
+.mp_topc, .ub1_lt{ border-radius: 14px; }
+.mp_topi, .ub1_lti{ border-radius: 10px; }
+/* Сақтау батырмалары: жирный + галочка */
+.btn.cashbox_pay, .btn.cashbox_pay2{ font-weight: 800; }
+/* Себеттегі + / − / жою батырмалары: 54px */
+.cash_bl1 .uc_uin_cn{ width: 54px; min-width: 54px; height: 54px; min-height: 54px; border-radius: 10px; font-size: 18px; }
+/* Төбе мен іздеу/мәзір арасы — іздеу мен каталог арасындай (16px) */
+@media (min-width: 769px){
+	.aheader{ top: 16px; }
+	.hup_bl{ padding-top: 98px; }
+	.hup_search{ margin-top: -82px; }
+	.cash_bl1{ top: 98px; height: calc(100vh - 98px - 16px); }
+	.flex_clm_rev{ padding-top: 100px; }
+}
+@media (max-width: 768px){
+	.aheader{ top: 12px; }
+	.hup_bl{ padding-top: 70px; }
+	.flex_clm_rev{ padding-top: 76px; }
+}
+
+/* ---------- Аккаунт панелі (оң жақтан) ---------- */
+.acc_drw{ position: fixed; inset: 0; z-index: 9990; visibility: hidden; pointer-events: none; }
+.acc_drw_act{ visibility: visible; pointer-events: auto; }
+.acc_drw_a{ position: absolute; inset: 0; background: rgba(0,0,0,.35); opacity: 0; transition: .25s; }
+.acc_drw_act .acc_drw_a{ opacity: 1; }
+.acc_drw_c{
+	position: absolute; top: 0; right: 0; bottom: 0; width: 420px; max-width: 100%;
+	padding: 24px 32px; background: #fff; overflow-y: auto;
+	box-shadow: -12px 0 40px rgba(0,0,0,.12);
+	transform: translateX(100%); transition: transform .25s;
+}
+.acc_drw_act .acc_drw_c{ transform: translateX(0); }
+.acc_drw_hd{ display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.acc_drw_hd h4{ margin: 0; font-size: 22px; font-weight: 800; }
+.acc_drw_hd .btn{ width: 54px; padding: 0; }
+.acc_drw_hd .btn i{ margin: 0; }
+.acc_drw .acc_hd{ padding: 12px 0 16px; margin-bottom: 4px; }
+.acc_drw .form_im{ margin-top: 16px; }
+.acc_drw .acc_f_save{ width: 100%; background: var(--bp-green); color: #fff; font-weight: 800; }
+@media (max-width: 480px){ .acc_drw_c{ padding: 20px 16px; } }
+
+/* ---------- Смена беті ---------- */
+.sh_c{ max-width: 860px; margin: 0 auto; padding-bottom: 32px; }
+.sh_card{ margin-top: 16px; padding: 24px; background: #fff; border-radius: 16px; box-shadow: var(--bp-shadow); }
+.sh_hd{ display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.sh_hd h4{ margin: 0; font-size: 22px; font-weight: 800; }
+.sh_hd h4 i{ margin-right: 6px; color: var(--bp-muted); }
+.sh_hd p{ margin-top: 6px; color: var(--bp-muted); font-size: 14px; }
+.sh_user{ height: 40px; padding: 0 14px; display: flex; align-items: center; gap: 8px; border-radius: 10px; background: var(--bp-pill); font-weight: 600; font-size: 14px; }
+.sh_grid{ margin-top: 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.sh_i{ padding: 14px 16px; border: 1px solid var(--bp-line); border-radius: 12px; background: #fafafa; }
+.sh_i span{ display: block; font-size: 13px; color: var(--bp-muted); }
+.sh_i b{ display: block; margin-top: 6px; font-size: 18px; font-weight: 800; color: var(--bp-text); white-space: nowrap; }
+.sh_i_main{ grid-column: 1 / -1; background: #e3f5ec; border-color: #c9ecd9; }
+.sh_i_main b{ font-size: 26px; color: var(--bp-green); }
+@media (max-width: 768px){ .sh_grid{ grid-template-columns: repeat(2, 1fr); } }
+.sh_sub{ margin-top: 22px; margin-bottom: 8px; font-size: 13px; font-weight: 700; color: var(--bp-muted); text-transform: uppercase; letter-spacing: .3px; }
+.sh_row{ min-height: 54px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--bp-line); font-size: 15px; }
+.sh_row span:first-child{ flex: 1; font-weight: 600; }
+.sh_row span:nth-child(2){ color: var(--bp-muted); }
+.sh_row b{ min-width: 110px; text-align: right; }
+.sh_row_c{ padding: 6px 0 10px; color: var(--bp-muted); font-size: 13px; border-bottom: 1px solid var(--bp-line); margin-top: -1px; }
+.sh_close{ margin-top: 22px; padding-top: 20px; border-top: 1px dashed var(--bp-line); }
+.sh_close .btn{ width: 100%; margin-top: 16px; background: var(--bp-green); color: #fff; font-weight: 800; }
+.sh_close_btn.sh_busy, .acc_f_save.acc_busy{ opacity: .6; pointer-events: none; }
+.sh_row_m{ color: var(--bp-muted); }
+/* Іздеу: мәзір сияқты көрінетін — көлеңке және боялған өріс */
+.hup_search{ box-shadow: 0 6px 20px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.04); }
+@media (min-width: 769px){
+	.hup_search{ box-shadow: 0 -10px 0 10px #f6f6f6, 0 6px 20px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.04); }
+}
+.hup_search .hup_search_inp{ background: #eef4f8; border-color: #dbe6ee; color: var(--bp-text); font-weight: 600; }
+.hup_search .hup_search_inp::placeholder{ color: #6b7a88; font-weight: 500; }
+.hup_search .hup_search_inp:focus{ background: #fff; border-color: var(--bp-blue); }
+.hup_search_icon{ color: #1f75a8; opacity: 1; }

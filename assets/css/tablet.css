@@ -1,0 +1,80 @@
+/* Berik POS: планшет және сенсорлы моноблок (769–1366px).
+   Компьютер дизайны (1367px+) өзгермейді. Телефон (<700px) /mobile/ бетіне жіберіледі. */
+
+/* ---------- 1366px-ке дейін: панельдер сәл ықшам ---------- */
+@media (min-width: 769px) and (max-width: 1366px){
+	.bl_c{ padding-left: 12px; padding-right: 12px; }
+
+	/* Жоғарғы мәзір ықшамдау */
+	.mp_topi{ padding: 0 16px; font-size: 15px; gap: 8px; }
+	.ub1_lt{ padding: 0 5px 0 16px; }
+	.ub1_lx{ margin-left: 8px; }
+
+	/* Касса: себет ені тұрақты, тауарлар қалған орынды алады */
+	.cash_bl1{ width: clamp(340px, 40%, 520px); }
+	.hup_r{ width: calc(100% - clamp(340px, 40%, 520px) - 10px); }
+
+	/* Тауарлар: 4 емес, 3 баған */
+	.hup_rcb{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+	.hup_rcbi{ min-height: 78px; padding: 10px 12px; }
+	.hup_rcbi > div:first-child{ font-size: 15px; }
+	.hup_rcbi > div:last-child{ font-size: 14px; }
+
+	/* Санаттар батырмасы сәл кіші */
+	.hup_rcti{ height: 50px; padding: 0 16px; font-size: 14px; }
+
+	/* Себеттегі қатар: саны бір жолда тұрады */
+	.cash_bl1 .uc_ui{ padding-left: 12px; padding-right: 12px; }
+	.cash_bl1 .uc_uiln{ width: 42%; padding-right: 6px; }
+	.cash_bl1 .uc_uil{ width: 58%; }
+	.cash_bl1 .uc_uilf2{ width: calc(48px * 2 + 8px); }
+	.cash_bl1 .uc_uilf1{ width: calc(100% - (48px * 2) - 8px - 10px); }
+	.cash_bl1 .uc_uin_cn{ width: 48px; min-width: 48px; height: 48px; min-height: 48px; }
+	.cash_bl1 .uc_ui .uc_uilf1c{ flex-wrap: nowrap; white-space: nowrap; gap: 6px; }
+	.cash_bl1 .uc_uilf1c .uc_uin_other{ font-size: 15px; }
+	.cash_bl1 .uc_ui_name{ font-size: 15px; }
+	.cash_bl1 .uc_uh .uc_uh_other{ white-space: nowrap; }
+
+	/* Төменгі «Қорытынды» жолағы сыйып тұрады */
+	.cash_bl1 .cash_bl1_rb{ padding: 0 12px 0 16px; gap: 10px; }
+	.cash_bl1_rbl{ width: auto; flex: 1 1 auto; min-width: 0; padding-right: 0; white-space: nowrap; }
+	.cash_bl1_rbl div{ font-size: 20px; }
+	.cash_bl1_rblin{ margin-right: 10px; }
+	.cash_bl1_rbr{ flex-shrink: 0; }
+	.cash_bl1_rbr .btn{ width: auto; min-width: 130px; padding: 0 18px; }
+
+	/* Тапсырыстар: сүзгілер тең бөлініп, қатарға сыйып тұрады */
+	.uc_ui69{ display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
+	.uc_ui69 .uc_uin_other, .uc_ui69 .uc_uin_other .form_im{ width: 100%; margin: 0; }
+	.uc_ui69 select, .uc_ui69 input.form_dt, .uc_ui69 .pre_tab{ width: 100%; }
+	.uc_ui69 .pre_tab{ justify-content: center; height: 56px; }
+	.uc_ui69 .uc_us{ width: 100%; grid-column: span 2; }
+	.bl_orm .uc_u{ gap: 14px; }
+}
+
+/* ---------- 1180px-ке дейін: профильде тек аватар (іздеу мәзірдің астына кірмеуі үшін) ---------- */
+@media (min-width: 769px) and (max-width: 1180px){
+	.ub1_ltf{ display: none; }
+	.ub1_lt{ padding: 0 5px; }
+	.mp_topi{ padding: 0 14px; }
+}
+
+/* ---------- 1100px-ке дейін: тапсырыстар 2 баған ---------- */
+@media (min-width: 769px) and (max-width: 1100px){
+	.bl_orm .uc_u, .bl_ors .uc_u{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* ---------- 900px-ке дейін (кіші планшет): мәзір тағы ықшам ---------- */
+@media (min-width: 769px) and (max-width: 900px){
+	/* Мәзір: иконка үстінде, жазу астында — ені тар */
+	.mp_topi{ flex-direction: column; justify-content: center; padding: 0 10px; min-width: 96px; font-size: 12px; gap: 4px; }
+	.mp_topi i{ font-size: 17px; }
+	.cash_bl1_rbl div{ font-size: 18px; }
+	.cash_bl1_rblin{ margin-right: 8px; }
+	.cash_bl1_rbr .btn{ min-width: 110px; padding: 0 14px; }
+	.cash_bl1{ width: 340px; }
+	.hup_r{ width: calc(100% - 340px - 10px); }
+	.hup_rcb{ grid-template-columns: repeat(3, minmax(0, 1fr)); grid-gap: 6px; }
+	.hup_rcbi{ padding: 8px 10px; }
+	.hup_rcbi > div:first-child{ font-size: 14px; }
+}

@@ -1,0 +1,160 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+html {
+    margin:0;
+    padding:0;
+}
+body {
+    width:70mm;
+    margin: 0;
+    padding: 5px;
+    font-size: 16px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.app{
+    width: 100%;
+    margin-bottom: 200px;
+}
+
+
+/*  */
+.head{
+    width: 100%;
+    text-align: center;
+    border-top: 3px solid #000;
+    border-bottom: 3px solid #000;
+    padding: 3px 0;
+}
+.branch_name{
+    font-size: 36px;
+    overflow: hidden;
+}
+
+/*  */
+.pred_order{
+    width: 100%;
+    border-top: 2px dashed #000;
+    margin-top: 3px;
+    padding-top: 6px;
+}
+.pred_order div{
+    font-size: 26px;
+    overflow: hidden;
+}
+.pred_order p{
+    font-size: 22px;
+    font-weight: 800;
+}
+
+
+/*  */
+.soboi{
+    width: 100%;
+    text-align: center;
+    border-bottom: 3px solid #000;
+    padding: 3px 0;
+    font-size: 36px;
+    overflow: hidden;
+}
+
+/*  */
+.head2{
+    width: 100%;
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+.number{
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.head_bd{
+    width: 100%;
+    margin-top: 4px;
+}
+
+.additional{
+    width: 100%;
+    margin-top: 10px;
+}
+
+
+
+
+
+
+
+
+
+/*  */
+table{
+    width: 100%;
+    border-top: 3px solid #000;
+    padding: 15px 0;
+    border-bottom: 3px solid #000;
+}
+.tr_border td {
+    border-bottom: 1px solid #000;
+    margin-bottom: 2px;
+    padding-bottom: 2px;
+    font-size: 14px;
+}
+
+.tr td {
+    padding: 3px 0;
+}
+.tr_title td {
+    border-top: 3px solid #000;
+    border-bottom: 3px solid #000;
+    text-align: center;
+    font-size: 36px;
+    overflow: hidden;
+}
+.tr_head td {
+    padding:3px 0;
+    border-bottom: 1px dashed #000;
+}
+
+.san{
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.tr_sep td {
+    padding:0;
+    border-bottom: 1px solid #000;
+}
+.tr_sep1 td {
+    padding: 0;
+    border-top: 2px dashed #000;
+}
+.tr_sep2 td {
+    padding: 0;
+    height: 4px;
+}
+.tr_promo td {
+    padding: 20px 10px;
+}
+
+
+
+/*  */
+.clens{
+    width: 100%;
+    margin-top: 30px;
+}
+.clens1{
+    border-bottom: 1px solid #000;
+    padding-bottom: 4px;
+    margin-bottom: 5px;
+    font-size: 14px;
+    font-weight: 600;
+}
+.clens2{
+
+}
+.clens2 p{
+    margin-top: 4px;
+}
