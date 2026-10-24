@@ -371,11 +371,13 @@
 							<div class="form_im_slo "><div class="form_im_slo_i" data-type="transfer"><?=t::w('Transfer', 'Аударым')?></div></div>
 							<div class="form_im_slo "><div class="form_im_slo_i form_im_slo_act" data-type="qr">Kaspi QR</div></div>
 							<div class="form_im_slo "><div class="form_im_slo_i" data-type="cash"><?=t::w('Cash', 'Қолма-қол')?></div></div>
-							<div class="form_im_slo "><div class="form_im_slo_i" data-type="red">RED <?=(@$red_pct ? $red_pct.'%' : '')?></div></div>
+							<? if (@$red_pct > 0): // company.red = 0 болса RED шықпайды ?>
+							<div class="form_im_slo "><div class="form_im_slo_i" data-type="red">RED <?=$red_pct?>%</div></div>
+							<? endif ?>
 							<div class="form_im_slo "><div class="form_im_slo_i sel_pay_mix2" data-type="mix"><i class="fal fa-plus"></i>&nbsp; <?=t::w('Mixed', 'Аралас')?></div></div>
 						</div>
 						<div class="qrm_mix dsp_n">
-							<? foreach (['transfer' => t::w('Transfer', 'Аударым'), 'qr' => 'Kaspi QR', 'cash' => t::w('Cash', 'Қолма-қол'), 'red' => 'RED'] as $qm_key => $qm): ?>
+							<? foreach (['transfer' => t::w('Transfer', 'Аударым'), 'qr' => 'Kaspi QR', 'cash' => t::w('Cash', 'Қолма-қол')] + (@$red_pct > 0 ? ['red' => 'RED'] : []) as $qm_key => $qm): ?>
 								<div class="form_im pay_mix_i">
 									<div class="form_span"><?=$qm?>:</div>
 									<input type="tel" class="form_txt fr_price btype_qrmix" data-name="<?=$qm_key?>" placeholder="0 тг" data-val="0">

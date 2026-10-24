@@ -467,7 +467,10 @@ $(document).ready(function() {
 
    // Кафе: төлем түрі. «Аралас» басылса, әр түрге сома жазылады
    $('.sel_pay .form_im_slo_i').click(function(){
-      $('.sel_pay .form_im_slo_i').removeClass('form_im_slo_act')
+      // Кафеде RED те төлем түрі: басқасы таңдалса RED өшеді (пайызы алынады)
+      var red_b = $('.form_im_slo_red')
+      if (red_b.hasClass('form_im_slo_act') && !$(this).is(red_b)) red_b.click()
+      $('.sel_pay .form_im_slo_i').not(red_b).removeClass('form_im_slo_act')
       $(this).addClass('form_im_slo_act')
       $('.sel_pay').attr('data-val', $(this).attr('data-type'))
       $('.pay_mix').toggleClass('dsp_n', $(this).attr('data-type') != 'mix')
@@ -602,6 +605,17 @@ $(document).ready(function() {
 
 		$(this).toggleClass('form_im_slo_act')
 	})
+   // Кафе: RED таңдалса, басқа төлем түрлері өшеді (RED ақшасы Kaspi арқылы — qr болып жазылады)
+   $('.form_im_slo_red').click(function(){
+      if ($('.sel_type').attr('data-val') != 4) return
+      var on = $(this).hasClass('form_im_slo_act')
+      if (on) {
+         $('.sel_pay .form_im_slo_i').not(this).removeClass('form_im_slo_act')
+         $('.sel_pay').attr('data-val', 'qr')
+         $('.pay_mix, .pay_cash').addClass('dsp_n')
+      } else if (!$('.sel_pay .form_im_slo_i.form_im_slo_act').not(this).length) $('.sel_pay').attr('data-val', '')
+      if (typeof pay_change == 'function') { pay_change(); pay_mix_rest() }
+   })
 
    $('.btype_ynd').click(function(){
       if (!$(this).hasClass('form_im_slo_act')) {
@@ -719,6 +733,29 @@ $(document).ready(function() {
 
 
    // 
+   // Нөмір толық жазылса, базадағы адресті автомат қою (адрес бос болса ғана)
+   var addr_auto = ''
+   $('html').on('input', '.btype_phone', function () {
+      var ph = $(this).attr('data-val') || ''
+      if ($(this).attr('data-sel') != 1 || ph.length < 11) return
+      var a = $('.btype_address')
+      if (!a.length) return
+      if (a.val() != '' && a.val() != addr_auto) return
+      $.ajax({
+         url: "/cashbox/get.php?phone_addr",
+         type: "POST",
+         dataType: "json",
+         data: ({ phone: ph }),
+         success: function(r){
+            if (!r || !r.address) return
+            if (a.val() != '' && a.val() != addr_auto) return
+            addr_auto = r.address
+            a.val(r.address).attr('data-val', r.address).trigger('input')
+            mess(w('Address filled', 'Бұрынғы адрес қойылды'))
+         }
+      })
+   })
+
    $('html').on('input', '.btype_phone', function () {
       if ($('.btype_phone').attr('data-sel') == 0) {
          $('.pop_usr_info').removeClass('pop_usr_info_act')

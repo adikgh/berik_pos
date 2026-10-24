@@ -211,6 +211,39 @@
       
 
 
+      // Клиент: client кестесіне бірден қосу/жаңарту (нөмір 10 санға келтіріледі)
+      $cl_ph = preg_replace('/\D+/', '', (string)$phone);
+      if (strlen($cl_ph) == 11 && ($cl_ph[0] == '8' || $cl_ph[0] == '7')) $cl_ph = substr($cl_ph, 1);
+      if (strlen($cl_ph) == 10 && $cl_ph[0] == '7' && mysqli_num_rows(db::query("SHOW TABLES LIKE 'client'"))) {
+         $cl_cmp = (int)$company;
+         $cl_addr = trim(preg_replace('/\s+/', ' ', (string)$address));
+         $cl_has_list = mysqli_num_rows(db::query("SHOW COLUMNS FROM `client` LIKE 'addresses'"));
+         $cl = mysqli_fetch_assoc(db::query("select * from client where company_id = '$cl_cmp' and phone = '$cl_ph' limit 1"));
+         $cl_e = function ($v) { return mysqli_real_escape_string(db::$connect, (string)$v); };
+         if (!$cl) {
+            db::query("INSERT IGNORE INTO `client` (`company_id`, `phone`, `address`, `first_dt`, `last_dt`, `ins_dt`)
+               VALUES ('$cl_cmp', '$cl_ph', ".($cl_addr !== '' ? "'".$cl_e($cl_addr)."'" : 'NULL').", '$ins_dt', '$ins_dt', '$datetime')");
+            $cl = mysqli_fetch_assoc(db::query("select * from client where company_id = '$cl_cmp' and phone = '$cl_ph' limit 1"));
+         }
+         if ($cl) {
+            $set = ["`upd_dt` = '$datetime'"];
+            if ($cl_addr !== '') $set[] = "`address` = '".$cl_e($cl_addr)."'"; // соңғы адрес
+            if (!$cl['last_dt'] || $cl['last_dt'] < $ins_dt) $set[] = "`last_dt` = '$ins_dt'";
+            // Барлық адрестер бір бағанда, «; » белгісімен (қайталанбайды)
+            if ($cl_has_list && $cl_addr !== '') {
+               $list = trim((string)$cl['addresses']);
+               if (mb_stripos('; '.$list.'; ', '; '.$cl_addr.'; ') === false) {
+                  $list = $list === '' ? $cl_addr : $list.'; '.$cl_addr;
+                  $set[] = "`addresses` = '".$cl_e($list)."'";
+               }
+            }
+            db::query("UPDATE `client` SET ".implode(', ', $set)." WHERE `id` = '".(int)$cl['id']."'");
+            if (mysqli_num_rows(db::query("SHOW COLUMNS FROM `retail_orders` LIKE 'client_id'"))) {
+               db::query("UPDATE `retail_orders` SET `client_id` = '".(int)$cl['id']."' WHERE `id` = '".(int)$id."'");
+            }
+         }
+      }
+
       // Жауапты бірден қайтарамыз (чек кідірмейді), Telegram артынан фонда жіберіледі
       $resp = $upd ? 'yes' : 'error';
       ignore_user_abort(true);
@@ -410,6 +443,27 @@
 
 
   // cashbox_plus
+	// Нөмір бойынша бұрынғы адрес: алдымен client, болмаса соңғы тапсырыс
+	if(isset($_GET['phone_addr'])) {
+		$d = preg_replace('/\D+/', '', (string)@$_POST['phone']);
+		if (strlen($d) == 11 && ($d[0] == '8' || $d[0] == '7')) $d = substr($d, 1);
+		$res = ['address' => '', 'name' => ''];
+		if (strlen($d) == 10) {
+			$cmp = (int)$company;
+			if (mysqli_num_rows(db::query("SHOW TABLES LIKE 'client'"))) {
+				$cl = db::query("select name, address from client where company_id = '$cmp' and phone = '$d' and archive = 0 limit 1");
+				if ($cl && $c = mysqli_fetch_assoc($cl)) $res = ['address' => (string)$c['address'], 'name' => (string)$c['name']];
+			}
+			if ($res['address'] == '') {
+				$ro = db::query("select address from retail_orders where company_id = '$cmp' and phone like '%$d' and address is not null and address <> '' order by ins_dt desc limit 1");
+				if ($ro && $r = mysqli_fetch_assoc($ro)) $res['address'] = (string)$r['address'];
+			}
+		}
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode($res, JSON_UNESCAPED_UNICODE);
+		exit();
+	}
+
 	if(isset($_GET['search_now'])) {
 		$search = strip_tags($_POST['inp']);
       $search2 = substr($search, 1);
