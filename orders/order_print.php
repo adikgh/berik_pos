@@ -12,18 +12,23 @@
             if  ($cashbox_d['print'] > 0) $print = 1;
 
             $branch_d = fun::branch($cashbox_d['branch_id']);
+            $cmp_p = fun::company($cashbox_d['company_id'] ?: $company);
         }
     }
+
+    // Чек ені: company.print_width (80 немесе 58), баған болмаса 80. Тексеру үшін ?w=58
+    $pw = (int)(@$_GET['w'] ?: @$cmp_p['print_width']);
+    if ($pw != 58) $pw = 80;
 
     $number = 1;
 
 ?>
 
-<link rel="stylesheet" href="/assets/css/print.css" />
+<link rel="stylesheet" href="/assets/css/print.css?v=<?=@filemtime('../assets/css/print.css')?>" />
 
-<div class="app">
+<div class="app p<?=$pw?>">
     <div class="head">
-        <div class="branch_name">SUSHI - PIZZA</div>
+        <div class="branch_name"><?=htmlspecialchars(trim((string)@$cmp_p['print_title']) ?: 'SUSHI - PIZZA')?></div>
         <? if ($cashbox_d['preorder_dt']): ?>
             <div class="pred_order">
                 <div>ПРЕДЗАКАЗ</div>
@@ -117,6 +122,8 @@
 
 
 <script type="text/javascript">
+    <? if ($pw == 58): ?>document.body.className += ' b58'<? endif ?>
+
     window.onload = function() {
 	    window.print();
     }
