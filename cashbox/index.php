@@ -262,6 +262,13 @@
 							<input type="text" class="form_txt btype_address" placeholder="" data-val="<?=$cashbox_d['address']?>" value="<?=$cashbox_d['address']?>">
 							<i class="fal fa-text form_icon"></i>
 						</div>
+						<? if (!empty($cmp['kv'])): // company.kv = 1 болса ғана ?>
+						<div class="form_im ">
+							<div class="form_span"><?=t::w('Apartment:', 'Кв:')?></div>
+							<input type="text" class="form_txt btype_kv" placeholder="" data-val="">
+							<i class="fal fa-door-closed form_icon"></i>
+						</div>
+						<? endif ?>
 					</div>
 
 					<br>

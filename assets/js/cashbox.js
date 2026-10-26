@@ -671,7 +671,7 @@ $(document).ready(function() {
             data: ({ 
                id: btn.data('id'),
                phone: $('.btype_phone').attr('data-val'),
-               address: $('.btype_address').attr('data-val'),
+               address: ($('.btype_address').attr('data-val') || '') + ($.trim($('.btype_kv').val() || '') ? ', кв. ' + $.trim($('.btype_kv').val()) : ''),
                add: $('.btype_add').attr('data-val'),
                preorder: $('.btype_preorder').attr('data-val'),
                total: $('.cashbox_pay_btotol_c').attr('data-val'),
@@ -944,7 +944,8 @@ $(document).ready(function() {
    $(document).on('click', '.sel_type .form_im_slo_i', function(){ setTimeout(opt_sync, 0) })
    setTimeout(function(){
       // мәні бар болса (сақталған жазбадан) — ашық тұрады
-      $('.tf_add, .tf_preorder').each(function(){ var v = $(this).find('input').val(); if (v && v !== '0') $(this).removeClass('opt_off') })
+      // Предзаказда күн өрісінде әрдайым бүгінгі күн тұрады, сондықтан тек дайын мәнге (btype_preorder) қараймыз
+      $('.tf_add, .tf_preorder').each(function(){ var v = $(this).is('.tf_preorder') ? $('.btype_preorder').val() : $(this).find('input').val(); if (v && v !== '0') $(this).removeClass('opt_off') })
       opt_sync()
    }, 120)
 
