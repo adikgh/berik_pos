@@ -12,12 +12,13 @@
             if  ($cashbox_d['print'] > 0) $print = 1;
 
             $branch_d = fun::branch($cashbox_d['branch_id']);
-            $cmp_p = fun::company($cashbox_d['company_id'] ?: $company);
         }
     }
 
-    // Чек ені: company.print_width (80 немесе 58), баған болмаса 80. Тексеру үшін ?w=58
-    $pw = (int)(@$_GET['w'] ?: @$cmp_p['print_width']);
+    // Чек ені: print_width (80 немесе 58), баған болмаса 80. Тексеру үшін ?w=58
+    // Филиалдан (company_branch), бос болса 80 мм / SUSHI - PIZZA
+    $pw = (int)(@$_GET['w'] ?: @$branch_d['print_width']);
+    $ptitle = trim((string)@$branch_d['print_title']) ?: 'SUSHI - PIZZA';
     if ($pw != 58) $pw = 80;
 
     $number = 1;
@@ -28,7 +29,7 @@
 
 <div class="app p<?=$pw?>">
     <div class="head">
-        <div class="branch_name"><?=htmlspecialchars(trim((string)@$cmp_p['print_title']) ?: 'SUSHI - PIZZA')?></div>
+        <div class="branch_name"><?=htmlspecialchars($ptitle)?></div>
         <? if ($cashbox_d['preorder_dt']): ?>
             <div class="pred_order">
                 <div>ПРЕДЗАКАЗ</div>

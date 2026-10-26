@@ -7,7 +7,7 @@
 
 
    // setting
-   $ver = 4.007;
+   $ver = 4.008;
 
    // 
    $site_set = [
