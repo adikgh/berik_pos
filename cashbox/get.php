@@ -133,7 +133,11 @@
 		$order_branch = @strip_tags($_POST['order_branch']);
 		$service = @mysqli_real_escape_string(db::$connect, trim(strip_tags($_POST['service'])));
 		$payment_method = @trim($_POST['payment_method']);
-		if (!in_array($payment_method, ['transfer', 'qr', 'cash', 'mixed'], true)) $payment_method = '';
+		if (!in_array($payment_method, ['transfer', 'qr', 'cash', 'mixed', 'unpaid'], true)) $payment_method = '';
+		if ($payment_method == 'unpaid') { // баған ENUM болып, ішінде unpaid жоқ болса — жазбаймыз
+			$pm_col = mysqli_fetch_assoc(db::query("SHOW COLUMNS FROM `retail_orders` LIKE 'payment_method'"));
+			if (!$pm_col || (stripos($pm_col['Type'], 'enum') === 0 && stripos($pm_col['Type'], "'unpaid'") === false)) $payment_method = '';
+		}
 		$transfer = (int)@$_POST['transfer'];
 		$prepay = (int)@$_POST['prepay'];
 		$red = (int)@$_POST['red'];

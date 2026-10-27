@@ -272,6 +272,7 @@ $(document).ready(function() {
       $('.tf_dlv').toggleClass('dsp_n', t != 1)
       $('.sel_srv').toggleClass('dsp_n', t != 3)
       $('.tf_preorder').toggleClass('dsp_n', t == 4 || t == 3)
+      $('.tf_add').toggleClass('dsp_n', t == 4) // Кафеде «Қосымша ақпарат» керек емес
       if (t == 3 && $('.form_im_slo_red').hasClass('form_im_slo_act')) $('.form_im_slo_red').click()
       // Кафеде RED батырмасы «Төлем түрі» қатарының ішінде тұрады
       var red_slo = $('.form_im_slo_red').parent()
@@ -310,7 +311,20 @@ $(document).ready(function() {
       $('.sel_branch .form_im_slo_i').removeClass('form_im_slo_act')
 		$(this).toggleClass('form_im_slo_act')
       $('.sel_branch').attr('data-val', $(this).attr('data-type'))
+      pay_types_sync()
 	})
+   // Төлем түрлері точкадан: company_branch.pay_types = «transfer,qr,cash,mix,unpaid». Бос болса — барлығы
+   function pay_types_sync() {
+      var b = $('.sel_branch .form_im_slo_act'), list = $.trim(b.attr('data-pay') || '')
+      if (!b.length) b = $('.sel_branch .form_im_slo_i').first(), list = $.trim(b.attr('data-pay') || '')
+      var keys = list ? list.split(',').map(function(k){ return $.trim(k) }) : null
+      $('.sel_pay .form_im_slo_i').not('.form_im_slo_red').each(function(){
+         var hide = keys && keys.indexOf($(this).attr('data-type')) < 0
+         $(this).parent().toggleClass('dsp_n', !!hide)
+         if (hide && $(this).hasClass('form_im_slo_act')) { $(this).removeClass('form_im_slo_act'); $('.sel_pay').attr('data-val', ''); $('.pay_mix, .pay_cash').addClass('dsp_n') }
+      })
+   }
+   pay_types_sync()
 
 
 
@@ -534,6 +548,8 @@ $(document).ready(function() {
       // Қалған сома — «Төлем түрі» бойынша (таңдалмаса — қолма-қол)
       // Жеткізуде қалғанын курьер алады — қолма-қол деп жазылады
       var rest = pay_rest(), pt = (t == 1 || t == 2 ? '' : $('.sel_pay').attr('data-val')) || 'cash'
+      // Кафе: «Төленбеген» — ақша әлі түскен жоқ, кейін тапсырысты өзгертіп төлем қабылданады
+      if (t == 4 && pt == 'unpaid') { v.method = 'unpaid'; return v }
       if (pt == 'mix') $('.btype_mix').each(function(){ v[$(this).attr('data-name')] += Number($(this).attr('data-val')) || 0 })
       else if (rest > 0) v[pt] += rest
       var kinds = ['transfer', 'qr', 'cash'].filter(function(k){ return v[k] > 0 })

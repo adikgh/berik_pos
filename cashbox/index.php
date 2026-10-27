@@ -201,7 +201,7 @@
 						<div class="form_span"><?=t::w('Branch:', 'Точка:')?></div>
 						<? foreach ($branch_list as $branch_d): ?>
 							<div class="form_im_slo " >
-								<div class="form_im_slo_i <?=($sel_branch == $branch_d['id']?'form_im_slo_act':'')?>"  data-type="<?=$branch_d['id']?>"><?=$branch_d['name']?></div>
+								<div class="form_im_slo_i <?=($sel_branch == $branch_d['id']?'form_im_slo_act':'')?>"  data-type="<?=$branch_d['id']?>" data-pay="<?=htmlspecialchars((string)@$branch_d['pay_types'])?>"><?=$branch_d['name']?></div>
 							</div>
 						<? endforeach ?>
 					</div>
@@ -419,6 +419,9 @@
 							<? endforeach ?>
 							<div class="form_im_slo ">
 								<div class="form_im_slo_i sel_pay_mix" data-type="mix"><i class="fal fa-plus"></i>&nbsp; <?=t::w('Mixed', 'Аралас')?></div>
+							</div>
+							<div class="form_im_slo ">
+								<div class="form_im_slo_i" data-type="unpaid"><?=t::w('Unpaid', 'Төленбеген')?></div>
 							</div>
 						</div>
 						<div class="pay_cash dsp_n">

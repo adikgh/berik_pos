@@ -199,6 +199,7 @@
 								<div class="uc_uil2" >
 									<div class="uc_uil2_top">
 										<div class="uc_uil2_nmb"><?=$branch_d['code']?><?=$buy_d['number']?></div>
+										<? if (@$buy_d['payment_method'] == 'unpaid'): ?><div style="align-self:center;margin:0 8px;padding:4px 10px;border-radius:8px;background:#e5484d;color:#fff;font-size:13px;font-weight:700;white-space:nowrap;"><?=t::w('Unpaid', 'Төленбеген')?></div><? endif ?>
 										<div class="uc_uil2_topc">
 											<div class="uc_uil2_topc1">
 												<div class="or_type">
