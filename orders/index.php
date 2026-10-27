@@ -12,6 +12,12 @@
 
 
 
+	// company.show_branch = 0: точка сүзгісі жасырылады, кассир тек өз точкасын көреді (URL арқылы да басқасы ашылмайды)
+	$branch_lock = isset($cmp['show_branch']) && $cmp['show_branch'] !== null && (int)$cmp['show_branch'] === 0;
+	if ($branch_lock) $_GET['branch'] = (int)$branch;
+	// Точка біреу ғана болса, сүзгі шықпайды
+	$branch_cnt = mysqli_num_rows(db::query("select id from company_branch where company_id = '$company'"));
+
    	$type = @$_GET['type'];
 
 	// if (@$_GET['time']) {
@@ -30,7 +36,7 @@
 	$now_dt = date('Y-m-d H:i:s');
 	$dt_cond = "ins_dt BETWEEN '$start_cdate' and '$end_cdate'";
 	if (@$_GET['pre']) $dt_cond = "(ins_dt > '$now_dt' and preorder_dt is not null and preorder_dt != '')";
-	$pre_cnt = mysqli_num_rows(db::query("select id from retail_orders where company_id = '$company' and ins_dt > '$now_dt' and preorder_dt is not null and preorder_dt != ''"));
+	$pre_cnt = mysqli_num_rows(db::query("select id from retail_orders where company_id = '$company'".($branch_lock ? " and branch_id = '".(int)$branch."'" : "")." and ins_dt > '$now_dt' and preorder_dt is not null and preorder_dt != ''"));
 
 	if (@$_GET['branch']) {
 		$sbranch = $_GET['branch'];
@@ -120,7 +126,7 @@
 						</div>
 					<? endif ?>
 
-					<div class="uc_uin_other">
+					<div class="uc_uin_other <?=($branch_lock || $branch_cnt < 2 ? 'dsp_n' : '')?>">
 						<select name="type" class="on_sort_branch" >
 							<option data-id="" value=""><?=t::w('Branch: all', 'Точка: барлығы')?></option>
 							<? $уbranch = db::query("select * from company_branch where company_id = '$company' order by number asc"); ?>
