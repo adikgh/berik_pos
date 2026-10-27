@@ -196,8 +196,11 @@
 						while ($branch_d = mysqli_fetch_assoc($уbranch)) $branch_list[] = $branch_d;
 						$sel_branch = $branch;
 						if (count($branch_list) == 1) $sel_branch = $branch_list[0]['id'];
+						// company.show_branch = 0 болса точка таңдауы жасырылады, кассирдің өз точкасы қойылады (баған жоқ не бос болса — көрінеді)
+						$branch_hide = count($branch_list) < 2 || (isset($cmp['show_branch']) && $cmp['show_branch'] !== null && (int)$cmp['show_branch'] === 0);
+						if ($branch_hide && !$sel_branch && $branch_list) $sel_branch = $branch_list[0]['id'];
 					?>
-					<div class="form_im form_imss sel_branch <?=(count($branch_list) < 2 ? 'dsp_n' : '')?>" data-val="<?=$sel_branch?>">
+					<div class="form_im form_imss sel_branch <?=($branch_hide ? 'dsp_n' : '')?>" data-val="<?=$sel_branch?>">
 						<div class="form_span"><?=t::w('Branch:', 'Точка:')?></div>
 						<? foreach ($branch_list as $branch_d): ?>
 							<div class="form_im_slo " >
