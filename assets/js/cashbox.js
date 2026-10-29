@@ -86,6 +86,10 @@ $(document).ready(function() {
    */
 
 
+   // Санаттар қатары: сырғытылады, сыймаса ‹ › батырмалары шығады
+   if (window.hscroll) hscroll('.hup_rct')
+
+
    // hup_search: кассада тауарды атауы бойынша іздеу
    var hupSearchTimer = null, hupSearchXhr = null
    function hupSearchReset() {
@@ -168,20 +172,24 @@ $(document).ready(function() {
       }
    })
 
+	// Себеттегі +/−/өшіру: бір басу — бір сұраныс
+	var cart_lock = false
 	// cashbox_remove
 	$('html').on('click', '.cashbox_remove', function () {
-		btn = $(this)
+		if (cart_lock) return // сұраныс біткенше қайта басылмайды
+		var b = $(this); btn = b; cart_lock = true; b.addClass('cb_busy')
+		var free = function(){ cart_lock = false; b.removeClass('cb_busy') }; setTimeout(free, 5000)
       $.ajax({
          url: "/cashbox/get.php?cashbox_remove",
+         error: free,
          type: "POST",
          dataType: "html",
          data: ({ id: btn.data('id'), }),
-         success: function(data){ 
+         success: function(data){ free(); 
             if (data == 'yes') cart_refresh();
             else console.log(data);
          },
-         beforeSend: function(){ },
-         error: function(data){ }
+         beforeSend: function(){ }
       })
 	})
 
@@ -204,18 +212,20 @@ $(document).ready(function() {
 
    // cashbox_remove
 	$('html').on('click', '.cashbox_minus', function () {
-		btn = $(this)
+		if (cart_lock) return // сұраныс біткенше қайта басылмайды
+		var b = $(this); btn = b; cart_lock = true; b.addClass('cb_busy')
+		var free = function(){ cart_lock = false; b.removeClass('cb_busy') }; setTimeout(free, 5000)
       $.ajax({
          url: "/cashbox/get.php?cashbox_minus",
+         error: free,
          type: "POST",
          dataType: "html",
          data: ({ id: btn.data('id'), }),
-         success: function(data){ 
+         success: function(data){ free(); 
             if (data == 'yes') cart_refresh();
             else console.log(data);
          },
-         beforeSend: function(){ },
-         error: function(data){ }
+         beforeSend: function(){ }
       })
 	})
 
@@ -262,6 +272,7 @@ $(document).ready(function() {
       $('.sel_type .form_im_slo_i').removeClass('form_im_slo_act')
 		$(this).toggleClass('form_im_slo_act')
       $('.sel_type').attr('data-val', $(this).attr('data-type'))
+      $('.tp_seg').css('--i', $('.tp_seg .form_im_slo').index($(this).parent())) // таңдалған фон жылжиды
 	})
 
    // Заказ түріне қарай өрістер: 1 Жеткізу — бәрі, 2 Собой — адрес/жеткізу жоқ, 4 Кафе — нөмір/адрес/жеткізу жоқ, 3 Сервис — жеткізу жоқ
@@ -323,8 +334,17 @@ $(document).ready(function() {
          $(this).parent().toggleClass('dsp_n', !!hide)
          if (hide && $(this).hasClass('form_im_slo_act')) { $(this).removeClass('form_im_slo_act'); $('.sel_pay').attr('data-val', ''); $('.pay_mix, .pay_cash').addClass('dsp_n') }
       })
+      // Негізгі төлем түрі (company_branch.pay_default): ештеңе таңдалмаса, автомат таңдалады
+      // «Өзгерту»: тапсырыстың бұрынғы төлем түрі бірінші рет таңдалады
+      var edit = $.trim($('.sel_pay').attr('data-edit') || ''); $('.sel_pay').removeAttr('data-edit')
+      if (edit && !$('.sel_pay').attr('data-val')) { var ec = $('.sel_pay .form_im_slo_i[data-type="' + edit + '"]').not('.form_im_slo_red'); if (ec.length) { ec.parent().removeClass('dsp_n'); ec.click(); return } }
+      var def = $.trim(b.attr('data-pay-def') || '')
+      if (def && !$('.sel_pay').attr('data-val') && !$('.form_im_slo_red').hasClass('form_im_slo_act')) {
+         var chip = $('.sel_pay .form_im_slo_i[data-type="' + def + '"]').not('.form_im_slo_red')
+         if (chip.length && !chip.parent().hasClass('dsp_n')) chip.click()
+      }
    }
-   pay_types_sync()
+   setTimeout(pay_types_sync, 0) // төлем батырмаларының click-і байланған соң
 
 
 
@@ -565,7 +585,40 @@ $(document).ready(function() {
 
 
    // Жеткізу сомасы: батырмамен таңдау, «+» басқанда астынан өріс шығады
-   $('.sel_dlv .form_im_slo_i').click(function(){
+   // Карта батырмасы: таңдау емес, ортадан поп-ап ашады
+   $('html').on('click', '.dlv_map', function(){ $('.dlv_map_pop').appendTo('body').addClass('dlv_map_act'); setTimeout(function(){ $('.dz_q').val('').trigger('input').focus() }, 50) }) // body-ге шығарамыз: «Сақтау» панелінің үстінде тұрсын
+   // Адрес + подъезд: артық үтір мен «подъезд» сөзі қайталанбайды
+   // Сақталған адресті бөледі: «..., подъезд 10» → адрес + подъезд
+   function addr_split(full) {
+      var m = String(full || '').match(/^(.*?)[\s,]*(?:подъезд\s*)+(.+)$/i)
+      return m ? { ad: $.trim(m[1]).replace(/[\s,]+$/, ''), en: $.trim(m[2]) } : { ad: $.trim(String(full || '')).replace(/[\s,]+$/, ''), en: '' }
+   }
+   function addr_full() {
+      var ad = $.trim($('.btype_address').attr('data-val') || '').replace(/[\s,]+$/, '')
+      var en = $.trim($('.btype_entr').val() || '').replace(/^((подъезд|под\.?|п\.)\s*)+/i, '')
+      return en ? (ad ? ad + ', ' : '') + 'подъезд ' + en : ad
+   }
+   // Жеткізу картасы: іздеу және көшені таңдау (бағасы бірден қойылады)
+   $('html').on('input', '.dz_q', function(){
+      var q = $.trim($(this).val()).toLowerCase(), n = 0
+      var br = String($('.sel_branch').attr('data-val') || '') // таңдалған точканың көшелері ғана (0 = барлық точкаға ортақ)
+      $('.dz_i').each(function(){ var b = $(this).attr('data-branch') || '0', ok = (b == '0' || !br || b == br) && (!q || String($(this).attr('data-name')).toLowerCase().indexOf(q) > -1); $(this).toggleClass('dsp_n', !ok); if (ok) n++ })
+      $('.dz_empty').toggleClass('dsp_n', n > 0)
+      // Бос болса: іздеу жазылмаса «көше әлі қосылмаған», жазылса ««...» бойынша көше табылмады»
+      var eq = $('.dz_empty_q'), raw = $.trim($(this).val())
+      $('.dz_empty_0').toggleClass('dsp_n', !!raw)
+      eq.toggleClass('dsp_n', !raw).text(String(eq.attr('data-tpl') || '').replace('%s', raw))
+   })
+   $('html').on('click', '.dz_i', function(){
+      var p = Number($(this).attr('data-price')) || 0, chip = $('.sel_dlv .form_im_slo_i[data-type="' + p + '"]')
+      if (chip.length) chip.click()
+      else { $('.sel_dlv .form_im_slo_i[data-type="add"]').click(); $('.btype_delivery').val(p).attr('data-val', p).trigger('input'); $('.sel_dlv').attr('data-val', p) }
+      $('.dz_i').removeClass('dz_act'); $(this).addClass('dz_act')
+      $('.dlv_map_pop').removeClass('dlv_map_act')
+   })
+   $('html').on('click', '.dlv_map_bg, .dlv_map_close', function(){ $('.dlv_map_pop').removeClass('dlv_map_act') })
+   $(document).on('keydown', function(e){ if (e.key == 'Escape') $('.dlv_map_pop').removeClass('dlv_map_act') })
+   $('.sel_dlv .form_im_slo_i').not('.dlv_map').click(function(){
       $('.sel_dlv .form_im_slo_i').removeClass('form_im_slo_act')
       $(this).addClass('form_im_slo_act')
       if ($(this).attr('data-type') == 'add') {
@@ -687,7 +740,9 @@ $(document).ready(function() {
             data: ({ 
                id: btn.data('id'),
                phone: $('.btype_phone').attr('data-val'),
-               address: ($('.btype_address').attr('data-val') || '') + ($.trim($('.btype_kv').val() || '') ? ', кв. ' + $.trim($('.btype_kv').val()) : ''),
+               address: addr_full(),
+               floor: $.trim($('.btype_floor').val() || ''),
+               apt: $.trim($('.btype_apt').val() || ''),
                add: $('.btype_add').attr('data-val'),
                preorder: $('.btype_preorder').attr('data-val'),
                total: $('.cashbox_pay_btotol_c').attr('data-val'),
@@ -712,7 +767,8 @@ $(document).ready(function() {
                   }
                   if (btn.attr('data-type') == 'ubd') location.href = '/orders/';
                   else location.reload();
-               } else if (data == 0) mess(w('Fill all fields', 'Барлық өрісті толтырыңыз'))
+               } else if (data == 'locked') mess(w('Closed order cannot be edited', 'Жабық тапсырысты өзгертуге болмайды'))
+               else if (data == 0) mess(w('Fill all fields', 'Барлық өрісті толтырыңыз'))
                console.log(data);
             },
             beforeSend: function(){ },
@@ -765,9 +821,13 @@ $(document).ready(function() {
          success: function(r){
             if (!r || !r.address) return
             if (a.val() != '' && a.val() != addr_auto) return
-            addr_auto = r.address
-            a.val(r.address).attr('data-val', r.address).trigger('input')
-            mess(w('Address filled', 'Бұрынғы адрес қойылды'))
+            var sp = addr_split(r.address)
+            addr_auto = sp.ad
+            a.val(sp.ad).attr('data-val', sp.ad).trigger('input')
+            if (sp.en && $('.btype_entr').length && $('.btype_entr').val() == '') $('.btype_entr').val(sp.en)
+            if (r.floor && $('.btype_floor').length && $('.btype_floor').val() == '') $('.btype_floor').val(r.floor)
+            if (r.apt && $('.btype_apt').length && $('.btype_apt').val() == '') $('.btype_apt').val(r.apt)
+            mess(w('Address filled', 'Бұрынғы адрес қойылды'), 'ok')
          }
       })
    })
@@ -948,16 +1008,21 @@ $(document).ready(function() {
       $('.opt_btn').each(function(){
          var box = $($(this).attr('data-target')), inp = box.find('input')
          var on = !box.hasClass('opt_off')
-         $(this).toggleClass('opt_btn_act', on).toggleClass('dsp_n', box.hasClass('dsp_n'))
+         // Предзаказ / Қосымша ақпарат ашық болса, батырмасы блоктың ішіндегі тақырыпқа ауысады (сыртта жасырылады)
+         $(this).toggleClass('opt_btn_act', on).toggleClass('dsp_n', box.hasClass('dsp_n') || (on && box.is('.tf_preorder, .tf_add')))
       })
    }
    $('html').on('click', '.opt_btn', function(){
       var box = $($(this).attr('data-target'))
       box.toggleClass('opt_off')
       if (!box.hasClass('opt_off')) box.find('input').first().focus()
+      // Предзаказ ашылғанда: бос слоты бар бірінші бөлік (мысалы Таңғы) автомат ашылып тұрады
+      if (box.is('.tf_preorder') && !box.hasClass('opt_off') && typeof pre_sync == 'function') { if (!$('.pre_time').val()) $('.pre_parts').attr('data-p', ''); pre_sync() }
       opt_sync()
    })
    $(document).on('click', '.sel_type .form_im_slo_i', function(){ setTimeout(opt_sync, 0) })
+   $('html').on('click', '.pre_close', function(){ $('.opt_btn[data-target=".tf_preorder"]').click() })
+   $('html').on('click', '.add_close', function(){ $('.opt_btn[data-target=".tf_add"]').click() })
    setTimeout(function(){
       // мәні бар болса (сақталған жазбадан) — ашық тұрады
       // Предзаказда күн өрісінде әрдайым бүгінгі күн тұрады, сондықтан тек дайын мәнге (btype_preorder) қараймыз
@@ -975,8 +1040,26 @@ $(document).ready(function() {
          if (pd.val() && mx && pd.val() > mx) pd.val(mx)
          if (pd.val() && mn && pd.val() < mn) pd.val(mn)
          day = pd.val()
+         $('.pre_day_i').removeClass('pre_day_act').filter('[data-date="' + day + '"]').addClass('pre_day_act')
       }
       var tm = $('.pre_time').val()
+      // Уақыт слоттары: бүгін болса өткен уақыт өшірулі, таңдалғаны белгіленеді
+      $('.pre_tm_val').text(tm || '--:--')
+      var now = new Date(), now_m = now.getHours() * 60 + now.getMinutes()
+      var is_today = day == $('.sel_pre_day .form_im_slo_i').first().attr('data-type')
+      var t2m = function(t){ return +t.substr(0, 2) * 60 + +t.substr(3, 2) }
+      $('.pre_s').each(function(){ $(this).toggleClass('pre_off', is_today && t2m($(this).attr('data-t')) <= now_m).toggleClass('pre_act', $(this).attr('data-t') == tm) })
+      // Қай бөлік ашық тұрады: таңдалған уақыттікі, әйтпесе бос слоты бар алғашқы бөлік
+      var pp = $('.pre_parts'), p = pp.attr('data-p')
+      if (p === '' || p === undefined) {
+         var s_act = $('.pre_s.pre_act').first(), s_free = $('.pre_s:not(.pre_off)').first()
+         p = s_act.length ? s_act.attr('data-p') : (s_free.length ? s_free.attr('data-p') : '2')
+      }
+      $('.pre_pt').each(function(){
+         var free = $('.pre_s[data-p="' + $(this).attr('data-p') + '"]:not(.pre_off)').length
+         $(this).toggleClass('pre_act', $(this).attr('data-p') == p).toggleClass('pre_off', !free)
+      })
+      $('.pre_s').each(function(){ $(this).toggleClass('dsp_n', $(this).attr('data-p') != p) })
       var v = (day && tm) ? day + ' ' + tm : ''
       $('.btype_preorder').val(v).attr('data-val', v || 0)
       var today = $('.sel_pre_day .form_im_slo_i').first().attr('data-type')
@@ -987,10 +1070,23 @@ $(document).ready(function() {
       $(this).addClass('form_im_slo_act')
       $('.sel_pre_day').attr('data-day', $(this).attr('data-type'))
       $('.pre_date_im').toggleClass('dsp_n', $(this).attr('data-type') != 'other')
-      if (!$('.pre_time').val()) $('.pre_time').focus()
+      if (!$('.pre_time').val()) $('.pre_parts').attr('data-p', '')
       pre_sync(); setTimeout(draft_save, 0)
    })
    $('html').on('input change', '.pre_date, .pre_time', function(){ pre_sync(); setTimeout(draft_save, 0) })
+   $('html').on('click', '.pre_pt', function(){
+      $('.pre_parts').attr('data-p', $(this).attr('data-p')); pre_sync()
+   })
+   $('html').on('click', '.pre_s', function(){
+      if ($(this).hasClass('pre_off')) return
+      $('.pre_parts').attr('data-p', $(this).attr('data-p'))
+      $('.pre_time').val($(this).attr('data-t')).trigger('change')
+   })
+   // Басқа күн: 6 күн батырмасы
+   $('html').on('click', '.pre_day_i', function(){
+      $('.pre_day_i').removeClass('pre_day_act'); $(this).addClass('pre_day_act')
+      $('.pre_date').val($(this).attr('data-date')).trigger('change')
+   })
    // Сақталған жазбадан қалпына келтіру
    function pre_restore() {
       var v = $('.btype_preorder').val()
@@ -1001,6 +1097,7 @@ $(document).ready(function() {
       $('.pre_time').val(tm); pre_sync()
       $('.tf_preorder').removeClass('opt_off'); if (typeof opt_sync == 'function') opt_sync()
    }
+   if (!$('.btype_preorder').val()) pre_sync() // бет ашылғанда бірден бөлік пен слоттар дұрыс тұрсын (сақталған мән болса, pre_restore өзі жасайды)
    setTimeout(pre_restore, 100)
 
 }) // end jquery

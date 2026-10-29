@@ -46,7 +46,7 @@
                             $onw['rask'] = 0;
                             $onw['cash'] = 0;
                             $onw['kaspi'] = 0;
-                            $staff = db::query("select * from user_staff where positions_id = 6");
+                            $staff = db::query("select * from company_staff where positions_id = 6");
                         ?>
                         <? while ($staff_d = mysqli_fetch_assoc($staff)): ?>
                             <? $staff_user_d = fun::user($staff_d['user_id']); ?>

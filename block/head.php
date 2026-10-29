@@ -46,11 +46,13 @@
 <title><?=@$menu['title_'.$lang]?> | <?=@$site['name_kz']?></title>
 <meta name="description" content="<?=@$menu['disc_'.$lang]?> <?=@$site['phone_view']?>">
 <meta name="keywords" content="<?=@$menu['keyw_'.$lang]?>">
-<meta name="theme-color" content="<?=@$site['color']?>">
+<meta name="theme-color" content="#0EA768">
 
 <!-- icon -->
-<link rel="icon" href="/assets/img/logo/icon.png" type="image/x-icon">
-<link rel="shortcut icon" type="image/icon" href="/assets/img/logo/icon.png">
+<link rel="icon" href="/assets/img/logo/favicon-32.png?v=2" type="image/x-icon">
+<link rel="icon" type="image/svg+xml" href="/assets/img/logo/berik-icon.svg?v=2">
+<link rel="apple-touch-icon" href="/assets/img/logo/apple-touch-icon.png?v=2">
+<link rel="shortcut icon" type="image/icon" href="/assets/img/logo/favicon-32.png?v=2">
 
 <!-- Open Graph -->
 <meta property="og:type" content="website" />

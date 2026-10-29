@@ -35,7 +35,13 @@
 	// Предзаказ: ins_dt = предзаказ уақыты, сондықтан өз күнінде шығады. ?pre=1 — алдағы предзаказдар
 	$now_dt = date('Y-m-d H:i:s');
 	$dt_cond = "ins_dt BETWEEN '$start_cdate' and '$end_cdate'";
+	// Бүгінге қабылданған предзаказдар (сол күні орындалатын) негізгі тізімде қабылданған күні де шығады
+	if (mysqli_num_rows(db::query("SHOW TABLES LIKE 'retail_orders_log'"))) $dt_cond = "(ins_dt BETWEEN '$start_cdate' and '$end_cdate' or (preorder_dt is not null and preorder_dt != '' and id in (select l.order_id from retail_orders_log l join retail_orders o2 on o2.id = l.order_id where l.field = 'created' and l.ins_dt BETWEEN '$start_cdate' and '$end_cdate' and (date(l.ins_dt) = date(o2.ins_dt) or date(l.ins_dt - interval 6 hour) = date(o2.ins_dt - interval 6 hour)))))";
 	if (@$_GET['pre']) $dt_cond = "(ins_dt > '$now_dt' and preorder_dt is not null and preorder_dt != '')";
+	// Төленбеген: таңдалған күннің төленбеген тапсырыстары (?unpaid=1), отказдар есепке кірмейді
+	$unp_cond = "payment_method = 'unpaid' and (order_status is null or order_status not in (5, 6, 10))";
+	$unp_cnt = mysqli_num_rows(db::query("select id from retail_orders where company_id = '$company'".($branch_lock ? " and branch_id = '".(int)$branch."'" : "")." and ins_dt BETWEEN '$start_cdate' and '$end_cdate' and $unp_cond"));
+	if (@$_GET['unpaid']) $dt_cond .= " and $unp_cond";
 	$pre_cnt = mysqli_num_rows(db::query("select id from retail_orders where company_id = '$company'".($branch_lock ? " and branch_id = '".(int)$branch."'" : "")." and ins_dt > '$now_dt' and preorder_dt is not null and preorder_dt != ''"));
 
 	if (@$_GET['branch']) {
@@ -97,7 +103,11 @@
 
 	<div class="">
 
-		<br><br><br>
+		<div class="bl_c">
+			<div class="head_c or_head">
+				<h1><?=t::w('Orders', 'Тапсырыстар')?></h1>
+			</div>
+		</div>
 
 		<!-- <div class="bl_c">
 			<div class="pp_cont">
@@ -124,6 +134,12 @@
 						<div class="uc_uin_other">
 							<a class="pre_tab <?=(@$_GET['pre'] ? 'pre_tab_act' : '')?>" href="<?=(@$_GET['pre'] ? '/orders/' : '/orders/?pre=1')?>"><i class="fal fa-calendar-alt"></i> <?=t::w('Pre-orders', 'Предзаказдар')?><?=($pre_cnt ? ' <b>'.$pre_cnt.'</b>' : '')?></a>
 						</div>
+						<? if (!empty($cmp['coffee'])): // Төленбеген тек Кафесі бар компанияда (company.coffee) ?>
+						<div class="uc_uin_other">
+							<? $unp_q = $_GET; unset($unp_q['pre']); if (@$_GET['unpaid']) unset($unp_q['unpaid']); else $unp_q['unpaid'] = 1; ?>
+							<a class="pre_tab unp_tab <?=(@$_GET['unpaid'] ? 'pre_tab_act' : '')?>" href="/orders/<?=($unp_q ? '?'.http_build_query($unp_q) : '')?>"><i class="fal fa-wallet"></i> <?=t::w('Unpaid', 'Төленбеген')?><?=($unp_cnt ? ' <b>'.$unp_cnt.'</b>' : '')?></a>
+						</div>
+						<? endif ?>
 					<? endif ?>
 
 					<div class="uc_uin_other <?=($branch_lock || $branch_cnt < 2 ? 'dsp_n' : '')?>">
@@ -149,30 +165,42 @@
 					<div class="uc_uin_other">
 						<select name="status" class="on_sort_status" data-order-id="<?=$buy_d['id']?>" >
 							<option data-id="" value=""><?=t::w('Status: all', 'Статус: барлығы')?></option>
+							<? // статус түстері — карточкадағы түстермен бірдей ?>
+							<? if (!isset($st_colors_db)) { $st_colors_db = []; $stc_q = db::query("select name_ru, clr from retail_orders_status"); while ($stc = mysqli_fetch_assoc($stc_q)) $st_colors_db[trim($stc["name_ru"])] = $stc["clr"]; } $st_colors_f = $st_colors_db; // түстер базадан: retail_orders_status.clr ?>
 							<? $orders_status = db::query("select * from retail_orders_status order by number asc"); ?>
 							<? while ($orders_status_d = mysqli_fetch_assoc($orders_status)): ?><? if (trim($orders_status_d['name_ru']) == 'Вопрос' && @$order_sts['id'] != $orders_status_d['id'] && @$_GET['status'] != $orders_status_d['id']) continue; // «Вопрос» тізімде көрсетілмейді, базада қалады ?>
-								<option data-id="<?=$orders_status_d['id']?>" <?=(@$_GET['status'] == $orders_status_d['id']?'selected':'')?> value="" ><?=t::w('st:'.$orders_status_d['name_ru'], $orders_status_d['name_ru'])?></option>
+								<? $f_nm = trim($orders_status_d['name_ru']); $f_clr = isset($st_colors_f[$f_nm]) ? $st_colors_f[$f_nm] : (isset($st_colors_f[trim($orders_status_d['name_kz'])]) ? $st_colors_f[trim($orders_status_d['name_kz'])] : $orders_status_d['clr']); ?>
+								<option data-id="<?=$orders_status_d['id']?>" data-clr="<?=htmlspecialchars((string)$f_clr)?>" <?=(@$_GET['status'] == $orders_status_d['id']?'selected':'')?> value="" ><?=t::w('st:'.$orders_status_d['name_ru'], $orders_status_d['name_ru'])?></option>
 							<? endwhile ?>
 						</select>
 					</div>
 					
+					<? $cr_cnt = mysqli_num_rows(db::query("select id from company_staff where positions_id = 6 and company_id = '$company'")); ?>
+					<? if ($cr_cnt): // Компанияда бірде-бір курьер болмаса, Курьер сүзгісі шықпайды ?>
 					<div class="uc_uin_other">
 						<select name="staff" class="on_sort_staff" data-order-id="<?=$buy_d['id']?>" >
 							<option data-id="" value=""><?=t::w('Courier: all', 'Курьер: барлығы')?></option>
 							<option data-id="off" <?=(@$_GET['staff'] == 'off'?'selected':'')?> value=""><?=t::w('Courier: none', 'Курьер: таңдалмаған')?></option>
-							<? $staff = db::query("select * from user_staff where positions_id = 6 and company_id = '$company'"); ?>
+							<? $staff = db::query("select * from company_staff where positions_id = 6 and company_id = '$company'"); ?>
 							<? while ($staff_d = mysqli_fetch_assoc($staff)): ?>
 								<? $staff_user_d = fun::user($staff_d['user_id']); ?>
 								<option data-id="<?=$staff_d['user_id']?>" <?=(@$_GET['staff'] == $staff_d['user_id']?'selected':'')?> value=""><?=$staff_user_d['name']?></option>
 							<? endwhile ?>
 						</select>
 					</div>
+					<? endif ?>
 					
 					<div class="uc_us">
 						<div class="form_im uc_usn">
 							<input class="form_txt order_search_in" type="text" placeholder="<?=t::w('Search', 'Іздеу')?>" >
 							<i class="fal fa-search form_icon"></i>
 						</div>
+					</div>
+
+					<div class="uc_uin_other">
+						<? /* Карточка / тізім ауыстыру батырмасы: әзірге өшірулі
+						<div class="or_view_btn" title="<?=t::w('Cards / list', 'Карточка / тізім')?>"><i class="far fa-list"></i><i class="far fa-th-large"></i></div>
+						*/ ?>
 					</div>
 
 				</div>
@@ -191,142 +219,10 @@
 				<? if ($orders != ''): ?>
 					<? if (mysqli_num_rows($orders) != 0): ?>
 						<? while ($buy_d = mysqli_fetch_assoc($orders)): ?>
-							<? // if ($buy_d['branch_id']) $branch_d = fun::branch($buy_d['branch_id']); ?>
-							<? $order_sts = fun::order_sts($buy_d['order_status']); ?>
-							<? // Статус түсі (атауы бойынша), тізімде жоқ болса базадағы түс
-	$st_colors = ['Жаңа'=>'#1f75a8', 'Дайын'=>'#e9b949', 'Курьерде'=>'#d9480f', 'Аяқталған'=>'#0EA768', 'Отказ'=>'#e5484d', 'Отказ при получение'=>'#e86fa0', 'Вопрос'=>'#9aa0a6'];
-	$st_name = trim(@$order_sts['name_ru']);
-	$st_clr = isset($st_colors[$st_name]) ? $st_colors[$st_name] : (isset($st_colors[trim(@$order_sts['name_kz'])]) ? $st_colors[trim(@$order_sts['name_kz'])] : $order_sts['clr']);
-?>
-							<? $order_type = fun::order_type($buy_d['order_type']); ?>
-							<? $branch_d = fun::branch($buy_d['branch_id']); ?>
-
-							<div class="uc_ui or_card" style="--st:<?=$st_clr?>;">
-								<div class="uc_uil2" >
-									<div class="uc_uil2_top">
-										<div class="uc_uil2_nmb"><?=$branch_d['code']?><?=$buy_d['number']?></div>
-										<? if (@$buy_d['payment_method'] == 'unpaid'): ?><div style="align-self:center;margin:0 8px;padding:4px 10px;border-radius:8px;background:#e5484d;color:#fff;font-size:13px;font-weight:700;white-space:nowrap;"><?=t::w('Unpaid', 'Төленбеген')?></div><? endif ?>
-										<div class="uc_uil2_topc">
-											<div class="uc_uil2_topc1">
-												<div class="or_type">
-													<select name="" id="" class="on_type" data-order-id="<?=$buy_d['id']?>" <?=($order_sts['id'] != 4 && $order_sts['id'] != 5 && $order_sts['id'] != 6 ? '':'disabled')?>>
-														<? $orders_type = db::query("select * from retail_orders_type order by number asc"); ?>
-														<? while ($orders_type_d = mysqli_fetch_assoc($orders_type)): ?>
-															<? $type_name = $orders_type_d['nms']; ?>
-															<? if ($cmp[$type_name] == 1): ?>
-																<option data-id="<?=$orders_type_d['id']?>" <?=($order_type['id'] == $orders_type_d['id']?'selected':'')?> value="" ><?=t::w('type:'.$orders_type_d['name'], $orders_type_d['name'])?></option>
-															<? endif ?>
-														<? endwhile ?>
-													</select>
-												</div>
-												<div class="or_status" style="background-color:<?=$st_clr?>;"> <?//=$order_sts['name_kz']?>
-													<select name="" id="" class="on_status" data-order-id="<?=$buy_d['id']?>" >
-														<? $orders_status = db::query("select * from retail_orders_status order by number asc"); ?>
-														<? while ($orders_status_d = mysqli_fetch_assoc($orders_status)): ?><? if (trim($orders_status_d['name_ru']) == 'Вопрос' && @$order_sts['id'] != $orders_status_d['id'] && @$_GET['status'] != $orders_status_d['id']) continue; // «Вопрос» тізімде көрсетілмейді, базада қалады ?>
-															<option data-id="<?=$orders_status_d['id']?>" <?=($order_sts['id'] == $orders_status_d['id']?'selected':'')?> value="" ><?=t::w('st:'.$orders_status_d['name_ru'], $orders_status_d['name_ru'])?></option>
-														<? endwhile ?>
-													</select>
-												</div>
-											</div>
-											<? if ($order_type['id'] == 1): ?>
-												<div class="uc_uil2_date">
-													<div class="uc_uil2_date1">
-														<select name="" id="" class="on_staff" data-order-id="<?=$buy_d['id']?>" <?=($order_sts['id'] != 4 && $order_sts['id'] != 5 && $order_sts['id'] != 6 ? '':'disabled')?>>
-															<option value="" data-id="kr" <?=($buy_d['сourier_id']==null?'selected':'')?>><?=t::w('Courier: none', 'Курьер: таңдалмаған')?></option>
-															<? $staff = db::query("select * from user_staff where positions_id = 6 and company_id = '$company'"); ?>
-															<? while ($staff_d = mysqli_fetch_assoc($staff)): ?>
-																<? $staff_user_d = fun::user($staff_d['user_id']); ?>
-																<option value="" data-id="<?=$staff_d['user_id']?>" <?=($buy_d['сourier_id'] == $staff_d['user_id']?'selected':'')?>><?=$staff_user_d['name']?> || <span class="fr_phone"><?=$staff_user_d['phone']?></span></option>
-															<? endwhile ?>
-														</select>
-													</div>
-												</div>
-											<? endif ?>
-										</div>
-									</div>
-									<div class="uc_uil2_date uc_uil2_raz">
-										<div class=""><?=date("d-m-Y", strtotime($buy_d['ins_dt']))?> ⌛ <?=date("H:i", strtotime($buy_d['ins_dt']))?> <?=($buy_d['preorder_dt']?'| 🔴':'')?>  <?=($buy_d['preorder_dt']?$buy_d['preorder_dt']:'')?></div>
-									</div>
-									<div class="uc_uil2_raz">
-										<div class="uc_uil2_mi">
-											<div class="uc_uil2_mi1"><?=t::w('Address', 'Адрес:')?></div>
-											<div class="uc_uil2_mi2"><?=$buy_d['address']?></div>
-										</div>
-										<div class="uc_uil2_mi">
-											<div class="uc_uil2_mi1"><?=t::w('Number', 'Номер:')?></div>
-											<div class="uc_uil2_mi2 fr_phone"><?=$buy_d['phone']?></div>
-										</div>
-									</div>
-									<div class="uc_uil2_raz">
-										<div class="uc_uil2_trt">
-											<div class="uc_uil2_trt1"><?=t::w('Name', 'Атауы')?></div>
-											<div class="uc_uil2_trt2"><?=t::w('Qty', 'Саны')?></div>
-											<div class="uc_uil2_trt3"><?=t::w('Price', 'Бағасы')?></div>
-										</div>
-										<div class="uc_uil2_trc">
-
-											<? 	
-												$cashbox_id = $buy_d['id'];
-												$cashboxp = db::query("select * from retail_orders_products where order_id = '$cashbox_id' order by ins_dt asc");
-												$number = 0; $total = 0;
-											?>
-											<? if (mysqli_num_rows($cashboxp) != 0): ?>
-												<? while ($sel_d = mysqli_fetch_assoc($cashboxp)): ?>
-													<? 
-														$number++; 
-														$sum = $sel_d['quantity'] * $sel_d['price']; 
-														$total = $total + $sum;
-														$product_d = product::product($sel_d['product_id']);
-													?>
-													<div class="uc_uil2_trt">
-														<div class="uc_uil2_trt1"><?=$number?>. <?=$product_d['name_ru']?></div>
-														<div class="uc_uil2_trt2"><?=$sel_d['quantity']?> шт</div>
-														<!-- <div class=""><?=$sel_d['price']?></div> -->
-														<div class="uc_uil2_trt3 fr_price"><?=$sum?></div>
-													</div>
-												<? endwhile ?>
-											<? endif ?>
-											
-											<div class="uc_uil2_trt">
-												<div class="uc_uil2_trt1"><?=t::w('Delivery fee', 'Доставка')?></div>
-												<div class="uc_uil2_trt3 fr_price"><?=$buy_d['pay_delivery']?></div>
-											</div>
-										</div>
-										<div class="uc_uil2_trb">
-											<div class="uc_uil2_trt1"><?=t::w('Total', 'Жалпы')?></div>
-											<div class="uc_uil2_trt2"></div>
-											<div class="uc_uil2_trt3 fr_price"><?=$buy_d['total']?></div>
-										</div>
-										<div class="uc_uil2_trc">
-											<div class="uc_uil2_trt">
-												<div class="uc_uil2_trt1"><?=t::w('Prepayment', 'Предоплата')?></div>
-												<div class="uc_uil2_trt2">-</div>
-												<div class="uc_uil2_trt3 fr_price"><?=$buy_d['pay_qr']?></div>
-											</div>
-											<div class="uc_uil2_trt">
-												<div class="uc_uil2_trt1"><?=t::w('To courier (cash)', 'Курьерге (нал)')?></div>
-												<div class="uc_uil2_trt2"></div>
-												<div class="uc_uil2_trt3 fr_price"><?=$buy_d['pay_cash']?></div>
-											</div>
-										</div>
-									</div>
-									<div class="uc_uil2_raz">
-										<div class="uc_uil2_mi">
-											<div class="uc_uil2_mi1"><?=t::w('Operator:', 'Оператор:')?></div>
-											<div class="uc_uil2_mi2"><?=(fun::user($buy_d['user_id']))['name']?></div>
-										</div>
-									</div>
-									<div class="uc_uil2_raz">
-										<div class="uc_uil2_mib">
-											<a class="btn btn_cl on_ubd" data-id="<?=$buy_d['id']?>" href="/cashbox/?id=<?=$buy_d['id']?>&type=ubd"><?=t::w('Edit', 'Өзгерту')?></a>
-											<div class="btn  on_print" data-id="<?=$buy_d['id']?>"><?=t::w('Print', 'Печать')?></div>
-										</div>
-									</div>
-								</div>
-							</div>
-
+							<? include __DIR__."/card.php"; ?>
 							<?	
-								if ($buy_d['order_status'] != 5 && $buy_d['order_status'] != 6) {
+								if (in_array((int)$buy_d['order_status'], [6, 10])) $allorder['total'] = $allorder['total'] + (int)@$buy_d['kept_sum']; // отказ: тек бізде қалған ақша
+								elseif ($buy_d['order_status'] != 5) {
 									$allorder['total'] = $allorder['total'] + $buy_d['total'];
 									$allorder['pay_qr'] = $allorder['pay_qr'] + $buy_d['pay_qr'];
 									$allorder['pay_cash'] = $allorder['pay_cash'] + $buy_d['pay_cash'];
@@ -345,6 +241,50 @@
 	</div>
 
 	<script>
+		// Карточка / тізім көрінісі (таңдау есте қалады)
+		(function(){
+			var k = 'or_view'; // try { if (localStorage.getItem(k) == 'list') document.body.classList.add('or_list') } catch (e) {} // тізім көрінісі әзірге өшірулі
+			$(document).on('click', '.or_view_btn', function(){
+				document.body.classList.toggle('or_list')
+				try { localStorage.setItem(k, document.body.classList.contains('or_list') ? 'list' : 'card') } catch (e) {}
+			})
+		})()
+		// Карточкадағы таңдаулар (тип, статус, курьер): әдемі тізім. Ішінде бұрынғы select қалады, change сол арқылы жүреді
+		$(function(){
+			function ph(p){ p = String(p || '').replace(/\D/g, ''); if (p.length == 11) p = p.substr(1); return p.length == 10 ? '8 (' + p.substr(0,3) + ') ' + p.substr(3,3) + '-' + p.substr(6,2) + '-' + p.substr(8,2) : p }
+			function esc(t){ return $('<i>').text(t).html() }
+			function item(o, staff){
+				var n = $(o).attr('data-name'), c = $(o).attr('data-clr')
+				if (n) return '<b>' + esc(n) + '</b><small>' + ph($(o).attr('data-phone')) + '</small>'
+				var ic = $(o).attr('data-ico'); if (ic) return '<i class="far ' + esc(ic) + ' cr_ico"></i><b>' + esc($.trim($(o).text())) + '</b>'
+				if (staff) return '<b class="cr_none">' + esc($(o).text()) + '</b>'
+				return (c ? '<em class="cr_dot" style="background:' + esc(c) + '"></em>' : '') + '<b>' + esc($.trim($(o).text())) + '</b>'
+			}
+			// scope: карточкалар (жаңартылған карточкаға да қайта шақырылады)
+			// Жеткізуде курьер таңдалмаса: Курьерде / Аяқталған бұғатталады
+			function no_cour(sel){ var card = sel.closest('.or_card'); return card.hasClass('or_t1') && (card.find('select.on_staff option:selected').attr('data-id') || 'kr') == 'kr' }
+			window.or_dd = function(scope){ $(scope).find('select.on_staff, select.on_type, select.on_status').each(function(){
+				var sel = $(this)
+				// Тип: dropdown емес, бірден иконка-батырмалар
+				if (sel.hasClass('on_type')) {
+					var tb = $('<div class="tp_btns"></div>'), dis = sel.prop('disabled')
+					tb.append('<span class="tp_sl"></span>').css('--i', sel.prop('selectedIndex')).toggleClass('tp_off', !!dis)
+					sel.find('option').each(function(i){ tb.append($('<div class="tp_b"></div>').attr({ 'data-i': i, title: $.trim($(this).text()) }).toggleClass('tp_act', i == sel.prop('selectedIndex')).toggleClass('tp_dis', !!dis).html('<i class="far ' + esc($(this).attr('data-ico') || 'fa-circle') + '"></i>')) })
+					tb.on('click', '.tp_b', function(e){ e.stopPropagation(); if ($(this).hasClass('tp_dis')) { mess('<?=t::w('Closed order cannot be edited', 'Жабық тапсырысты өзгертуге болмайды')?>'); return } var i = +$(this).attr('data-i'); if (i == sel.prop('selectedIndex')) return; tb.find('.tp_b').removeClass('tp_act'); $(this).addClass('tp_act'); tb.css('--i', i); sel.prop('selectedIndex', i).trigger('change') })
+					sel.hide().after(tb); return
+				}
+				var staff = sel.hasClass('on_staff'), box = $('<div class="cr_dd"><div class="cr_btn"></div><div class="cr_list"></div></div>')
+				if (sel.hasClass('on_status')) box.addClass('cr_st'); if (sel.hasClass('on_type')) box.addClass('cr_tp')
+				if (sel.prop('disabled')) box.addClass('cr_dis')
+				sel.find('option').each(function(i){ box.find('.cr_list').append($('<div class="cr_opt"></div>').attr('data-i', i).html(item(this, staff))) })
+				function show(){ var o = sel.find('option:selected')[0]; box.find('.cr_btn').html('<span class="cr_v">' + (sel.hasClass('on_status') ? '<b>' + esc($.trim($(o).text())) + '</b>' : item(o, staff)) + '</span><i class="far fa-chevron-down"></i>'); box.find('.cr_opt').removeClass('cr_act').eq(sel.prop('selectedIndex')).addClass('cr_act') }
+				show(); sel.hide().after(box)
+				box.on('click', '.cr_btn', function(e){ e.stopPropagation(); if (box.hasClass('cr_dis')) return; if (sel.hasClass('on_status')) { var nc = no_cour(sel); sel.find('option').each(function(i){ var lk = $(this).attr('data-lock') == '1' && i != sel.prop('selectedIndex'); var ld = $(this).attr('data-done') == '1'; box.find('.cr_opt').eq(i).toggleClass('cr_lock_d', ld); var lu = $(this).attr('data-unp') == '1' && i != sel.prop('selectedIndex'); box.find('.cr_opt').eq(i).toggleClass('cr_lock_k', lk).toggleClass('cr_lock_u', lu).toggleClass('cr_lock', ld || lk || lu || (nc && $(this).attr('data-cour') == '1')) }) } $('.cr_dd').not(box).removeClass('cr_open'); box.toggleClass('cr_open') })
+				box.on('click', '.cr_opt', function(e){ e.stopPropagation(); var i = +$(this).attr('data-i'); if ($(this).hasClass('cr_lock_d')) { mess('<?=t::w('Delivered order cannot be refused', 'Курьер аяқтаған тапсырысқа отказ қоюға болмайды')?>'); return } if ($(this).hasClass('cr_lock_k')) { mess('<?=t::w('Only the courier sets this status', 'Бұл статусты тек курьер қояды')?>'); return } if ($(this).hasClass('cr_lock_u')) { mess('<?=t::w('Unpaid order cannot be completed', 'Төленбеген тапсырысты аяқтауға болмайды')?>'); return } if ($(this).hasClass('cr_lock')) { mess('<?=t::w('Choose a courier first', 'Алдымен курьерді таңдаңыз')?>'); return } box.removeClass('cr_open'); if (i == sel.prop('selectedIndex')) return; sel.prop('selectedIndex', i).trigger('change'); show() })
+			}) }
+			or_dd($('.or_card'))
+			$(document).on('click', function(){ $('.cr_dd').removeClass('cr_open') })
+		})
 		$(document).ready(function() {
 			$('.pp_total').html('<?=t::w('Total', 'Жалпы')?>: <?=$allorder['total']?> тг');
 			$('.pp_qr').html('QR: <?=$allorder['pay_qr']?> тг');

@@ -1,4 +1,5 @@
 <? include "../config/core.php";
+   include_once "../orders/log.php";
    
    
    // 
@@ -77,7 +78,7 @@
    // cashbox_qn
 	if(isset($_GET['cashbox_qn'])) {
 		$id = strip_tags($_POST['id']);
-		$qn = strip_tags($_POST['qn']);
+		$qn = max(1, (int)strip_tags($_POST['qn'])); // 0 не теріс сан болмайды
       $retailop_d = fun::retailop($id);
       $pitem_id = $retailop_d['product_id'];
       $pitem_d = product::product($pitem_id);
@@ -107,7 +108,8 @@
    // cashbox_minus
 	if(isset($_GET['cashbox_minus'])) {
 		$id = strip_tags($_POST['id']);
-      $upd1 = db::query("UPDATE `retail_orders_products` SET `quantity` = `quantity` - 1 WHERE id = '$id';");
+      // 1-ден төмен түспейді (интернет баяу болып бірнеше рет басылса да)
+      $upd1 = db::query("UPDATE `retail_orders_products` SET `quantity` = `quantity` - 1 WHERE id = '".(int)$id."' and `quantity` > 1;");
       if ($upd1) echo 'yes'; else echo 'none';
       exit();
 	}
@@ -125,6 +127,11 @@
 		$delivery = @strip_tags($_POST['delivery']);
 		$address = @strip_tags($_POST['address']);
 		$add = @strip_tags($_POST['add']);
+		// Этаж, квартира: бөлек бағандарда (курьер сайтында бөлек көрсету үшін)
+		$floor = mb_substr(trim(str_replace(',', ' ', strip_tags((string)@$_POST['floor']))), 0, 10);
+		$apt = mb_substr(trim(str_replace(',', ' ', strip_tags((string)@$_POST['apt']))), 0, 10);
+		// Бір бағанда, үтірмен: «4 этаж, 15 кв»
+		$floor_apt = implode(', ', array_filter([$floor !== '' ? $floor.' этаж' : '', $apt !== '' ? $apt.' кв' : '']));
 		$preorder = @trim(strip_tags($_POST['preorder']));
 		if (!preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/', $preorder)) $preorder = '';
 		if ($preorder && substr($preorder, 0, 10) > date('Y-m-d', strtotime('+7 day'))) $preorder = ''; // ең көбі 1 апта
@@ -148,16 +155,34 @@
 		$phone = @strip_tags($_POST['phone']);
       $phone2 = substr($phone, 1);
 
-      // Предзаказ: ins_dt = предзаказ уақыты, нөмірі сол күннің ретімен
+      // Предзаказ: ins_dt = предзаказ уақыты. Нөмірі: бүгінге болса — бүгінгі жалпы ретпен (15-тен соң 16),
+      // басқа күнге болса — сол күннің ретімен (1, 2, ...)
       $ins_dt = $datetime; $n_start = $start_cdate; $n_end = $end_cdate;
+      $pre_today = true;
       if ($preorder) {
          $ins_dt = $preorder.':00';
-         if ($ins_dt < $start_cdate || $ins_dt >= $end_cdate) {
+         $pre_today = substr($ins_dt, 0, 10) == date('Y-m-d') || ($ins_dt >= $start_cdate && $ins_dt < $end_cdate);
+         if (!$pre_today) {
             $n_start = date('Y-m-d 06:00:00', strtotime($ins_dt.' -6 hours'));
             $n_end = date('Y-m-d 06:00:00', strtotime($n_start.' +1 day'));
          }
       }
       $cashbox_number = product::next_number_order($n_start, $n_end, $company, $order_branch);
+      if (order_log_on()) {
+         // Әр тапсырыс қай күннің ретіне жатады: кәдімгі — ins_dt күні; предзаказ «бүгінге» болса — қабылданған күні
+         // (қабылданған уақыты тарихтағы «created»), басқа күнге болса — предзаказ күні
+         $pre_w = "(o.preorder_dt is not null and o.preorder_dt != '')";
+         $acc = "coalesce(l.ins_dt, o.ins_dt)";
+         $tt = "(date($acc) = date(o.ins_dt) or date($acc - interval 6 hour) = date(o.ins_dt - interval 6 hour))";
+         $nq = mysqli_fetch_assoc(db::query("select max(o.number) m from retail_orders o left join retail_orders_log l on l.order_id = o.id and l.field = 'created'
+            where o.company_id = '$company' and o.branch_id = '$order_branch' and o.id != '".(int)$id."'
+            and ((not $pre_w and o.ins_dt BETWEEN '$n_start' and '$n_end')
+              or ($pre_w and $tt and $acc BETWEEN '$n_start' and '$n_end')
+              or ($pre_w and not $tt and o.ins_dt BETWEEN '$n_start' and '$n_end'))"));
+         $cashbox_number = (int)@$nq['m'] + 1;
+      }
+      $log_before = order_row($id); // тарих үшін: өзгеріске дейінгі күйі
+      if ($type == 'ubd' && in_array((int)@$log_before['order_status'], [4, 5, 6, 10])) { echo 'locked'; exit(); } // жабық тапсырыс өзгертілмейді
 
       if ($type != 'ubd') {
          $upd = db::query("UPDATE `retail_orders` SET `number` = '$cashbox_number', `branch_id` = '$order_branch', `paid` = 1, `total` = '$total', `ins_dt` = '$ins_dt', `upd_dt` = '$datetime' WHERE `id`='$id'");
@@ -209,30 +234,41 @@
       if ($phone) $upd = db::query("UPDATE `retail_orders` SET `phone` = '$phone2', `upd_dt` = '$datetime' WHERE `id`='$id'");
       if ($address) $upd = db::query("UPDATE `retail_orders` SET `address` = '$address', `upd_dt` = '$datetime' WHERE `id`='$id'");
       if ($add) $upd = db::query("UPDATE `retail_orders` SET `additional` = '$add', `upd_dt` = '$datetime' WHERE `id`='$id'");
+      $fa_e = function ($v) { return $v === '' ? 'NULL' : "'".mysqli_real_escape_string(db::$connect, $v)."'"; };
+      if (isset($_POST['floor']) && mysqli_num_rows(db::query("SHOW COLUMNS FROM `retail_orders` LIKE 'floor_apt'"))) {
+         db::query("UPDATE `retail_orders` SET `floor_apt` = ".$fa_e(trim($floor_apt))." WHERE `id`='".(int)$id."'");
+      }
       if ($preorder) $upd = db::query("UPDATE `retail_orders` SET `preorder_dt` = '$preorder', `ins_dt` = '$preorder:00', `upd_dt` = '$datetime' WHERE `id`='$id'");
       
       // if ($ynd) $upd = db::query("UPDATE `retail_orders` SET `order_type` = 3, `upd_dt` = '$datetime' WHERE `id`='$id'");
       
 
 
-      // Клиент: client кестесіне бірден қосу/жаңарту (нөмір 10 санға келтіріледі)
+      // Клиент: company_client кестесіне бірден қосу/жаңарту (нөмір 10 санға келтіріледі)
       $cl_ph = preg_replace('/\D+/', '', (string)$phone);
       if (strlen($cl_ph) == 11 && ($cl_ph[0] == '8' || $cl_ph[0] == '7')) $cl_ph = substr($cl_ph, 1);
-      if (strlen($cl_ph) == 10 && $cl_ph[0] == '7' && mysqli_num_rows(db::query("SHOW TABLES LIKE 'client'"))) {
+      if (strlen($cl_ph) == 10 && $cl_ph[0] == '7' && mysqli_num_rows(db::query("SHOW TABLES LIKE 'company_client'"))) {
          $cl_cmp = (int)$company;
          $cl_addr = trim(preg_replace('/\s+/', ' ', (string)$address));
-         $cl_has_list = mysqli_num_rows(db::query("SHOW COLUMNS FROM `client` LIKE 'addresses'"));
-         $cl = mysqli_fetch_assoc(db::query("select * from client where company_id = '$cl_cmp' and phone = '$cl_ph' limit 1"));
+         $cl_has_list = mysqli_num_rows(db::query("SHOW COLUMNS FROM `company_client` LIKE 'addresses'"));
+         $cl = mysqli_fetch_assoc(db::query("select * from company_client where company_id = '$cl_cmp' and phone = '$cl_ph' limit 1"));
          $cl_e = function ($v) { return mysqli_real_escape_string(db::$connect, (string)$v); };
          if (!$cl) {
-            db::query("INSERT IGNORE INTO `client` (`company_id`, `phone`, `address`, `first_dt`, `last_dt`, `ins_dt`)
+            db::query("INSERT IGNORE INTO `company_client` (`company_id`, `phone`, `address`, `first_dt`, `last_dt`, `ins_dt`)
                VALUES ('$cl_cmp', '$cl_ph', ".($cl_addr !== '' ? "'".$cl_e($cl_addr)."'" : 'NULL').", '$ins_dt', '$ins_dt', '$datetime')");
-            $cl = mysqli_fetch_assoc(db::query("select * from client where company_id = '$cl_cmp' and phone = '$cl_ph' limit 1"));
+            $cl = mysqli_fetch_assoc(db::query("select * from company_client where company_id = '$cl_cmp' and phone = '$cl_ph' limit 1"));
+         }
+         // клиентті user-ге байлау (user = барлық адам, телефон 10 сан)
+         if ($cl && empty($cl['user_id'])) {
+            db::query("INSERT IGNORE INTO `user` (`name`, `phone`) VALUES ('', '$cl_ph')");
+            $cl_u = mysqli_fetch_assoc(db::query("select id from `user` where phone = '$cl_ph' limit 1"));
+            if ($cl_u) db::query("UPDATE `company_client` SET `user_id` = '".(int)$cl_u['id']."' WHERE `id` = '".(int)$cl['id']."'");
          }
          if ($cl) {
             $set = ["`upd_dt` = '$datetime'"];
             if ($cl_addr !== '') $set[] = "`address` = '".$cl_e($cl_addr)."'"; // соңғы адрес
             if (!$cl['last_dt'] || $cl['last_dt'] < $ins_dt) $set[] = "`last_dt` = '$ins_dt'";
+            if ($cl_addr !== '' && array_key_exists('floor_apt', $cl)) { $set[] = "`floor_apt` = ".$fa_e(trim($floor_apt)); } // соңғы адрестікі
             // Барлық адрестер бір бағанда, «; » белгісімен (қайталанбайды)
             if ($cl_has_list && $cl_addr !== '') {
                $list = trim((string)$cl['addresses']);
@@ -241,11 +277,27 @@
                   $set[] = "`addresses` = '".$cl_e($list)."'";
                }
             }
-            db::query("UPDATE `client` SET ".implode(', ', $set)." WHERE `id` = '".(int)$cl['id']."'");
+            db::query("UPDATE `company_client` SET ".implode(', ', $set)." WHERE `id` = '".(int)$cl['id']."'");
             if (mysqli_num_rows(db::query("SHOW COLUMNS FROM `retail_orders` LIKE 'client_id'"))) {
                db::query("UPDATE `retail_orders` SET `client_id` = '".(int)$cl['id']."' WHERE `id` = '".(int)$id."'");
             }
          }
+      }
+
+      // Тарих: жаңа тапсырыс не өзгертілген өрістер (ескі → жаңа), тағамдар тізімі
+      if (order_log_on()) {
+         $log_after = order_row($id);
+         if ($type != 'ubd') {
+            order_log($id, 'created', '', '#'.$cashbox_number);
+            order_log($id, 'status', '', @$log_after['order_status']);
+         } else {
+            foreach (['order_type','branch_id','phone','address','floor_apt','additional','preorder_dt','total','pay_delivery','pay_qr','pay_cash','pay_prepay','prepay_method','payment_method','pay_transfer','pay_red','service','order_status'] as $lf) {
+               if (array_key_exists($lf, (array)$log_after)) order_log($id, $lf == 'order_status' ? 'status' : $lf, @$log_before[$lf], @$log_after[$lf]);
+            }
+         }
+         $snap = order_items_snap($id);
+         $prev = mysqli_fetch_assoc(db::query("select new_value from retail_orders_log where order_id = '".(int)$id."' and field = 'items' order by id desc limit 1"));
+         order_log($id, 'items', $prev ? $prev['new_value'] : '', $snap);
       }
 
       // Жауапты бірден қайтарамыз (чек кідірмейді), Telegram артынан фонда жіберіледі
@@ -297,6 +349,7 @@
             'Формат'     => ($type_names[(int)$order_type] ?? '').($order_type == 3 && $service !== '' ? ' ('.$service.')' : ''),
             'Телефон'    => (strlen(preg_replace('/\D+/', '', (string)$phone)) > 4 ? $phone : ''),
             'Адрес'      => $address,
+            'Этаж, кв'   => $floor_apt,
             'Қосымша'    => $add,
             'Предзаказ'  => $preorder,
          ];
@@ -454,9 +507,9 @@
 		$res = ['address' => '', 'name' => ''];
 		if (strlen($d) == 10) {
 			$cmp = (int)$company;
-			if (mysqli_num_rows(db::query("SHOW TABLES LIKE 'client'"))) {
-				$cl = db::query("select name, address from client where company_id = '$cmp' and phone = '$d' and archive = 0 limit 1");
-				if ($cl && $c = mysqli_fetch_assoc($cl)) $res = ['address' => (string)$c['address'], 'name' => (string)$c['name']];
+			if (mysqli_num_rows(db::query("SHOW TABLES LIKE 'company_client'"))) {
+				$cl = db::query("select * from company_client where company_id = '$cmp' and phone = '$d' and archive = 0 limit 1");
+				if ($cl && $c = mysqli_fetch_assoc($cl)) $res = ['address' => (string)$c['address'], 'name' => (string)$c['name'], 'floor' => preg_match('/(\S+) этаж/u', (string)@$c['floor_apt'], $m1) ? $m1[1] : '', 'apt' => preg_match('/(\S+) кв/u', (string)@$c['floor_apt'], $m2) ? $m2[1] : ''];
 			}
 			if ($res['address'] == '') {
 				$ro = db::query("select address from retail_orders where company_id = '$cmp' and phone like '%$d' and address is not null and address <> '' order by ins_dt desc limit 1");

@@ -19,9 +19,10 @@
 
 	// sign in phone
 	if(isset($_GET['sign'])) {
-		$user_id = strip_tags($_POST['user_id']);
-		$code = strip_tags($_POST['code']);
-		$user = db::query("SELECT * FROM user WHERE id = '$user_id' and `code` = '$code' and `right` = 1");
+		$user_id = (int)@$_POST['user_id'];
+		$code = preg_replace('/\D/', '', (string)@$_POST['code']);
+		// POS коды company_staff кестесінде
+		$user = db::query("SELECT u.* FROM user u JOIN company_staff s ON s.user_id = u.id WHERE u.id = '$user_id' and s.code = '$code' and u.`right` = 1 limit 1");
 		if (mysqli_num_rows($user)) {
 			$user_d = mysqli_fetch_array($user);
 			$_SESSION['upi'] = $user_d['id'];
@@ -50,7 +51,7 @@
 		$sex = strip_tags($_POST['sex']);
 		$age = strip_tags($_POST['age']);
 		$mail = strip_tags($_POST['mail']);
-		$phone = strip_tags($_POST['phone']);
+		$phone = substr(preg_replace('/\D/', '', (string)@$_POST['phone']), -10);
 		$password = strip_tags($_POST['password']);
 		
 		$upd = db::query("UPDATE `user` SET `name`='$n_name', `surname`='$surname', `sex`='$sex', `age`='$age', `mail`='$mail', `phone`='$phone', `password`='$password', `upd_dt`='$datetime' WHERE id = '$user_id'");

@@ -3,6 +3,7 @@
 		<div class="bl_c">
 			<div class="aheader_c">
 				<div class="alogo" href="/">
+					<a href="/cashbox/" class="bp_brand" title="BERIK POS" style="display:flex;align-items:center;gap:8px;margin-right:12px;text-decoration:none;color:inherit;white-space:nowrap"><img src="/assets/img/logo/berik-icon.svg" alt="BERIK POS" width="34" height="34" style="display:block;width:34px;height:34px"><span style="font-family:'Nunito',sans-serif;font-style:italic;font-weight:900;font-size:19px;letter-spacing:.3px;line-height:1">BERIK <b style="color:#0EA768;font-weight:800">POS</b></span></a>
 					<!-- <div><?=$site['name']?></div> -->
 					<!-- <p title="Касса"><i class="fal fa-cash-register"></i> 1</p> -->
 					<!-- <p>Кассир: <?=$user['name']?> <?=$user['surname']?></p> -->

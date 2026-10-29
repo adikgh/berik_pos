@@ -116,6 +116,9 @@
         <div class="clens2">
             <p>Номер: <b>8<?=$cashbox_d['phone']?></b></p>
             <p>Адрес: <b><?=$cashbox_d['address']?></b></p>
+            <? $fa = trim((string)@$cashbox_d['floor_apt']); if ($fa !== ''): ?>
+            <p><b><?=htmlspecialchars($fa)?></b></p>
+            <? endif ?>
         </div>
     </div>
 

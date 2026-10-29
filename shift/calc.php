@@ -7,11 +7,11 @@
 		$col = function($c) { return mysqli_num_rows(db::query("SHOW COLUMNS FROM `retail_orders` LIKE '$c'")) > 0; };
 		$has = ['pay_prepay' => $col('pay_prepay'), 'prepay_method' => $col('prepay_method'), 'pay_transfer' => $col('pay_transfer'), 'service' => $col('service')];
 
-		// Отказ статустары есепке кірмейді
-		$st_off = [];
-		$q = db::query("select id from retail_orders_status where name_ru in ('Отказ', 'Отказ при получение')");
-		while ($r = mysqli_fetch_assoc($q)) $st_off[] = (int)$r['id'];
-		$st_cond = $st_off ? "and (order_status is null or order_status not in (".implode(',', $st_off)."))" : '';
+		// «Отказ» (money=none) есепке кірмейді; «Отказ при получение» / «Отказ вне» (money=kept) — тек бізде қалған ақша (kept_sum)
+		$st_off = []; $st_none = []; $st_kept = [];
+		$q = db::query("select id, money from retail_orders_status where money <> 'full'");
+		while ($r = mysqli_fetch_assoc($q)) { $st_off[] = (int)$r['id']; if ($r['money'] == 'kept') $st_kept[] = (int)$r['id']; else $st_none[] = (int)$r['id']; }
+		$st_cond = $st_none ? "and (order_status is null or order_status not in (".implode(',', $st_none)."))" : '';
 
 		$res = ['cash' => 0, 'qr' => 0, 'transfer' => 0, 'red' => 0, 'my' => 0, 'cnt' => 0,
 			'pre_cnt' => 0, 'pre_sum' => 0, 'cafe_cnt' => 0, 'cafe_sum' => 0,
@@ -23,13 +23,15 @@
 		$q = db::query("select * $base $st_cond");
 		while ($o = mysqli_fetch_assoc($q)) {
 			$t = (int)$o['order_type'];
+			$kept = in_array((int)$o['order_status'], $st_kept) ? max(0, (int)@$o['kept_sum']) : -1; // -1: отказ емес
 			$cash = (int)$o['pay_cash']; $qr = (int)$o['pay_qr'];
 			$tr = $has['pay_transfer'] ? (int)$o['pay_transfer'] : 0;
 			if ($t == 3) {
 				$name = ($has['service'] && trim((string)$o['service']) !== '') ? trim($o['service']) : 'Басқа';
 				if (!isset($res['srv'][$name])) $res['srv'][$name] = ['cnt' => 0, 'sum' => 0];
-				$res['srv'][$name]['cnt']++; $res['srv'][$name]['sum'] += (int)$o['total'];
-				$res['srv_cnt']++; $res['srv_sum'] += (int)$o['total'];
+				$srv_sum = $kept >= 0 ? $kept : (int)$o['total'];
+				$res['srv'][$name]['cnt']++; $res['srv'][$name]['sum'] += $srv_sum;
+				$res['srv_cnt']++; $res['srv_sum'] += $srv_sum;
 				continue;
 			}
 			if ($t == 4) {
@@ -39,6 +41,7 @@
 			}
 			// Жеткізу / Өзімен: тек предоплата
 			$pre = $has['pay_prepay'] ? (int)$o['pay_prepay'] : $qr;
+			if ($kept >= 0) $pre = min($pre, $kept); // отказ: предоплатадан тек бізде қалғаны
 			if ($pre <= 0) continue;
 			$m = $has['prepay_method'] ? (string)$o['prepay_method'] : '';
 			if ($m == 'cash') $res['cash'] += $pre;

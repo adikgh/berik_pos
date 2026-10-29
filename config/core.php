@@ -28,14 +28,15 @@
          $user_pc = false;
 
          if (isset($_COOKIE['upi']) && isset($_COOKIE['upc'])) {
-            $user_id = $_COOKIE['upi'];
-            $user_pc = $_COOKIE['upc'];
+            $user_id = (int)$_COOKIE['upi'];
+            $user_pc = preg_replace('/\D/', '', (string)$_COOKIE['upc']);
          }
          if ($user_id && $user_pc) {
-            $user = db::query("SELECT * FROM user WHERE id = '$user_id'");
+            // POS коды company_staff кестесінде
+            $user = db::query("SELECT u.* FROM user u JOIN company_staff s ON s.user_id = u.id WHERE u.id = '$user_id' and s.code = '$user_pc' limit 1");
             if (mysqli_num_rows($user)) {
                $user_data = mysqli_fetch_assoc($user);
-               if ($user_pc == $user_data['code'] && $user_data['right']) {
+               if ($user_data['right']) {
                   self::$user_id = $user_id;
                   self::$user_data = $user_data;
                } else $this->user_unset();

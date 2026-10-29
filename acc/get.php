@@ -6,7 +6,7 @@
 	if (isset($_GET['upd'])) {
 		$name = mysqli_real_escape_string(db::$connect, trim(strip_tags(@$_POST['name'])));
 		$surname = mysqli_real_escape_string(db::$connect, trim(strip_tags(@$_POST['surname'])));
-		$phone = preg_replace('/\D+/', '', (string)@$_POST['phone']);
+		$phone = substr(preg_replace('/\D/', '', (string)@$_POST['phone']), -10);
 		if ($name === '') { echo 'name'; exit(); }
 		if ($phone !== '' && strlen($phone) < 10) { echo 'phone'; exit(); }
 		$phone_sql = $phone === '' ? 'NULL' : "'$phone'";

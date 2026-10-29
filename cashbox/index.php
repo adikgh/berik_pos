@@ -18,6 +18,7 @@
 	} else $cashbox = db::query("select * from retail_orders where user_id = '$user_id' and paid = 0 order by id desc limit 1");
 	if (mysqli_num_rows($cashbox)) {
 		$cashbox_d = mysqli_fetch_assoc($cashbox);
+		if (@$_GET['type'] == 'ubd' && in_array((int)$cashbox_d['order_status'], [4, 5, 6, 10])) { header('location: /orders/'); exit(); } // жабық тапсырыс өзгертілмейді
 		$cashbox_id = $cashbox_d['id'];
 	} else {
 		$cashbox_id = (mysqli_fetch_assoc(db::query("SELECT * FROM `retail_orders` order by id desc")))['id'] + 1;
@@ -171,6 +172,34 @@
 <? include "../block/footer.php"; ?>
 
 	<!--  -->
+	<!-- Жеткізу картасы: экран ортасында ашылады -->
+	<div class="dlv_map_pop">
+		<div class="dlv_map_bg"></div>
+		<div class="dlv_map_box">
+			<div class="dlv_map_head">
+				<h4><?=t::w('Delivery map', 'Жеткізу картасы')?></h4>
+				<div class="btn btn_dd dlv_map_close"><i class="fal fa-times"></i></div>
+			</div>
+			<? // Көшелер / аудандар: company_delivery_zone кестесінен (кесте жоқ болса бос)
+				$dz_list = [];
+				if (mysqli_num_rows(db::query("SHOW TABLES LIKE 'company_delivery_zone'"))) {
+					$dz_br = mysqli_num_rows(db::query("SHOW COLUMNS FROM company_delivery_zone LIKE 'branch_id'")) > 0; // точкаға байланған ба
+					$dz = db::query("select id, name, price".($dz_br ? ", branch_id" : "")." from company_delivery_zone where company_id = '".(int)$company."' order by sort asc, name asc");
+					while ($dz_d = mysqli_fetch_assoc($dz)) $dz_list[] = $dz_d;
+				}
+			?>
+			<div class="dlv_map_body">
+				<div class="dz_search"><i class="fal fa-search"></i><input type="text" class="dz_q" placeholder="<?=t::w('Search street', 'Көшені іздеу')?>"></div>
+				<div class="dz_grid">
+					<? foreach ($dz_list as $dz_d): ?>
+						<div class="dz_i" data-price="<?=(int)$dz_d['price']?>" data-branch="<?=(int)@$dz_d['branch_id']?>" data-name="<?=htmlspecialchars($dz_d['name'])?>"><span><?=htmlspecialchars($dz_d['name'])?></span><b><?=number_format((int)$dz_d['price'], 0, '', ' ')?> тг</b></div>
+					<? endforeach ?>
+					<div class="dz_empty <?=($dz_list ? 'dsp_n' : '')?>"><i class="fal fa-map-marked-alt"></i><span class="dz_empty_0"><?=t::w('No streets yet', 'Бұл точкаға көше әлі қосылмаған')?></span><span class="dz_empty_q dsp_n" data-tpl="<?=htmlspecialchars(t::w('Street not found', '«%s» бойынша көше табылмады'))?>"></span></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<div class="pop_bl pop_bl2 cashbox_pay_block">
 		<div class="pop_bl_a cashbox_pay_back"></div>
 
@@ -195,6 +224,8 @@
 						$уbranch = db::query("select * from company_branch where company_id = '$company' order by number asc");
 						while ($branch_d = mysqli_fetch_assoc($уbranch)) $branch_list[] = $branch_d;
 						$sel_branch = $branch;
+						$is_edit = !empty($cashbox_d['paid']); // «Өзгерту»: тапсырыстың бұрынғы мәндері таңдалып тұрады
+						if ($is_edit && @$cashbox_d['branch_id']) $sel_branch = $cashbox_d['branch_id'];
 						if (count($branch_list) == 1) $sel_branch = $branch_list[0]['id'];
 						// company.show_branch = 0 болса точка таңдауы жасырылады, кассирдің өз точкасы қойылады (баған жоқ не бос болса — көрінеді)
 						$branch_hide = count($branch_list) < 2 || (isset($cmp['show_branch']) && $cmp['show_branch'] !== null && (int)$cmp['show_branch'] === 0);
@@ -204,7 +235,7 @@
 						<div class="form_span"><?=t::w('Branch:', 'Точка:')?></div>
 						<? foreach ($branch_list as $branch_d): ?>
 							<div class="form_im_slo " >
-								<div class="form_im_slo_i <?=($sel_branch == $branch_d['id']?'form_im_slo_act':'')?>"  data-type="<?=$branch_d['id']?>" data-pay="<?=htmlspecialchars((string)@$branch_d['pay_types'])?>"><?=$branch_d['name']?></div>
+								<div class="form_im_slo_i <?=($sel_branch == $branch_d['id']?'form_im_slo_act':'')?>"  data-type="<?=$branch_d['id']?>" data-pay="<?=htmlspecialchars((string)@$branch_d['pay_types'])?>" data-pay-def="<?=htmlspecialchars((string)@$branch_d['pay_default'])?>"><?=$branch_d['name']?></div>
 							</div>
 						<? endforeach ?>
 					</div>
@@ -214,29 +245,37 @@
 						foreach ([1 => 'delivery', 2 => 'yourself', 4 => 'coffee', 3 => 'service'] as $t_id => $t_col) if (@$cmp[$t_col]) $type_on[] = $t_id;
 						$type_def = (int)@$cmp['type_def'];
 						if (!in_array($type_def, $type_on)) $type_def = $type_on ? $type_on[0] : 1;
+						$type_first = $type_def; // компанияның стандарты бірінші тұрады
+						if (!empty($cashbox_d['paid']) && in_array((int)@$cashbox_d['order_type'], $type_on)) $type_def = (int)$cashbox_d['order_type'];
 					?>
 					<div class="form_im form_imss sel_type" data-val="<?=$type_def?>">
 						<div class="form_span"><?=t::w('Order type:', 'Заказ түрі:')?></div>
+						<? // Бір блок ішінде ауысатын батырмалар: --n саны, --i таңдалғанның орны
+							$tp_on = []; foreach ([1 => 'delivery', 2 => 'yourself', 4 => 'coffee', 3 => 'service'] as $tk => $tn) if ($cmp[$tn]) $tp_on[] = $tk;
+							$tp_i = array_search((int)$type_def, $tp_on); if ($tp_i === false) $tp_i = 0;
+						?>
+						<div class="tp_seg" style="--n:<?=max(1, count($tp_on))?>; --i:<?=$tp_i?>;"><span class="tp_seg_sl"></span>
 						<? if ($cmp['delivery']): ?>
-							<div class="form_im_slo<?=($type_def == 1 ? ' sel_type_def' : '')?>">
-								<div class="form_im_slo_i <?=($type_def == 1 ? 'form_im_slo_act' : '')?>"  data-type="1"><?=t::w('Delivery', 'Жеткізу')?></div>
+							<div class="form_im_slo<?=($type_first == 1 ? ' sel_type_def' : '')?>">
+								<div class="form_im_slo_i <?=($type_def == 1 ? 'form_im_slo_act' : '')?>"  data-type="1"><i class="far fa-car tp_ico"></i><span><?=t::w('Delivery', 'Жеткізу')?></span></div>
 							</div>
 						<? endif ?>
 						<? if ($cmp['yourself']): ?>
-							<div class="form_im_slo<?=($type_def == 2 ? ' sel_type_def' : '')?>">
-								<div class="form_im_slo_i <?=($type_def == 2 ? 'form_im_slo_act' : '')?>"  data-type="2"><?=t::w('Takeaway', 'Өзімен')?></div>
+							<div class="form_im_slo<?=($type_first == 2 ? ' sel_type_def' : '')?>">
+								<div class="form_im_slo_i <?=($type_def == 2 ? 'form_im_slo_act' : '')?>"  data-type="2"><i class="far fa-walking tp_ico"></i><span><?=t::w('Takeaway', 'Өзімен')?></span></div>
 							</div>
 						<? endif ?>
 						<? if ($cmp['coffee']): ?>
-							<div class="form_im_slo<?=($type_def == 4 ? ' sel_type_def' : '')?>">
-								<div class="form_im_slo_i <?=($type_def == 4 ? 'form_im_slo_act' : '')?>"  data-type="4"><?=t::w('Cafe', 'Кафе')?></div>
+							<div class="form_im_slo<?=($type_first == 4 ? ' sel_type_def' : '')?>">
+								<div class="form_im_slo_i <?=($type_def == 4 ? 'form_im_slo_act' : '')?>"  data-type="4"><i class="far fa-utensils tp_ico"></i><span><?=t::w('Cafe', 'Кафе')?></span></div>
 							</div>
 						<? endif ?>
 						<? if ($cmp['service']): ?>
-							<div class="form_im_slo<?=($type_def == 3 ? ' sel_type_def' : '')?>">
-								<div class="form_im_slo_i <?=($type_def == 3 ? 'form_im_slo_act' : '')?>" data-type="3" btype_ynd><?=t::w('Service', 'Сервис')?></div>
+							<div class="form_im_slo<?=($type_first == 3 ? ' sel_type_def' : '')?>">
+								<div class="form_im_slo_i <?=($type_def == 3 ? 'form_im_slo_act' : '')?>" data-type="3" btype_ynd><i class="far fa-backpack tp_ico"></i><span><?=t::w('Service', 'Сервис')?></span></div>
 							</div>
 						<? endif ?>
+						</div>
 					</div>
 
 					<? $srv_list = ['Яндекс', 'Глово', 'Волт', 'Басқа']; $srv_cur = trim((string)@$cashbox_d['service']); if ($srv_cur !== '' && !in_array($srv_cur, $srv_list)) $srv_cur = 'Басқа'; ?>
@@ -262,14 +301,31 @@
 					<div class="tf_address">
 						<div class="form_im ">
 							<div class="form_span"><?=t::w('Address:', 'Мекен-жай (адрес):')?></div>
-							<input type="text" class="form_txt btype_address" placeholder="" data-val="<?=$cashbox_d['address']?>" value="<?=$cashbox_d['address']?>">
+							<? // Сақталған адрес: «..., подъезд 10» бөлек өріске бөлінеді (қайта сақтағанда қайталанбайды)
+								$ad_full = trim((string)@$cashbox_d['address']); $ad_entr = '';
+								if (!empty($cmp['kv']) && preg_match('/^(.*?)[\s,]*(?:подъезд\s*)+(.+)$/u', $ad_full, $am)) { $ad_full = $am[1]; $ad_entr = trim($am[2]); }
+								$ad_full = rtrim($ad_full, " ,");
+							?>
+							<input type="text" class="form_txt btype_address" placeholder="" data-val="<?=htmlspecialchars($ad_full)?>" value="<?=htmlspecialchars($ad_full)?>">
 							<i class="fal fa-text form_icon"></i>
 						</div>
 						<? if (!empty($cmp['kv'])): // company.kv = 1 болса ғана ?>
 						<div class="form_im ">
-							<div class="form_span"><?=t::w('Apartment:', 'Кв:')?></div>
-							<input type="text" class="form_txt btype_kv" placeholder="" data-val="">
-							<i class="fal fa-door-closed form_icon"></i>
+							<div class="form_span"><?=t::w('Block / entrance:', 'Блок / подъезд:')?></div>
+							<input type="text" class="form_txt btype_entr" placeholder="" data-val="" value="<?=htmlspecialchars(@$ad_entr)?>">
+							<i class="fal fa-building form_icon"></i>
+						</div>
+						<div class="form_2col">
+							<div class="form_im ">
+								<div class="form_span"><?=t::w('Floor:', 'Этаж:')?></div>
+								<input type="text" class="form_txt btype_floor" placeholder="" value="<?=(preg_match('/(\S+) этаж/u', (string)@$cashbox_d['floor_apt'], $m) ? htmlspecialchars($m[1]) : '')?>">
+								<i class="fal fa-layer-group form_icon"></i>
+							</div>
+							<div class="form_im ">
+								<div class="form_span"><?=t::w('Apartment:', 'Квартира:')?></div>
+								<input type="text" class="form_txt btype_apt" placeholder="" value="<?=(preg_match('/(\S+) кв/u', (string)@$cashbox_d['floor_apt'], $m) ? htmlspecialchars($m[1]) : '')?>">
+								<i class="fal fa-door-closed form_icon"></i>
+							</div>
 						</div>
 						<? endif ?>
 					</div>
@@ -282,8 +338,8 @@
 					</div>
 
 					<div class="tf_add opt_off">
+						<div class="form_span add_head"><i class="far fa-comment-alt"></i><span><?=t::w('Additional info', 'Қосымша ақпарат')?><small><?=t::w('Notes if needed', 'Қосымша қажет болса жазыңыз')?></small></span><em class="add_close" title="<?=t::w('Close', 'Жабу')?>"><i class="fal fa-minus"></i></em></div>
 						<div class="form_im ">
-							<div class="form_span"><?=t::w('Notes if needed:', 'Қосымша қажет болса:')?></div>
 							<input type="text" class="form_txt btype_add" placeholder="<?=t::w('Notes example', 'Мысалы: Замена пицца или суши')?>" data-val="0">
 							<i class="fal fa-text form_icon"></i>
 						</div>
@@ -293,18 +349,33 @@
 
 					<div class="tf_preorder opt_off">
 						<div class="form_im form_imss sel_pre_day">
-							<div class="form_span"><?=t::w('Preorder:', 'Алдын-ала тапсырыс (предзаказ):')?></div>
-							<div class="form_im_slo "><div class="form_im_slo_i form_im_slo_act" data-type="<?=date('Y-m-d')?>"><?=t::w('Today', 'Бүгін')?></div></div>
-							<div class="form_im_slo "><div class="form_im_slo_i" data-type="<?=date('Y-m-d', strtotime('+1 day'))?>"><?=t::w('Tomorrow', 'Ертең')?></div></div>
-							<div class="form_im_slo "><div class="form_im_slo_i sel_pre_other" data-type="other"><i class="fal fa-calendar-alt"></i>&nbsp; <?=t::w('Another day', 'Басқа күн')?></div></div>
+							<div class="form_span pre_head"><i class="far fa-clock"></i><span><?=t::w('Preorder', 'Предзаказ')?><small><?=t::w('Pre-order for a set time', 'Алдын-ала тапсырыс, уақытын таңдаңыз')?></small></span><em class="pre_close" title="<?=t::w('Close', 'Жабу')?>"><i class="fal fa-minus"></i></em></div>
+							<div class="form_im_slo "><div class="form_im_slo_i form_im_slo_act" data-type="<?=date('Y-m-d')?>"><b><?=t::w('Today', 'Бүгін')?></b><small><?=date('d.m')?></small></div></div>
+							<div class="form_im_slo "><div class="form_im_slo_i" data-type="<?=date('Y-m-d', strtotime('+1 day'))?>"><b><?=t::w('Tomorrow', 'Ертең')?></b><small><?=date('d.m', strtotime('+1 day'))?></small></div></div>
+							<div class="form_im_slo "><div class="form_im_slo_i sel_pre_other" data-type="other"><b><i class="fal fa-calendar-alt"></i>&nbsp; <?=t::w('Another day', 'Басқа күн')?></b><small><?=t::w('up to 7 days', '7 күнге дейін')?></small></div></div>
 						</div>
 						<div class="pre_dt_row">
 							<div class="form_im pre_date_im dsp_n">
-								<input type="date" class="form_txt pre_date" min="<?=date('Y-m-d')?>" max="<?=date('Y-m-d', strtotime('+7 day'))?>" value="<?=date('Y-m-d')?>">
+								<? // Басқа күн: браузер күнтізбесі емес, келесі 6 күн батырмамен (ең көбі 1 апта алдыға) ?>
+								<input type="hidden" class="pre_date" min="<?=date('Y-m-d')?>" max="<?=date('Y-m-d', strtotime('+7 day'))?>" value="<?=date('Y-m-d', strtotime('+2 day'))?>">
+								<div class="pre_days">
+									<? $wd = [1 => 'Дс', 2 => 'Сс', 3 => 'Ср', 4 => 'Бс', 5 => 'Жм', 6 => 'Сб', 7 => 'Жс']; ?>
+									<? for ($pd_i = 2; $pd_i <= 7; $pd_i++): $pd_t = strtotime('+'.$pd_i.' day'); ?>
+										<div class="pre_day_i <?=($pd_i == 2 ? 'pre_day_act' : '')?>" data-date="<?=date('Y-m-d', $pd_t)?>"><small><?=$wd[(int)date('N', $pd_t)]?></small><b><?=date('d', $pd_t)?></b><small><?=date('m', $pd_t)?></small></div>
+									<? endfor ?>
+								</div>
 							</div>
-							<div class="form_im pre_time_im">
-								<input type="time" class="form_txt pre_time" step="300">
-								<i class="fal fa-clock form_icon"></i>
+							<div class="pre_time_im">
+								<? // Уақыт: тәулік бөлігі (Таңғы / Түскі / Кешкі) + 30 минут сайынғы слоттар ?>
+								<input type="hidden" class="pre_time" value="">
+								<div class="pre_tm_head"><span><?=t::w('Time', 'Уақыты')?></span><b class="pre_tm_val">--:--</b></div>
+								<? $pre_parts = [[8, 12, t::w('Morning', 'Таңғы')], [12, 17, t::w('Afternoon', 'Түскі')], [17, 24, t::w('Evening', 'Кешкі')]]; ?>
+								<div class="pre_parts" data-p="">
+									<? foreach ($pre_parts as $pp_i => $pp): ?><div class="pre_pt" data-p="<?=$pp_i?>"><b><?=$pp[2]?></b><small><?=sprintf('%02d', $pp[0])?>–<?=sprintf('%02d', $pp[1])?></small></div><? endforeach ?>
+								</div>
+								<div class="pre_slots">
+									<? foreach ($pre_parts as $pp_i => $pp): for ($m = $pp[0] * 60; $m < $pp[1] * 60; $m += 30): $pt = sprintf('%02d:%02d', intdiv($m, 60), $m % 60); ?><div class="pre_s" data-p="<?=$pp_i?>" data-t="<?=$pt?>"><?=$pt?></div><? endfor; endforeach ?>
+								</div>
 							</div>
 						</div>
 						<div class="pre_note dsp_n"><?=t::w('Preorder note', 'Басқа күнге: тапсырыс сақталады, бірақ бүгінгі тізімге түспейді, «Предзаказдар» бөлімінде тұрады.')?></div>
@@ -329,6 +400,9 @@
 						<div class="form_im_slo ">
 							<div class="form_im_slo_i sel_dlv_add <?=($dlv_custom ? 'form_im_slo_act' : '')?>" data-type="add"><i class="fal fa-plus"></i>&nbsp; <?=t::w('Other', 'Басқа')?></div>
 						</div>
+						<div class="form_im_slo ">
+							<div class="form_im_slo_i dlv_map" title="<?=t::w('Map', 'Карта')?>"><i class="far fa-map-marked-alt"></i></div>
+						</div>
 					</div>
 					<div class="form_im dlv_inp <?=($dlv_custom ? '' : 'dsp_n')?>">
 						<input type="tel" class="form_txt fr_price btype_delivery" placeholder="<?=t::w('Other amount', 'Басқа сома')?>" data-val="<?=$cashbox_d['pay_delivery']?>" value="<?=$cashbox_d['pay_delivery']?>">
@@ -343,7 +417,7 @@
 					<div class="form_im form_imss tf_red">
 						<!-- <div class="form_span">Тип оплаты:</div> -->
 						<div class="form_im_slo " data-type-name="RED" data-nall="">
-							<div class="form_im_slo_i form_im_slo_red btype_red " data-type="<?=$red_pct?>">RED <?=$red_pct?>%</div>
+							<div class="form_im_slo_i form_im_slo_red btype_red " data-type="<?=$red_pct?>"><i class="far fa-percent pay_ic"></i>RED <?=$red_pct?>%</div>
 						</div>
 					</div>
 					<? endif ?>
@@ -353,7 +427,7 @@
 					<div class="pay_box">
 					<div class="pay_box_h"><?=t::w('Payment', 'Төлем')?></div>
 					<? // Предоплата: дайын сомалар, «Толық» — жалпы сома, «+» — басқа сома
-						$qr_list = [0, 2000, 3000, 5000];
+						$qr_list = [0, 1000, 2000, 3000, 5000, 10000];
 						$qr_cur = (int)$cashbox_d['pay_qr'];
 						$qr_custom = !in_array($qr_cur, $qr_list);
 					?>
@@ -376,15 +450,16 @@
 							<input type="tel" class="form_txt fr_price btype_qr" placeholder="<?=t::w('Other amount', 'Басқа сома')?>" data-val="<?=$cashbox_d['pay_qr']?>" value="<?=$cashbox_d['pay_qr']?>">
 							<i class="fal fa-tenge form_icon"></i>
 						</div>
-						<div class="form_im form_imss sel_qrm <?=($qr_cur > 0 ? '' : 'dsp_n')?>" data-val="qr">
+						<? $qrm_cur = (!empty($cashbox_d['paid']) && in_array((string)@$cashbox_d['prepay_method'], ['transfer','qr','cash','red','mix'])) ? $cashbox_d['prepay_method'] : 'qr'; ?>
+						<div class="form_im form_imss sel_qrm <?=($qr_cur > 0 ? '' : 'dsp_n')?>" data-val="<?=$qrm_cur?>">
 							<div class="form_span"><?=t::w('Prepaid with:', 'Предоплата немен төленді:')?></div>
-							<div class="form_im_slo "><div class="form_im_slo_i" data-type="transfer"><?=t::w('Transfer', 'Аударым')?></div></div>
-							<div class="form_im_slo "><div class="form_im_slo_i form_im_slo_act" data-type="qr">Kaspi QR</div></div>
-							<div class="form_im_slo "><div class="form_im_slo_i" data-type="cash"><?=t::w('Cash', 'Қолма-қол')?></div></div>
+							<div class="form_im_slo "><div class="form_im_slo_i <?=($qrm_cur == 'transfer' ? 'form_im_slo_act' : '')?>" data-type="transfer"><i class="far fa-exchange-alt pay_ic"></i><?=t::w('Transfer', 'Аударым')?></div></div>
+							<div class="form_im_slo "><div class="form_im_slo_i <?=($qrm_cur == 'qr' ? 'form_im_slo_act' : '')?>" data-type="qr"><i class="far fa-qrcode pay_ic"></i>Kaspi QR</div></div>
+							<div class="form_im_slo "><div class="form_im_slo_i <?=($qrm_cur == 'cash' ? 'form_im_slo_act' : '')?>" data-type="cash"><i class="far fa-money-bill-wave pay_ic"></i><?=t::w('Cash', 'Қолма-қол')?></div></div>
 							<? if (@$red_pct > 0): // company.red = 0 болса RED шықпайды ?>
-							<div class="form_im_slo "><div class="form_im_slo_i" data-type="red">RED <?=$red_pct?>%</div></div>
+							<div class="form_im_slo "><div class="form_im_slo_i <?=($qrm_cur == 'red' ? 'form_im_slo_act' : '')?>" data-type="red"><i class="far fa-percent pay_ic"></i>RED <?=$red_pct?>%</div></div>
 							<? endif ?>
-							<div class="form_im_slo "><div class="form_im_slo_i sel_pay_mix2" data-type="mix"><i class="fal fa-plus"></i>&nbsp; <?=t::w('Mixed', 'Аралас')?></div></div>
+							<div class="form_im_slo "><div class="form_im_slo_i sel_pay_mix2" data-type="mix"><i class="far fa-random pay_ic"></i><?=t::w('Mixed', 'Аралас')?></div></div>
 						</div>
 						<div class="qrm_mix dsp_n">
 							<? foreach (['transfer' => t::w('Transfer', 'Аударым'), 'qr' => 'Kaspi QR', 'cash' => t::w('Cash', 'Қолма-қол')] + (@$red_pct > 0 ? ['red' => 'RED'] : []) as $qm_key => $qm): ?>
@@ -412,19 +487,21 @@
 						// кілт = retail_orders.payment_method мәні, сома сол бағанға жазылады (transfer → pay_transfer, qr → pay_qr, cash → pay_cash)
 						$pay_list = ['transfer' => t::w('Transfer', 'Аударым'), 'qr' => 'Kaspi QR', /* 'halyk' => 'Halyk QR', 'card' => 'Картамен', */ 'cash' => t::w('Cash', 'Қолма-қол')]; // Halyk QR, Картамен уақытша жасырылды
 					?>
+					<? $pay_ic = ['transfer' => 'fa-exchange-alt', 'qr' => 'fa-qrcode', 'cash' => 'fa-money-bill-wave']; // төлем түрлерінің иконкалары ?>
 					<div class="tf_paytype dsp_n">
-						<div class="form_im form_imss sel_pay" data-val="">
+						<? $pay_edit = !empty($cashbox_d['paid']) ? (string)@$cashbox_d['payment_method'] : ''; if ($pay_edit == 'mixed') $pay_edit = 'mix'; ?>
+						<div class="form_im form_imss sel_pay" data-val="" data-edit="<?=htmlspecialchars($pay_edit)?>">
 							<div class="form_span"><?=t::w('Payment type:', 'Төлем түрі:')?></div>
 							<? foreach ($pay_list as $pay_key => $pay): ?>
 								<div class="form_im_slo ">
-									<div class="form_im_slo_i" data-type="<?=$pay_key?>"><?=$pay?></div>
+									<div class="form_im_slo_i" data-type="<?=$pay_key?>"><? if (!empty($pay_ic[$pay_key])): ?><i class="far <?=$pay_ic[$pay_key]?> pay_ic"></i><? endif ?><?=$pay?></div>
 								</div>
 							<? endforeach ?>
 							<div class="form_im_slo ">
-								<div class="form_im_slo_i sel_pay_mix" data-type="mix"><i class="fal fa-plus"></i>&nbsp; <?=t::w('Mixed', 'Аралас')?></div>
+								<div class="form_im_slo_i sel_pay_mix" data-type="mix"><i class="far fa-random pay_ic"></i><?=t::w('Mixed', 'Аралас')?></div>
 							</div>
 							<div class="form_im_slo ">
-								<div class="form_im_slo_i" data-type="unpaid"><?=t::w('Unpaid', 'Төленбеген')?></div>
+								<div class="form_im_slo_i" data-type="unpaid"><i class="far fa-clock pay_ic"></i><?=t::w('Unpaid', 'Төленбеген')?></div>
 							</div>
 						</div>
 						<div class="pay_cash dsp_n">

@@ -25,8 +25,8 @@
          // if (($access - $result) == 0) $precent = 0; elseif (($access - $result) < $access) $precent = round(100 / ($access / ($access - $result))); else $precent = 100;
       }
 
-      $user_mn = db::query("select * from user_staff where positions_id in (4) and company_id = '$comp'");
-   } // else $user_mn = db::query("select * from user_staff where positions_id in (3, 4)");
+      $user_mn = db::query("select * from company_staff where positions_id in (4) and company_id = '$comp'");
+   } // else $user_mn = db::query("select * from company_staff where positions_id in (3, 4)");
 
 
 
