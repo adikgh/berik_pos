@@ -26,7 +26,7 @@
 	$items = function ($id) {
 		$r = []; $n = 0;
 		$q = db::query("select p.name_kz, p.name_ru, op.quantity from retail_orders_products op left join product p on p.id = op.product_id where op.order_id = '".(int)$id."' order by op.id asc");
-		while ($q && $x = mysqli_fetch_assoc($q)) { $n++; if (count($r) < 3) $r[] = htmlspecialchars(trim((string)($x['name_kz'] ?: $x['name_ru']))).((int)$x['quantity'] > 1 ? ' ×'.(int)$x['quantity'] : ''); }
+		while ($q && $x = mysqli_fetch_assoc($q)) { $n++; if (count($r) < 3) $r[] = htmlspecialchars(trim(preg_replace('/\s+/u', ' ', strip_tags(html_entity_decode((string)($x['name_kz'] ?: $x['name_ru']), ENT_QUOTES, 'UTF-8'))))).((int)$x['quantity'] > 1 ? ' ×'.(int)$x['quantity'] : ''); }
 		return implode(', ', $r).($n > 3 ? ' +'.($n - 3) : '');
 	};
 	$row = function ($o, $with_date) use ($types, $sum, $items) {

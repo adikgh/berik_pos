@@ -10,7 +10,7 @@
 
     <? $product = db::query("select * from product where catalog_id = '$catalog_id' and arh = 0 order by name_kz asc"); ?>
     <? while ($product_d = mysqli_fetch_assoc($product)): ?>
-        <div class="hup_rcbi cashbox_add" data-oid="<?=$cashbox_id?>" data-id="<?=$product_d['id']?>">
+        <div class="hup_rcbi cashbox_add" data-oid="<?=$cashbox_id?>" data-id="<?=$product_d['id']?>"<?=(!empty($product_d['description']) ? ' data-desc="'.htmlspecialchars($product_d['description']).'"' : '')?>>
             <div class=""><?=$product_d['name_kz']?></div>
             <div class=""><?=$product_d['price']?> тг</div>
         </div>
@@ -50,7 +50,7 @@ if (isset($_GET['search'])):
 ?>
     <? if (count($found)): ?>
         <? foreach ($found as $product_d): ?>
-            <div class="hup_rcbi cashbox_add" data-oid="<?=$cashbox_id?>" data-id="<?=$product_d['id']?>">
+            <div class="hup_rcbi cashbox_add" data-oid="<?=$cashbox_id?>" data-id="<?=$product_d['id']?>"<?=(!empty($product_d['description']) ? ' data-desc="'.htmlspecialchars($product_d['description']).'"' : '')?>>
                 <div class=""><?=$product_d['name_kz']?></div>
                 <div class=""><?=$product_d['price']?> тг</div>
             </div>

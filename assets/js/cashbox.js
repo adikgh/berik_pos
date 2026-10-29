@@ -1090,7 +1090,7 @@ $(document).ready(function() {
    if (!$('.btype_preorder').val()) pre_sync() // бет ашылғанда бірден бөлік пен слоттар дұрыс тұрсын (сақталған мән болса, pre_restore өзі жасайды)
    setTimeout(pre_restore, 100)
 
-}) // end jquery
+}); // end jquery
 
 // Іздеу өрісі бос тұрғанда тауар атаулары анимациямен «жазылып-өшіріліп» тұрады
 (function(){
@@ -1110,4 +1110,66 @@ $(document).ready(function() {
    }
    inp.on('focus', function(){ inp.attr('placeholder', base) })
    timer = setTimeout(tick, 1200)
+})();
+
+
+// Тағам сипаттамасы: ұзақ басқанда (телефон/планшет) не тышқанды ұстағанда (компьютер) қара tooltip.
+// Мәтін textContent арқылы шығады, сондықтан атаудағы HTML тегтері көрінбейді.
+(function(){
+   var tip = null, card = null, timer = null, sx = 0, sy = 0, skip = false
+   function show(c) {
+      var d = c.getAttribute('data-desc'); if (!d) return
+      if (!tip) { tip = document.createElement('div'); tip.className = 'pdesc_tip'; document.body.appendChild(tip) }
+      tip.textContent = d
+      tip.className = 'pdesc_tip pdesc_on'
+      // карточканың төменгі оң жағынан шығады; экранға сыймаса, солға не жоғары ауысады
+      var r = c.getBoundingClientRect(), w = tip.offsetWidth, th = tip.offsetHeight
+      var vw = document.documentElement.clientWidth, vh = document.documentElement.clientHeight
+      // бастау нүктесі: карточканың енінің 75%, биіктігінің 75%
+      var ax = r.left + r.width * .75, x = ax - 20, y = r.top + r.height * .75 + 6
+      if (x + w > vw - 10) x = ax + 20 - w
+      x = Math.max(10, Math.min(x, vw - w - 10))
+      if (y + th > vh - 10 && r.top + r.height * .25 - th - 6 >= 10) y = r.top + r.height * .25 - th - 6
+      else tip.className += ' pdesc_dn'
+      tip.style.left = x + 'px'; tip.style.top = y + 'px'
+      tip.style.setProperty('--ax', Math.max(12, Math.min(ax - x, w - 12)) + 'px')
+      card = c
+   }
+   function hide() { clearTimeout(timer); timer = null; card = null; if (tip) tip.classList.remove('pdesc_on') }
+   function cardOf(e) { var c = e.target.closest && e.target.closest('.hup_rcbi[data-desc]'); return c }
+
+   document.addEventListener('pointerdown', function (e) {
+      hide()
+      if (e.pointerType == 'mouse') return
+      var c = cardOf(e); if (!c) return
+      sx = e.clientX; sy = e.clientY
+      timer = setTimeout(function(){ show(c); skip = true }, 450)
+   }, true)
+   document.addEventListener('pointermove', function (e) {
+      if (e.pointerType != 'mouse' && timer && !card && (Math.abs(e.clientX - sx) > 10 || Math.abs(e.clientY - sy) > 10)) hide()
+   }, true)
+   document.addEventListener('pointerup', function (e) {
+      if (e.pointerType == 'mouse') return
+      clearTimeout(timer); timer = null
+      if (card) setTimeout(hide, 1500)
+   }, true)
+   document.addEventListener('pointercancel', function (e) { if (e.pointerType != 'mouse' && !card) hide() }, true)
+   // ұзақ басқаннан кейінгі click тағамды себетке қоспасын
+   document.addEventListener('click', function (e) {
+      if (skip && cardOf(e)) { e.preventDefault(); e.stopImmediatePropagation() }
+      skip = false
+   }, true)
+   document.addEventListener('contextmenu', function (e) { if (cardOf(e)) e.preventDefault() }, true)
+
+   // компьютер: тышқанды 0.5 сек ұстаса көрінеді
+   document.addEventListener('pointerover', function (e) {
+      if (e.pointerType != 'mouse') return
+      var c = cardOf(e); if (!c || c === card) return
+      hide(); timer = setTimeout(function(){ show(c) }, 500)
+   })
+   document.addEventListener('pointerout', function (e) {
+      if (e.pointerType != 'mouse') return
+      var c = cardOf(e); if (c && !c.contains(e.relatedTarget)) hide()
+   })
+   window.addEventListener('scroll', hide, true)
 })();

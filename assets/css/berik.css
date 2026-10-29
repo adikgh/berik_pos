@@ -1620,3 +1620,10 @@ html body .uc_ui.or_card.or_pre_soon{ border-top: 4px solid #e5484d; animation: 
 /* Предзаказ: «Жаңа»-дан басқа статуста таймер ақ, пульсациясыз */
 .or_pre_tm.or_pre_calm{ background: #fff; color: #1d2433; box-shadow: inset 0 0 0 1px #e3e6ea; }
 .or_pre_tm.or_pre_calm i{ color: #8a8f98; }
+
+/* Тағам сипаттамасы (кассадағы карточканы ұзақ басқанда) */
+.pdesc_tip{ position: fixed; z-index: 9999; max-width: min(320px, calc(100vw - 20px)); padding: 10px 12px; background: #23262d; color: #fff; border-radius: 8px; font-size: 14px; line-height: 1.4; box-shadow: 0 6px 20px rgba(0,0,0,.25); pointer-events: none; opacity: 0; visibility: hidden; transition: opacity .12s, visibility .12s; white-space: pre-line; overflow-wrap: anywhere; }
+
+.pdesc_tip::after{ content: ''; position: absolute; left: var(--ax, 50%); top: 100%; margin-left: -7px; border: 7px solid transparent; border-bottom-width: 0; border-top-color: #23262d; }
+.pdesc_tip.pdesc_dn::after{ top: auto; bottom: 100%; border-width: 0 7px 7px; border-color: transparent transparent #23262d; }
+.pdesc_on{ opacity: 1; visibility: visible; }
