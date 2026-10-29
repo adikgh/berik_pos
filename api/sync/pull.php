@@ -14,7 +14,7 @@
 		'retail_orders_status', 'retail_orders_type', 'site', 'site_word', 'site_menu', 'word_block', 'info'];
 
 	// Бұл кестелерде пароль сияқты құпия бағандар кассаға жіберілмейді
-	$hide = ['user' => ['password', 'code'], 'company' => ['smsc_login', 'smsc_password', 'tg_token', 'kaspi_token']];
+	$hide = ['user' => ['password', 'code'], 'company' => ['code', 'smsc_login', 'smsc_password', 'tg_token', 'kaspi_token']];
 
 	$all = []; foreach (rows("SHOW TABLES") as $r) $all[] = array_values($r)[0];
 

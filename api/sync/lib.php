@@ -56,8 +56,8 @@
 		if (strlen($tok) != 64) fail('no_token', 401);
 		$d = row("SELECT * FROM company_device WHERE token = '$tok' AND arh = 0 LIMIT 1");
 		if (!$d) fail('bad_token', 401);
-		$b = row("SELECT * FROM company_branch WHERE id = '".(int)$d['branch_id']."'");
-		if (!$b || !(int)@$b['offline']) fail('branch_not_offline', 403);
+		$b = row("SELECT id FROM company_branch WHERE id = '".(int)$d['branch_id']."' AND company_id = '".(int)$d['company_id']."'");
+		if (!$b) fail('branch_not_found', 403);
 		$ver = substr(preg_replace('/[^0-9.]/', '', (string)@$_SERVER['HTTP_X_APP_VER']), 0, 20);
 		db::query("UPDATE company_device SET last_dt = '".date('Y-m-d H:i:s')."', last_ip = ".sqlv(substr((string)@$_SERVER['REMOTE_ADDR'], 0, 45)).($ver ? ", ver = '$ver'" : '')." WHERE id = '".(int)$d['id']."'");
 		return $d;
