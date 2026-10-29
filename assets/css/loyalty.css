@@ -1,0 +1,10 @@
+/* Кассадағы лоялдық блогы: кэшбэк және сыйлық */
+.lc_box{margin:12px 0 4px;padding:12px 14px;border:1px solid var(--gr2);border-radius:12px;display:flex;flex-direction:column;gap:10px}
+.lc_row{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14px}
+.lc_lbl{font-weight:600}
+.lc_lbl i{margin-right:4px;opacity:.7}
+.lc_val{color:var(--gr)}
+.lc_val b{color:var(--bl)}
+.lc_gift_due{padding:10px 12px;border-radius:10px;background:rgba(255,184,0,.14);font-size:14px;line-height:1.35}
+.lc_gift_due i{margin-right:4px}
+.lc_gift_due small{display:block;opacity:.75;margin-top:3px;font-size:12px}

@@ -1,5 +1,6 @@
 <? include "../config/core.php";
    include_once "../orders/log.php";
+   require_once "../config/loyalty.php";
    
    
    // 
@@ -284,6 +285,17 @@
          }
       }
 
+      // Лоялдық: кэшбэкпен төлеу және сыйлық (касса loyalty.js lc=1 жібергенде ғана)
+      $lc_cb = 0; $lc_gift = '';
+      if (isset($_POST['lc']) && loyalty::on()) {
+         $lc_want = max(0, (int)@$_POST['cashback']);
+         $lc_cb = loyalty::order_save($company, $id, $lc_want, (int)@$_POST['gift'], $user_id);
+         // баланс жетпей, сұралғаннан аз жазылса — қалғаны жалпы сомаға қайта қосылады
+         if ($lc_cb < $lc_want) { $total = (int)$total + ($lc_want - $lc_cb); db::query("UPDATE `retail_orders` SET `total` = '".(int)$total."' WHERE `id` = '".(int)$id."'"); }
+         $lc_o = mysqli_fetch_assoc(db::query("select gift_name from retail_orders where id = '".(int)$id."'"));
+         $lc_gift = (string)@$lc_o['gift_name'];
+      }
+
       // Тарих: жаңа тапсырыс не өзгертілген өрістер (ескі → жаңа), тағамдар тізімі
       if (order_log_on()) {
          $log_after = order_row($id);
@@ -356,11 +368,13 @@
          foreach ($info as $k => $v) if (trim((string)$v) !== '' && $v !== '0') $txt .= "<b>$k:</b> ".$tg($v)."\n";
 
          if ($items) $txt .= "\n<b>Тауарлар:</b>\n".$items;
+         if ($lc_gift !== '') $txt .= "🎁 <b>Сыйлық:</b> ".$tg($lc_gift)."\n";
 
          $txt .= "\n";
          if ($items_sum) $txt .= "<b>Тауар сомасы:</b> ".$tg_sum($items_sum)."\n";
          if ((int)$delivery) $txt .= "<b>Жеткізу:</b> ".$tg_sum($delivery)."\n";
          if ($red) $txt .= "<b>RED:</b> ".$tg_sum($red)."\n";
+         if ($lc_cb) $txt .= "<b>Кэшбэкпен:</b> −".$tg_sum($lc_cb)."\n";
          $txt .= "<b>Жалпы:</b> ".$tg_sum($total)."\n";
 
          $pay = '';

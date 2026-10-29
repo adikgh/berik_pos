@@ -1,4 +1,6 @@
 <? include "../config/core.php";
+   require_once "../config/loyalty.php";
+   if ($user_id) loyalty::sync($company); // кэшбэк: аяқталған/отказ тапсырыстарды реттеу (15 секундта бір рет)
    
    // returns
 	if(isset($_GET['return_sn'])) {

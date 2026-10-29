@@ -11,7 +11,31 @@
 							<? $order_type = fun::order_type($buy_d['order_type']); ?>
 							<? $branch_d = fun::branch($buy_d['branch_id']); ?>
 							<? $ot = (int)$order_type['id']; // 1 Жеткізу, 2 Өзімен, 3 Сервис, 4 Кафе
-								$pm_names = ['transfer' => t::w('Transfer', 'Аударым'), 'qr' => 'Kaspi QR', 'cash' => t::w('Cash', 'Қолма-қол'), 'mixed' => t::w('Mixed', 'Аралас'), 'unpaid' => t::w('Unpaid', 'Төленбеген')]; ?>
+								$pm_names = ['transfer' => t::w('Transfer', 'Аударым'), 'qr' => 'Kaspi QR', 'cash' => t::w('Cash', 'Қолма-қол'), 'mixed' => t::w('Mixed', 'Аралас'), 'unpaid' => t::w('Unpaid', 'Төленбеген')];
+								// Жеткізу / Өзімен: предоплата pay_prepay-де (кез келген түрмен), prepay_method бос болса — ескі тапсырыс, предоплата pay_qr-да
+								$pre_m = (string)@$buy_d['prepay_method'];
+								$pre_sum = $pre_m !== '' ? (int)$buy_d['pay_prepay'] : (int)$buy_d['pay_qr'];
+								$rest_sum = $pre_m !== '' ? max(0, (int)$buy_d['total'] - $pre_sum) : (int)$buy_d['pay_cash']; // курьерге / алғанда
+								$cb_sum = (int)@$buy_d['pay_cashback'];
+								// Немен төленді: предоплата түрі + қалғаны (курьерге / алғанда)
+								$pay_parts = [];
+								if ($ot == 1 || $ot == 2) {
+									$pre_nm = ['qr' => 'Kaspi QR', 'transfer' => t::w('Transfer', 'Аударым'), 'cash' => t::w('Cash', 'Қолма-қол'), 'red' => 'Kaspi RED'];
+									if ($pre_sum > 0) {
+										if ($pre_m == 'mix') {
+											$mx_qr = (int)$buy_d['pay_qr']; $mx_tr = (int)$buy_d['pay_transfer']; $mx_cs = max(0, $pre_sum - $mx_qr - $mx_tr);
+											foreach (['qr' => $mx_qr, 'transfer' => $mx_tr, 'cash' => $mx_cs] as $mk => $mv) if ($mv > 0) $pay_parts[] = $pre_nm[$mk].' '.number_format($mv, 0, '', ' ');
+										} else $pay_parts[] = $pre_nm[$pre_m] ?? 'Kaspi QR';
+									}
+									if ($rest_sum > 0) {
+										$cm = (string)@$buy_d['courier_method']; // курьер қалай алды (admin белгілейді)
+										$cm_nm = ['cash' => t::w('Cash', 'Қолма-қол'), 'kaspi' => 'Kaspi', 'mix' => t::w('Mixed', 'Аралас')];
+										$pay_parts[] = ($ot == 1 ? t::w('courier', 'курьерге') : t::w('on pickup', 'алғанда')).' '.($cm_nm[$cm] ?? t::w('cash', 'қолма-қол'));
+									}
+								}
+								if ($cb_sum > 0) $pay_parts[] = t::w('Cashback', 'Кэшбэк');
+								$pay_lbl = implode(' + ', $pay_parts);
+								if ($pay_lbl !== '') $pay_lbl = mb_strtoupper(mb_substr($pay_lbl, 0, 1)).mb_substr($pay_lbl, 1); ?>
 
 							<div class="uc_ui or_card or_t<?=$ot?><?=(@$buy_d['payment_method'] == 'unpaid' ? ' or_unpaid_c' : '')?>" data-oid="<?=$buy_d['id']?>"<?=(@$buy_d['preorder_dt'] && (int)$buy_d['order_status'] == 1 ? ' data-pre-left="'.(strtotime($buy_d['preorder_dt']) - time()).'"' : '')?> style="--st:<?=$st_clr?>;">
 								<div class="uc_uil2" >
@@ -53,7 +77,7 @@
 											</div>
 									<div class="or_sum">
 										<b class="fr_price"><?=$buy_d['total']?></b>
-										<span><?=($ot == 4 ? (@$pm_names[$buy_d['payment_method']] ?: '') : ($ot == 1 || $ot == 2 ? t::w('Prepayment', 'Предоплата').' '.number_format((int)$buy_d['pay_qr'], 0, '', ' ') : htmlspecialchars((string)@$buy_d['service'])))?></span>
+										<span><?=($ot == 4 ? (@$pm_names[$buy_d['payment_method']] ?: '') : ($ot == 1 || $ot == 2 ? t::w('Prepayment', 'Предоплата').' '.number_format($pre_sum, 0, '', ' ') : htmlspecialchars((string)@$buy_d['service'])))?></span>
 									</div>
 									<? if ($ot == 1): // Жеткізу: курьер басты орында ?>
 										<div class="or_courier">
@@ -138,12 +162,30 @@
 											<div class="uc_uil2_trt">
 												<div class="uc_uil2_trt1"><?=t::w('Prepayment', 'Предоплата')?></div>
 												<div class="uc_uil2_trt2">-</div>
-												<div class="uc_uil2_trt3 fr_price"><?=$buy_d['pay_qr']?></div>
+												<div class="uc_uil2_trt3 fr_price"><?=$pre_sum?></div>
 											</div>
 											<div class="uc_uil2_trt">
 												<div class="uc_uil2_trt1"><?=($ot == 1 ? t::w('To courier (cash)', 'Курьерге (нал)') : t::w('On pickup', 'Алғанда төлейді'))?></div>
 												<div class="uc_uil2_trt2"></div>
-												<div class="uc_uil2_trt3 fr_price"><?=$buy_d['pay_cash']?></div>
+												<div class="uc_uil2_trt3 fr_price"><?=$rest_sum?></div>
+											</div>
+										</div>
+										<? endif ?>
+										<? if ($cb_sum > 0): // Кэшбэкпен төленген бөлігі (жалпы сомадан бұрын алынған) ?>
+										<div class="uc_uil2_trc">
+											<div class="uc_uil2_trt">
+												<div class="uc_uil2_trt1"><?=t::w('Cashback used', 'Кэшбэкпен')?></div>
+												<div class="uc_uil2_trt2">-</div>
+												<div class="uc_uil2_trt3 fr_price"><?=$cb_sum?></div>
+											</div>
+										</div>
+										<? endif ?>
+										<? if (($ot == 1 || $ot == 2) && $pay_lbl !== ''): ?>
+										<div class="uc_uil2_trc">
+											<div class="uc_uil2_trt or_paym">
+												<div class="uc_uil2_trt1"><?=t::w('Paid by', 'Төлем түрі')?></div>
+												<div class="uc_uil2_trt2"></div>
+												<div class="uc_uil2_trt3"><?=htmlspecialchars($pay_lbl)?></div>
 											</div>
 										</div>
 										<? endif ?>

@@ -1,0 +1,27 @@
+/* Кассадағы «Тұтынушы жайлы» блогы: кэшбэк, бүгінгі заказ, соңғы заказдар, сыйлық */
+.pop_usr_info{display:flex;flex-direction:column;right:580px;width:480px;height:auto;min-height:300px;max-height:calc(100vh - 40px)}
+.pop_usr_info_c{flex:1;overflow-y:auto;padding:20px 40px 30px!important}
+.ui_h{margin:18px 0 8px;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.03em;opacity:.55}
+.ui_h:first-child{margin-top:0}
+.ui_h_today{color:#c0392b;opacity:1}
+.ui_cb{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-radius:12px;background:rgba(40,167,69,.12);color:#1e7e34;font-size:15px}
+.ui_cb i{margin-right:4px}
+.ui_cb b{font-size:22px}
+.ui_o{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--gr2)}
+.ui_o:last-of-type{border-bottom:0}
+.ui_o_nmb{flex:0 0 44px;height:44px;border-radius:8px;background:var(--cm);color:var(--wh);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px}
+.ui_o_c{flex:1;min-width:0}
+.ui_o_top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ui_o_st{font-size:12px;padding:3px 8px;border-radius:20px;background:var(--gr1);white-space:nowrap}
+.ui_o_items{font-size:14px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ui_o_meta{font-size:12px;opacity:.6;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ui_gift{padding:12px 14px;border-radius:12px;border:1px solid var(--gr2)}
+.ui_gift_due{background:rgba(255,184,0,.14);border-color:rgba(240,173,0,.5)}
+.ui_gift_t{font-size:14px}
+.ui_gift_t i{color:#f0ad00;margin-right:4px}
+.ui_stamps{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.ui_stamp{width:24px;height:24px;border-radius:50%;border:2px dashed rgba(0,0,0,.2)}
+.ui_stamp_on{border:2px solid #28a745;background:rgba(40,167,69,.15)}
+.ui_stamp_gift{border-style:solid;border-color:#f0ad00;display:flex;align-items:center;justify-content:center;font-size:11px;color:#f0ad00}
+.ui_stamp_gift.ui_stamp_on{background:#f0ad00;color:#fff}
+.ui_gift_s{font-size:12px;opacity:.6;margin-top:8px}

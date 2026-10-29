@@ -1,4 +1,5 @@
 <? include "../config/core.php";
+	require_once "../config/loyalty.php";
 
 	// 
 	if (!$user_id) header('location: /');
@@ -38,8 +39,10 @@
 	// site setting
 	$menu_name = 'cashbox';
 	$site_set['swiper'] = true;
-	$css = ['cashbox'];
+	$css = ['cashbox', 'usr_info'];
 	$js = ['cashbox'];
+	$lc_on = loyalty::on() && loyalty::any($company); // кэшбэк не сыйлық қосулы болса ғана
+	if ($lc_on) { $css[] = 'loyalty'; $js[] = 'loyalty'; }
 ?>
 <? include "../block/header.php"; ?>
 
@@ -421,6 +424,7 @@
 						</div>
 					</div>
 					<? endif ?>
+					<? if ($lc_on): ?><div class="lc_box dsp_n" data-oid="<?=$cashbox_id?>"></div><? endif ?>
 
 					<br><br>
 					
