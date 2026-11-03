@@ -106,14 +106,15 @@ body.posm .hup_rcb{
 }
 @media (min-width: 560px){ body.posm .hup_rcb{ grid-template-columns: repeat(3, minmax(0, 1fr)) !important; } }
 body.posm .hup_rcbi{
-	position: relative; min-height: 84px !important; height: auto !important; padding: 12px 12px 10px !important; margin: 0 !important;
-	display: flex !important; flex-direction: column; justify-content: space-between; gap: 8px;
+	position: relative; min-height: 0 !important; height: auto !important; padding: 12px 12px 11px !important; margin: 0 !important;
+	display: flex !important; flex-direction: column; justify-content: flex-start; gap: 6px;
 	background: #fff !important; border: 1px solid var(--pm-ln) !important; border-radius: 14px !important; box-shadow: none !important;
 	font-size: 14px !important; line-height: 1.25 !important; font-weight: 600; word-break: break-word; overflow: visible;
 	transition: transform .12s, border-color .2s, background .2s !important; user-select: none; -webkit-user-select: none;
 }
 body.posm .hup_rcbi > div:first-child{ overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
-body.posm .hup_rcbi > div:nth-child(2){ font-size: 15px !important; font-weight: 800 !important; color: var(--pm-g) !important; }
+body.posm .hup_rcbi > div:nth-child(2){ font-size: 15px !important; font-weight: 800 !important; color: #1f75a8 !important; }
+body.posm .hup_rcbi.posm_in > div:nth-child(2){ color: var(--pm-g) !important; }
 body.posm .hup_rcbi:active{ transform: scale(.97); }
 body.posm .hup_rcbi.posm_in{ border-color: var(--pm-g) !important; background: #f6fcf9 !important; }
 .posm_qn{
