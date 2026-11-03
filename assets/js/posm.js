@@ -35,9 +35,9 @@ jQuery(function ($) {
 		if ($acc.length) $more.append($acc)
 		$(document).on('click', '.posm_more .acc_open', function () { close() })
 		if (page == 'orders') {
-			var $hb = $('<div class="posm_hbtns"><a class="posm_hbtn posm_hbtn_add" href="/cashbox/" title="' + T('New order', 'Жаңа тапсырыс') + '"><i class="far fa-plus"></i></a><a class="posm_hbtn posm_hbtn_menu" href="javascript:;" title="' + T('Menu', 'Мәзір') + '"><i class="far fa-bars"></i></a></div>')
-			$('.or_head').first().append($hb)
-			$hb.find('.posm_hbtn_menu').on('click', function (e) { e.preventDefault(); open($more) })
+			// Оң жақ астында: үстінде «+» (жаңа тапсырыс), астында «Мәзір»
+			var $hb = $('<div class="posm_fabs"><a class="posm_fab posm_fab_add" href="/cashbox/" title="' + T('New order', 'Жаңа тапсырыс') + '"><i class="far fa-plus"></i></a><a class="posm_fab posm_fab_menu" href="javascript:;" title="' + T('Menu', 'Мәзір') + '"><i class="far fa-bars"></i></a></div>').appendTo('body')
+			$hb.find('.posm_fab_menu').on('click', function (e) { e.preventDefault(); open($more) })
 		} else {
 			$('body').append('<a class="posm_fab" href="/orders/' + (br ? '?' + br : '') + '" title="' + T('Orders', 'Тапсырыстар') + '"><i class="far fa-receipt"></i></a>')
 		}
@@ -135,6 +135,12 @@ jQuery(function ($) {
 			var y = $('.hup_rcb').offset().top - $top.outerHeight() - 4; if (window.scrollY > y) window.scrollTo({ top: y, behavior: 'smooth' })
 		})
 		var $act = $('.catalog_ubd.hup_rcti_act')[0]; if ($act && $act.scrollIntoView) $act.scrollIntoView({ inline: 'center', block: 'nearest' })
+
+		// Телефонда чек шығарылмайды: тек сақтау
+		$('.cashbox_pay2[data-print="1"]').each(function () {
+			if ($(this).attr('data-type') == 'ubd') $(this).remove()
+			else $(this).attr('data-print', '0').find('span').text(T('Save', 'Сақтау')).end().find('i').attr('class', 'far fa-check')
+		})
 
 		// «Сақтау» басылғанда себет жабылады, төлем терезесі ашылады
 		$(document).on('click', '.posm_cart .cashbox_pay', function () { close() })
