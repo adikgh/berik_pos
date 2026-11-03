@@ -359,3 +359,9 @@ body.posm .uc_ui69 > .uc_us{ width: 100% !important; flex: 1 1 100% !important; 
 /* Телефонда чек/печать жоқ */
 body.posm .on_print, body.posm .pay_print{ display: none !important; }
 body.posm .or_card .uc_uil2_mib .btn{ flex: 1 1 100% !important; }
+
+/* Категориялар: бір қатарға сыймаса келесі қатарға түседі (сырғытпай) */
+body.posm .hup_rct{ flex-wrap: wrap !important; overflow: visible !important; gap: 8px !important; padding: 10px 12px 12px !important; }
+body.posm .hup_rcti{ height: 38px !important; padding: 0 14px !important; justify-content: center; }
+body.posm .posm_top{ padding-bottom: 2px; border-bottom: 1px solid var(--pm-ln); }
+body.posm .hup_rcb{ margin-top: 12px !important; }
