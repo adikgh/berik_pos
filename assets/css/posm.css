@@ -381,3 +381,19 @@ body.posm .posm_flt_dot::after{ content: ''; position: absolute; top: 9px; right
 body.posm .uc_ui69:not(.posm_flt_on) > *:not(.posm_flt_date):not(.posm_flt_btn){ display: none !important; }
 body.posm .bl_c:has(> .or_head){ display: none !important; }
 body.posm.posm_pg_orders .uc_ui69{ margin-top: 0 !important; }
+
+/* Тапсырыс карточкасы: тауар жолдары тең бағандар, сомалар тураланған (2026-11-03) */
+body.posm .or_card .or_items .uc_uil2_trt{ display: grid !important; grid-template-columns: minmax(0,1fr) 44px 96px; column-gap: 10px; align-items: center; }
+body.posm .or_card .or_items .uc_uil2_trt:not(:has(.uc_uil2_trt2)){ grid-template-columns: minmax(0,1fr) 96px; }
+body.posm .or_card .or_items .uc_uil2_trt1, body.posm .or_card .or_items .uc_uil2_trt2, body.posm .or_card .or_items .uc_uil2_trt3{ width: auto !important; flex: none !important; margin: 0 !important; }
+body.posm .or_card .or_items .uc_uil2_trt2{ text-align: center !important; color: #6b7480; white-space: nowrap; }
+body.posm .or_card .or_items .uc_uil2_trt3{ text-align: right !important; font-weight: 700; white-space: nowrap; }
+body.posm .or_card .or_items .uc_uil2_trt1{ line-height: 1.3; word-break: break-word; }
+/* Жалпы / Предоплата / Төлем түрі: аты сол жақта, мәні оң жақта */
+body.posm .or_card .or_paybox .uc_uil2_trb, body.posm .or_card .or_paybox .uc_uil2_trt{ display: flex !important; justify-content: space-between; align-items: baseline; gap: 12px; width: 100% !important; }
+body.posm .or_card .or_paybox .uc_uil2_trt1{ flex: 0 0 auto !important; width: auto !important; }
+body.posm .or_card .or_paybox .uc_uil2_trt2{ display: none !important; }
+body.posm .or_card .or_paybox .uc_uil2_trt3{ flex: 1 1 auto !important; width: auto !important; min-width: 0; text-align: right !important; white-space: nowrap; }
+body.posm .or_card .or_paybox .uc_uil2_trt2:not(:empty) + .uc_uil2_trt3::before{ content: '\2212\00a0'; }
+body.posm .or_card .or_paybox .or_paym .uc_uil2_trt3{ white-space: normal; line-height: 1.3; }
+body.posm .or_card .uc_uil2_raz.or_items{ margin: 12px 0 0 !important; padding: 12px 0 0 !important; width: auto !important; }
