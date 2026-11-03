@@ -5,7 +5,7 @@
 	<? include "head.php"; ?>
 
 </head>
-<body id="body" class="body">
+<body id="body" class="body<?=(!empty($posm) ? ' posm' : '')?>">
 	
 	<? include "menu.php"; ?>
 

@@ -3,6 +3,15 @@
 	$r = (string)@$_GET['r'];
 	if ($r === '' || $r[0] !== '/' || (isset($r[1]) && ($r[1] === '/' || $r[1] === '\\')) || strpos($r, '/mobile') === 0) $r = '/';
 	header('Cache-Control: no-store');
+	// Телефон нұсқасы: сол сайттың posm.* домені (posb.gprog.kz → posm.gprog.kz, pos.berik.c → posm.berik.c)
+	$h = preg_replace('~[^a-z0-9.\-]~i', '', (string)@$_SERVER['HTTP_HOST']);
+	$h_parts = explode('.', $h);
+	$posm_url = '';
+	if (count($h_parts) >= 2) {
+		$h_parts[0] = 'posm';
+		$c = (int)@$_COOKIE['c'];
+		$posm_url = '//'.implode('.', $h_parts).'/'.($c ? '?c='.$c : '');
+	}
 ?><!DOCTYPE html>
 <html lang="kk">
 <head>
@@ -10,7 +19,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="robots" content="noindex, nofollow">
 	<meta name="theme-color" content="#f6f6f6">
-	<title>Телефоннан кіруге болмайды | Berik POS</title>
+	<title>Телефон нұсқасы | Berik POS</title>
 	<link rel="icon" href="/assets/img/logo/icon.png" type="image/x-icon">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" />
 	<link rel="stylesheet" href="/assets/pl/fontawesome/css/all.min.css" />
@@ -24,8 +33,8 @@
 			-webkit-user-select: none; user-select: none;
 		}
 		.mb_c{ width: 100%; max-width: 420px; padding: 32px 24px 28px; background: #fff; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,.08); text-align: center; }
-		.mb_ic{ position: relative; width: 88px; height: 88px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; border-radius: 24px; background: #fdeced; color: #e5484d; font-size: 40px; }
-		.mb_ic i + i{ position: absolute; right: -6px; bottom: -6px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #e5484d; color: #fff; font-size: 16px; border: 3px solid #fff; }
+		.mb_ic{ position: relative; width: 88px; height: 88px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; border-radius: 24px; background: #e7f6ef; color: #0EA768; font-size: 40px; }
+		.mb_ic i + i{ position: absolute; right: -6px; bottom: -6px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #0EA768; color: #fff; font-size: 16px; border: 3px solid #fff; }
 		h1{ font-size: 22px; font-weight: 800; line-height: 1.25; }
 		p{ margin-top: 12px; font-size: 15px; line-height: 1.5; color: #555; }
 		.mb_ok{ margin-top: 20px; padding: 14px 16px; display: flex; gap: 12px; align-items: center; text-align: left; border-radius: 14px; background: #eef6fb; color: #1f75a8; font-size: 14px; font-weight: 700; line-height: 1.4; }
@@ -33,14 +42,17 @@
 		.mb_ru{ margin-top: 18px; padding-top: 16px; border-top: 1px dashed #e7e7e7; font-size: 13px; color: #8a8f98; }
 		.mb_back{ display: none; margin-top: 20px; height: 54px; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; background: #0EA768; color: #fff; font-size: 16px; font-weight: 800; text-decoration: none; }
 		.mb_back_on{ display: flex; }
+		.mb_go{ margin-top: 20px; height: 54px; display: flex; align-items: center; justify-content: center; gap: 10px; border-radius: 12px; background: #0EA768; color: #fff; font-size: 16px; font-weight: 800; text-decoration: none; }
+		.mb_back{ background: #fff; color: #0EA768; border: 2px solid #0EA768; }
 	</style>
 </head>
 <body>
 	<div class="mb_c">
-		<div class="mb_ic"><i class="fal fa-mobile"></i><i class="fas fa-lock"></i></div>
-		<h1>Телефоннан кіруге болмайды</h1>
-		<p>Қауіпсіздік үшін Berik POS кассасының телефон нұсқасы жабық. Кассаны компьютерден, планшеттен немесе сенсорлы моноблоктан ашыңыз.</p>
-		<div class="mb_ru">Вход с телефона запрещён. Откройте кассу на компьютере, планшете или сенсорном моноблоке.</div>
+		<div class="mb_ic"><i class="fal fa-desktop"></i><i class="fas fa-mobile"></i></div>
+		<h1>Бұл сілтеме компьютерге арналған</h1>
+		<p>Телефоннан кассаға бөлек сілтеме арқылы кіріңіз<?=($posm_url ? ': <b>'.htmlspecialchars(implode('.', $h_parts)).'</b>' : '')?>. Компьютер, планшет және сенсорлы моноблок осы сілтемеде қалады.</p>
+		<? if ($posm_url): ?><a class="mb_go" href="<?=htmlspecialchars($posm_url)?>"><i class="far fa-mobile"></i><span>Телефон нұсқасын ашу</span></a><? endif ?>
+		<div class="mb_ru">Эта ссылка для компьютера. С телефона откройте кассу по отдельной ссылке<?=($posm_url ? ' '.htmlspecialchars(implode('.', $h_parts)) : '')?>.</div>
 		<a class="mb_back" href="<?=htmlspecialchars($r)?>"><i class="far fa-arrow-left"></i><span>Кассаға қайту</span></a>
 	</div>
 	<script>

@@ -64,17 +64,34 @@
 	$h = ''; while ($prev && $o = mysqli_fetch_assoc($prev)) $h .= $row($o, true);
 	if ($h) $out .= '<div class="ui_h">'.t::w('Last orders', 'Соңғы заказдары').'</div>'.$h;
 
-	// 4. Сыйлық
+	// 4. Сыйлық: осы тапсырыс сыйлық па, келесі сыйлыққа дейін қанша қалды, деңгейлер тізімі
 	if ($lc && $lc['gift'] && $cl) {
-		$n = $lc['gift_every']; $c = min($lc['gift_cnt'], $n - 1);
-		$out .= '<div class="ui_h">'.t::w('Gift', 'Сыйлық').'</div><div class="ui_gift'.($lc['gift_due'] ? ' ui_gift_due' : '').'">';
-		$out .= '<div class="ui_gift_t">'.($lc['gift_due']
-			? '<i class="far fa-gift"></i> '.t::w('This order is a gift', 'Бұл тапсырыс — сыйлық').': <b>'.htmlspecialchars($lc['gift_name']).'</b>'
-			: $n.t::w('-th order gift', '-шы тапсырысқа сыйлық').': <b>'.htmlspecialchars($lc['gift_name']).'</b>').'</div>';
-		$out .= '<div class="ui_stamps">';
-		for ($i = 1; $i < $n; $i++) $out .= '<span class="ui_stamp'.($i <= $c ? ' ui_stamp_on' : '').'"></span>';
-		$out .= '<span class="ui_stamp ui_stamp_gift'.($lc['gift_due'] ? ' ui_stamp_on' : '').'"><i class="far fa-gift"></i></span></div>';
-		if (!$lc['gift_due']) $out .= '<div class="ui_gift_s">'.$c.' / '.$n.' · '.($n - 1 - $c).' '.t::w('orders left', 'тапсырыс қалды').'</div>';
+		$c = (int)$lc['gift_cnt']; $nx = $lc['next'];
+		$out .= '<div class="ui_h">'.t::w('Gift', 'Сыйлық').' · '.$c.' '.t::w('orders done', 'тапсырыс жасалған').'</div><div class="ui_gift'.($lc['gift_due'] ? ' ui_gift_due' : '').'">';
+		if ($lc['gift_due']) $out .= '<div class="ui_gift_t"><i class="far fa-gift"></i> '.$lc['gift_k'].t::w('-th order is a gift', '-шы тапсырыс — сыйлық').': <b>'.htmlspecialchars($lc['gift_name']).'</b></div>';
+		$tg_k = $lc['gift_due'] ? $lc['gift_k'] : ($nx ? $nx['k'] : 0);
+		if ($tg_k) {
+			// белгілер: толық цикл 1..ең үлкен деңгей (мысалы 1–20); жасалғаны жасыл ✓, осы тапсырыс сары, сыйлық орындары белгімен
+			$mx = 0; foreach ($lc['tiers'] as $t) $mx = max($mx, (int)$t['every']);
+			$from = $mx ? (int)floor($c / $mx) * $mx : 0;
+			$got = []; // берілген сыйлықтар: нешінші тапсырыста
+			if (loyalty::tiers_on()) { $gq = db::query("select order_no from company_client_gift where client_id = '".(int)$cl['id']."' and order_no is not null"); while ($gq && $gr = mysqli_fetch_assoc($gq)) $got[(int)$gr['order_no']] = true; }
+			$out .= '<div class="ui_stamps">';
+			for ($i = $from + 1; $i <= $from + $mx; $i++) {
+				$ti = loyalty::tier_for($cmp, $i);
+				$out .= '<span class="ui_stamp'.($i <= $c ? ' ui_stamp_on' : '').($ti ? ' ui_stamp_gift' : '').($i == $lc['gift_k'] ? ' ui_stamp_now' : '').(isset($got[$i]) ? ' ui_stamp_got' : '').'" title="'.$i.($ti ? ': '.htmlspecialchars($ti['name']).(isset($got[$i]) ? ' ('.t::w('received', 'алды').')' : '') : '').'">'
+					.($ti ? '<i class="far fa-gift"></i><small>'.$i.'</small>' : ($i <= $c ? '✓' : $i)).'</span>';
+			}
+			$out .= '</div>';
+			if (!$lc['gift_due'] && $nx) $out .= '<div class="ui_gift_s">'.$nx['k'].t::w('-th order', '-шы тапсырыс').': <b>'.htmlspecialchars($nx['tier']['name']).'</b> · '.($nx['left'] ? $nx['left'].' '.t::w('orders left after this one', 'тапсырыс қалды (осыдан кейін)') : t::w('The very next order', 'Келесі тапсырыста')).'</div>';
+			elseif ($nx) $out .= '<div class="ui_gift_s">'.t::w('Next gift', 'Келесі сыйлық').' — '.$nx['k'].t::w('-th order', '-шы тапсырыс').': '.htmlspecialchars($nx['tier']['name']).'</div>';
+		}
+		if (count($lc['tiers']) > 1) {
+			$tl = array_reverse($lc['tiers']);
+			$out .= '<div class="ui_tiers">';
+			foreach ($tl as $t) $out .= '<div><span>'.t::w('Every', 'Әр').' '.(int)$t['every'].t::w('-th', '-шы').'</span>'.htmlspecialchars($t['name']).'</div>';
+			$out .= '</div>';
+		}
 		$out .= '</div>';
 	}
 

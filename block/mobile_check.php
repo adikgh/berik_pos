@@ -1,4 +1,6 @@
 <? // Телефоннан кіруге болмайды: сервер жағынан тексеру (User-Agent). Планшет өтеді.
+	// posm.* (телефон нұсқасы) доменінде тексеру жоқ
+	if (!empty($posm)) return;
 	$mob_ua = (string)@$_SERVER['HTTP_USER_AGENT'];
 	$mob_by_ua = $mob_ua !== '' && !preg_match('~iPad|Tablet~i', $mob_ua)
 		&& preg_match('~iPhone|iPod|Windows Phone|IEMobile|BlackBerry|BB10|Opera Mini|Android.*Mobile~i', $mob_ua);

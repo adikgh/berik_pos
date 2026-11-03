@@ -290,8 +290,9 @@
       if (isset($_POST['lc']) && loyalty::on()) {
          $lc_want = max(0, (int)@$_POST['cashback']);
          $lc_cb = loyalty::order_save($company, $id, $lc_want, (int)@$_POST['gift'], $user_id);
-         // баланс жетпей, сұралғаннан аз жазылса — қалғаны жалпы сомаға қайта қосылады
-         if ($lc_cb < $lc_want) { $total = (int)$total + ($lc_want - $lc_cb); db::query("UPDATE `retail_orders` SET `total` = '".(int)$total."' WHERE `id` = '".(int)$id."'"); }
+         // касса шегерген сома мен сервер жазғаны сәйкес болмаса (баланс жетпесе, сыйлық келмесе) — айырмасы жалпы сомаға қайта қосылады
+         $lc_diff = ($lc_want - $lc_cb) + (max(0, (int)@$_POST['gift_disc']) - (int)loyalty::$gift_discount);
+         if ($lc_diff) { $total = max(0, (int)$total + $lc_diff); db::query("UPDATE `retail_orders` SET `total` = '".(int)$total."' WHERE `id` = '".(int)$id."'"); }
          $lc_o = mysqli_fetch_assoc(db::query("select gift_name from retail_orders where id = '".(int)$id."'"));
          $lc_gift = (string)@$lc_o['gift_name'];
       }
@@ -374,6 +375,7 @@
          if ($items_sum) $txt .= "<b>Тауар сомасы:</b> ".$tg_sum($items_sum)."\n";
          if ((int)$delivery) $txt .= "<b>Жеткізу:</b> ".$tg_sum($delivery)."\n";
          if ($red) $txt .= "<b>RED:</b> ".$tg_sum($red)."\n";
+         if (loyalty::$gift_discount) $txt .= "<b>Сыйлық жеңілдігі:</b> −".$tg_sum(loyalty::$gift_discount)."\n";
          if ($lc_cb) $txt .= "<b>Кэшбэкпен:</b> −".$tg_sum($lc_cb)."\n";
          $txt .= "<b>Жалпы:</b> ".$tg_sum($total)."\n";
 

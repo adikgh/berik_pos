@@ -48,6 +48,11 @@
 								</div>
 							</div>
 							<div class="acc_list">
+								<label class="menu_ci kph_tg">
+									<div class="menu_cin"><i class="fal fa-image"></i></div>
+									<div class="menu_cih"><?=t::w('Show photos', 'Фотоларды көрсету')?></div>
+									<input type="checkbox" class="kph_cb"><span class="kph_sw"></span>
+								</label>
 								<a class="menu_ci" href="/shift/">
 									<div class="menu_cin"><i class="fal fa-cash-register"></i></div>
 									<div class="menu_cih"><?=t::w('Close shift', 'Сменді жабу')?></div>
@@ -67,6 +72,31 @@
 			</div>
 		</div>
 	</div>
+	<style>
+		/* «Фотоларды көрсету»: тағам батырмаларында фото (әдепкі өшік, әр құрылғыда өзі сақталады) */
+		.kph_img{ display: none; }
+		html.kph_on .kph_img{ display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; margin: 0 0 8px; background: #eef2f6; }
+		html.kph_on body.posm .hup_rcbi > div:first-child:has(.kph_img){ display: block; }
+		.acc_menu .kph_tg{ cursor: pointer; position: relative; display: flex; align-items: center; }
+		.acc_menu .kph_tg .menu_cih{ width: auto; flex: 1; }
+		.kph_tg input{ position: absolute; opacity: 0; pointer-events: none; }
+		.kph_sw{ width: 42px; height: 24px; border-radius: 24px; background: #d5dbe3; position: relative; transition: .2s; flex-shrink: 0; }
+		.kph_sw:after{ content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: .2s; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+		.kph_tg input:checked + .kph_sw{ background: #0EA768; }
+		.kph_tg input:checked + .kph_sw:after{ left: 21px; }
+	</style>
+	<script>
+		(function(){
+			var on = false; try { on = localStorage.getItem('kph') === '1' } catch (e) {}
+			document.documentElement.classList.toggle('kph_on', on)
+			var cb = document.querySelector('.kph_cb'); if (!cb) return
+			cb.checked = on
+			cb.addEventListener('change', function(){
+				try { localStorage.setItem('kph', cb.checked ? '1' : '0') } catch (e) {}
+				document.documentElement.classList.toggle('kph_on', cb.checked)
+			})
+		})()
+	</script>
 	<script>
 		// Аккаунт мәзірі: ішін басқанда жабылмайды, сыртын басқанда жабылады
 		document.addEventListener('click', function(e){

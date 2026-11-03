@@ -3,7 +3,8 @@
 $(function () {
    var box = $('.lc_box')
    if (!box.length) return
-   var info = null, cb_on = false, cb_amt = 0, gift_on = false, last_ph = ''
+   var info = null, cb_on = false, cb_amt = 0, gift_on = false, gd_amt = 0, last_ph = ''
+   var esc = function (t) { return $('<i>').text(t || '').html() }
    var tg = function (n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' тг' }
    var tot = $('.cashbox_pay_btotol_c')
 
@@ -31,11 +32,23 @@ $(function () {
       render()
    }
 
+   // Сыйлық белгісі. Жеңілдік деңгейі болса жалпы сома азаяды (кэшбэк одан кейін есептеледі)
+   function gift_set(on) {
+      if (on == gift_on) return
+      var cb = cb_on
+      if (cb) cb_set(false)
+      if (on) { gd_amt = Math.min(info.gift_discount || 0, Number(tot.attr('data-val')) || 0); if (gd_amt) total_add(-gd_amt) }
+      else { if (gd_amt) total_add(gd_amt); gd_amt = 0 }
+      gift_on = on
+      if (cb) cb_set(true)
+      render()
+   }
+
    function render() {
       if (!info || !info.on) { box.addClass('dsp_n').html(''); return }
       var h = ''
       if (info.cashback) {
-         h += '<div class="lc_row"><div class="lc_lbl"><i class="far fa-coins"></i> ' + w('Cashback', 'Кэшбэк') + ' ' + info.percent.toString().replace(/\.0+$/, '') + '%</div>'
+         h += '<div class="lc_row"><div class="lc_lbl"><i class="far fa-coins"></i> ' + w('Cashback', 'Кэшбэк') + ' ' + (info.label || (info.percent.toString().replace(/\.0+$/, '') + '%')) + '</div>'
          h += '<div class="lc_val">' + w('Balance', 'Балансы') + ': <b>' + tg(info.available) + '</b></div></div>'
          if (info.available > 0) {
             var a = cb_on ? cb_amt : Math.min(info.available, Number(tot.attr('data-val')) || 0)
@@ -43,14 +56,15 @@ $(function () {
          }
       }
       if (info.gift) {
-         var n = info.gift_every, c = Math.min(info.gift_cnt, n - 1)
          if (info.gift_due) {
-            h += '<div class="lc_gift_due"><i class="far fa-gift"></i> ' + n + w('-th order: gift', '-шы тапсырыс. Сыйлық') + ': <b>' + $('<i>').text(info.gift_name).html() + '</b>'
-            h += '<small>' + w('Add the gift to the order with price 0', 'Сыйлықты тапсырысқа қосып, бағасын 0 қойыңыз') + '</small></div>'
-            h += '<div class="form_im_slo"><div class="form_im_slo_i lc_gift ' + (gift_on ? 'form_im_slo_act' : '') + '"><i class="far fa-gift pay_ic"></i>' + w('Gift given', 'Сыйлық берілді') + '</div></div>'
-         } else {
-            h += '<div class="lc_row"><div class="lc_lbl"><i class="far fa-gift"></i> ' + w('Gift', 'Сыйлық') + '</div><div class="lc_val">' + c + ' / ' + n + ' · ' + (n - 1 - c) + ' ' + w('orders left', 'тапсырыс қалды') + '</div></div>'
+            h += '<div class="lc_gift_due"><i class="far fa-gift"></i> ' + info.gift_k + w('-th order: gift', '-шы тапсырыс. Сыйлық') + ': <b>' + esc(info.gift_name) + '</b>'
+            if (info.gift_product) h += '<small>' + w('The gift is added to the order at 0 tg', 'Сыйлық тапсырысқа 0 тг болып қосылады') + '</small>'
+            else if (info.gift_discount > 0) h += '<small>' + w('Discount', 'Жеңілдік') + ' −' + tg(info.gift_discount) + '</small>'
+            h += '</div>'
+            h += '<div class="form_im_slo"><div class="form_im_slo_i lc_gift ' + (gift_on ? 'form_im_slo_act' : '') + '"><i class="far fa-gift pay_ic"></i>' + w('Give the gift', 'Сыйлықты беру') + (gd_amt ? ' −' + tg(gd_amt) : '') + '</div></div>'
          }
+         var nx = info.next
+         if (nx && nx.tier) h += '<div class="lc_row"><div class="lc_lbl"><i class="far fa-gift"></i> ' + w('Next gift', 'Келесі сыйлық') + '</div><div class="lc_val">' + nx.k + w('-th', '-шы') + ': ' + esc(nx.tier.name) + ' · ' + (nx.left ? nx.left + ' ' + w('orders left', 'тапсырыс қалды') : w('next order', 'келесі тапсырыс')) + '</div></div>'
       }
       box.html(h).toggleClass('dsp_n', h == '')
    }
@@ -62,9 +76,10 @@ $(function () {
          success: function (r) {
             if (ph != last_ph) return
             if (cb_on) cb_set(false)
+            if (gift_on) gift_set(false)
             info = r
-            gift_on = !!(r && r.gift_given)
             render()
+            if (r && r.gift_given) gift_set(true) // өзгертуде: сыйлық бұрын берілген
             if (r && r.used > 0) cb_set(true) // өзгертуде: бұрын кэшбэкпен төленген
          }
       })
@@ -77,7 +92,8 @@ $(function () {
       if (ph == last_ph) return
       last_ph = ph
       if (cb_on) cb_set(false)
-      info = null; gift_on = false
+      if (gift_on) gift_set(false)
+      info = null
       render()
       if (ph) load(ph)
    }
@@ -85,15 +101,20 @@ $(function () {
    setTimeout(phone_check, 300)
 
    $('html').on('click', '.lc_cb', function () { cb_set(!cb_on) })
-   $('html').on('click', '.lc_gift', function () { gift_on = !gift_on; render() })
+   $('html').on('click', '.lc_gift', function () { gift_set(!gift_on) })
 
-   // Жеткізу сомасы өзгерсе, cashbox.js жалпы соманы қайта есептейді: кэшбэкті қайта шегереміз
-   $('html').on('input', '.btype_delivery', function () { if (cb_on) { cb_on = false; setTimeout(function () { cb_set(true); render() }, 0) } })
+   // Жеткізу сомасы өзгерсе, cashbox.js жалпы соманы қайта есептейді: жеңілдік пен кэшбэкті қайта шегереміз
+   $('html').on('input', '.btype_delivery', function () {
+      var g = gift_on, c = cb_on
+      if (!g && !c) return
+      gift_on = false; gd_amt = 0; cb_on = false
+      setTimeout(function () { if (g) gift_set(true); if (c) cb_set(true); render() }, 0)
+   })
 
    // Сақтағанда: кэшбэк сомасы мен сыйлық белгісін қосып жібереміз (info жүктелмесе — ештеңе жібермейміз, бұрынғысы қалады)
    $.ajaxPrefilter(function (o) {
       if (!o.url || o.url.indexOf('cashbox_pay') < 0 || !info || !info.on) return
       if (typeof o.data != 'string') return
-      o.data += '&lc=1&cashback=' + (cb_on ? cb_amt : 0) + '&gift=' + (gift_on ? 1 : 0)
+      o.data += '&lc=1&cashback=' + (cb_on ? cb_amt : 0) + '&gift=' + (gift_on ? 1 : 0) + '&gift_disc=' + (gift_on ? gd_amt : 0)
    })
 })

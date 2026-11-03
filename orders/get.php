@@ -168,7 +168,7 @@
       $st_d = mysqli_fetch_assoc(db::query("select id, types from retail_orders_status where id = '$sid' limit 1"));
       if (!$st_d || !$old) { echo 'none'; exit(); }
       if (((int)$old['order_type'] == 1 && ((int)$old['order_status'] == 3 || (int)$old['order_status'] == 6 || ((int)$old['order_status'] == 4 && !empty($old['сourier_id']) && (int)@mysqli_fetch_assoc(db::query("select user_id from retail_orders_log where order_id = '".(int)$old['id']."' and field = 'status' order by id desc limit 1"))['user_id'] == (int)$old['сourier_id'])))) { echo 'by_courier'; exit(); } // статусты курьер қойған: оператор өзгерте алмайды
-      if ((int)$old['order_status'] == 4) { echo 'locked'; exit(); } // Аяқталды: тек admin.pf.c өзгертеді
+      if ((int)$old['order_status'] == 4) { echo 'locked'; exit(); } // Аяқталды: тек adm.berik.c өзгертеді
       // id: 3 Жолда, 4 Аяқталды, 6 Отказ при получение, 10 Отказ вне
       if (!in_array((string)@$old['order_type'], explode(',', (string)$st_d['types']))) { echo 'bad_type'; exit(); } // бұл түрге жатпайтын статус
       if ($sid == 6 || ($sid == 3 && @$old['order_type'] == 1)) { echo 'only_courier'; exit(); } // бұл статустарды тек курьер қояды

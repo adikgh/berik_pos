@@ -69,7 +69,12 @@
    $company = 1; 
    if (@$user_right['company_id']) $company = $user_right['company_id'];
    else {
-      if (isset($_GET['company'])) if ($_GET['company'] == 1 || $_GET['company'] == 2) $_SESSION['company'] = $_GET['company'];
+      // компания id емес, code арқылы: ?company=n990 (базада #n990)
+      if (isset($_GET['company'])) {
+         $gc = '#'.preg_replace('/[^a-z0-9]/', '', strtolower((string)$_GET['company']));
+         $gr = mysqli_fetch_assoc(db::query("select id from company where lower(code) = '$gc' limit 1"));
+         if ($gr) $_SESSION['company'] = (int)$gr['id'];
+      }
       if (isset($_SESSION['company'])) $company = $_SESSION['company'];
    }
 

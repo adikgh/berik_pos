@@ -65,6 +65,12 @@
    $url = explode('?', $url);
    $url = $url[0];
 
+   // posm.* домені — кассаның телефон нұсқасы (сол код, сол база). Тек сыртқы көрінісі бөлек: assets/css/posm.css, assets/js/posm.js
+   $posm = (bool)preg_match('~^posm\.~i', (string)@$_SERVER['HTTP_HOST']);
+
+   // Тағам фотолары admin сайтында сақталады (product.img). Кассада мәзірдегі «Фотоларды көрсету» қосулы болса ғана шығады.
+   $pr_img_url = (preg_match('~gprog\.kz$~i', (string)@$_SERVER['HTTP_HOST']) ? '//admb.gprog.kz' : '//adm.berik.c').'/assets/uploads/products/';
+
    // token telegram
    $token = "1581082911:AAEKW20w_-5V0Wx9tzhyThV2pjCgZtCjyc8";
 

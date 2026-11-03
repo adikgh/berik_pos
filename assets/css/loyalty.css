@@ -8,3 +8,16 @@
 .lc_gift_due{padding:10px 12px;border-radius:10px;background:rgba(255,184,0,.14);font-size:14px;line-height:1.35}
 .lc_gift_due i{margin-right:4px}
 .lc_gift_due small{display:block;opacity:.75;margin-top:3px;font-size:12px}
+/* Кэшбэк / сыйлық батырмасы: иконка мен жазу арасы ашық, төлем батырмаларындай (2026-11-03) */
+.lc_lbl{display:flex;align-items:center;gap:8px}
+.lc_lbl i{margin:0;width:16px;text-align:center;color:#0EA768;opacity:1}
+.lc_box .form_im_slo{margin:0}
+.lc_box .lc_cb, .lc_box .lc_gift{display:inline-flex;align-items:center;gap:10px;height:48px;padding:0 18px;margin:0;border:1px solid var(--bp-line,#e3e7ec);background:var(--bp-card,#fff);border-radius:10px;font-size:15px;font-weight:700;color:var(--bp-text,#1d2433);cursor:pointer;user-select:none;transition:.2s}
+.lc_box .lc_cb:hover, .lc_box .lc_gift:hover{border-color:#0EA768}
+.lc_box .lc_cb .pay_ic, .lc_box .lc_gift .pay_ic{margin:0;font-size:17px;color:#0EA768}
+.lc_box .lc_gift .pay_ic{color:#e9a23b}
+.lc_box .lc_cb.form_im_slo_act, .lc_box .lc_gift.form_im_slo_act{background:#0EA768;border-color:#0EA768;color:#fff}
+.lc_box .form_im_slo_act .pay_ic{color:#fff}
+.lc_gift_due{display:flex;flex-wrap:wrap;align-items:center;gap:0 8px}
+.lc_gift_due i{margin:0}
+.lc_gift_due small{flex-basis:100%}

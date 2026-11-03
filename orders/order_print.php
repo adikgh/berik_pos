@@ -12,6 +12,21 @@
             if  ($cashbox_d['print'] > 0) $print = 1;
 
             $branch_d = fun::branch($cashbox_d['branch_id']);
+
+            // Лоялдық: кэшбэкпен төленгені, сыйлық, осы тапсырыстан түсетін кэшбэк және баланс
+            require_once "../config/loyalty.php";
+            $lc_p = null;
+            if (loyalty::on() && loyalty::any($cashbox_d['company_id'])) {
+                $lc_cfg = loyalty::cfg($cashbox_d['company_id']);
+                $lc_cl = $cashbox_d['client_id'] ? mysqli_fetch_assoc(db::query("select cashback_balance from company_client where id = '".(int)$cashbox_d['client_id']."'")) : null;
+                $lc_p = [
+                    'paid' => (int)@$cashbox_d['pay_cashback'],
+                    'gift' => trim((string)@$cashbox_d['gift_name']),
+                    'disc' => (int)@$cashbox_d['gift_discount'],
+                    'earn' => $lc_cl && $lc_cfg['cashback'] ? ((int)$cashbox_d['cashback_sum'] ?: loyalty::earn_preview($cashbox_d['company_id'], $cashbox_d['id'], @$cashbox_d['pay_cashback'], @$cashbox_d['gift_discount'])) : 0,
+                    'bal' => $lc_cl && $lc_cfg['cashback'] ? (int)$lc_cl['cashback_balance'] : null,
+                ];
+            }
         }
     }
 
@@ -84,6 +99,19 @@
             <td align="center"></td>
             <td align="right"><?=$cashbox_d['pay_delivery']?></td>
         </tr>
+        <? if ($lc_p && $lc_p['gift'] !== ''): ?>
+        <tr class="tr" valign="top">
+            <td align="left" colspan="2">Подарок: <?=htmlspecialchars($lc_p['gift'])?></td>
+            <td align="right"><?=($lc_p['disc'] ? '- '.$lc_p['disc'] : '')?></td>
+        </tr>
+        <? endif ?>
+        <? if ($lc_p && $lc_p['paid']): ?>
+        <tr class="tr" valign="top">
+            <td align="left">Оплачено кэшбэком</td>
+            <td align="center"></td>
+            <td align="right">- <?=$lc_p['paid']?></td>
+        </tr>
+        <? endif ?>
         <tr class="tr_sep2"><td colspan="3"></td></tr>
         <tr class="tr_sep1"><td colspan="3"></td></tr>
         <tr class="tr_sep2"><td colspan="3"></td></tr>
@@ -118,6 +146,10 @@
             <p>Адрес: <b><?=$cashbox_d['address']?></b></p>
             <? $fa = trim((string)@$cashbox_d['floor_apt']); if ($fa !== ''): ?>
             <p><b><?=htmlspecialchars($fa)?></b></p>
+            <? endif ?>
+            <? if ($lc_p && $lc_p['bal'] !== null): ?>
+            <p>Кэшбэк за заказ: <b>+<?=$lc_p['earn']?></b></p>
+            <p>Баланс кэшбэка: <b><?=$lc_p['bal']?></b></p>
             <? endif ?>
         </div>
     </div>
