@@ -1632,3 +1632,6 @@ body:not(.posm) .hup_rcbi{ position: relative; }
 body:not(.posm) .hup_rcbi.cb_in{ border-color: #0EA768; background: #f6fcf9; }
 body:not(.posm) .hup_rcbi.cb_in > div:last-child{ color: #0EA768; }
 body:not(.posm) .hup_rcbi.cb_in::after{ content: attr(data-cbq); position: absolute; top: -7px; right: -6px; min-width: 24px; height: 24px; padding: 0 7px; border-radius: 12px; background: #0EA768; color: #fff; font-size: 13px; font-weight: 800; line-height: 1; display: flex; align-items: center; justify-content: center; border: 2px solid #fff; pointer-events: none; z-index: 2; }
+/* Каталогтың соңғы қатары экран шетіне жабысып қалмасын (2026-11-03) */
+body:not(.posm) .hup_bl{ padding-bottom: 28px; }
+body:not(.posm) .hup_r > div:last-child .hup_rcb, body:not(.posm) .hup_rcb{ padding-bottom: 14px; }
