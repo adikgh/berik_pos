@@ -35,6 +35,15 @@ jQuery(function ($) {
 		if ($acc.length) $more.append($acc)
 		$(document).on('click', '.posm_more .acc_open', function () { close() })
 		if (page == 'orders') {
+			$('.bseg').each(function () { this.style.setProperty('--n', $(this).children('.bseg_i').length || 1) })
+			// Сүзгілер батырма арқылы ашылады (күн жанында)
+			var $f = $('.uc_ui69').first()
+			if ($f.length) {
+				var fon = /[?&](pre|unpaid|type|status|staff)=[^&]/.test(location.search)
+				var $fb = $('<div class="posm_flt_btn' + (fon ? ' posm_flt_dot' : '') + '" title="' + T('Filter', 'Сүзгі') + '"><i class="far fa-sliders-h"></i></div>')
+				$f.children().first().addClass('posm_flt_date').after($fb)
+				$fb.on('click', function () { $f.toggleClass('posm_flt_on'); $fb.toggleClass('posm_flt_btn_on', $f.hasClass('posm_flt_on')) })
+			}
 			// Оң жақ астында: үстінде «+» (жаңа тапсырыс), астында «Мәзір»
 			var $hb = $('<div class="posm_fabs"><a class="posm_fab posm_fab_add" href="/cashbox/" title="' + T('New order', 'Жаңа тапсырыс') + '"><i class="far fa-plus"></i></a><a class="posm_fab posm_fab_menu" href="javascript:;" title="' + T('Menu', 'Мәзір') + '"><i class="far fa-bars"></i></a></div>').appendTo('body')
 			$hb.find('.posm_fab_menu').on('click', function (e) { e.preventDefault(); open($more) })

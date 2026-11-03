@@ -211,6 +211,9 @@ body.posm .opt_btns{ gap: 8px !important; }
 /* Заказ түрі: 4 батырма бір қатарға сыйсын (иконка үстінде, жазу астында) */
 body.posm .tp_seg .form_im_slo_i{ flex-direction: column !important; gap: 2px !important; min-height: 56px !important; padding: 6px 2px !important; font-size: 12.5px !important; }
 body.posm .tp_seg .form_im_slo_i .tp_ico{ margin: 0 !important; font-size: 17px !important; }
+body.posm .sel_type .tp_seg{ height: 66px !important; padding: 5px !important; }
+body.posm .sel_type .tp_seg .form_im_slo_i{ height: 56px !important; }
+body.posm .sel_type .tp_seg_sl{ top: 5px !important; height: 56px !important; }
 body.posm .pre_days{ overflow-x: auto; flex-wrap: nowrap !important; }
 body.posm .pre_slots{ grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
 
@@ -291,10 +294,10 @@ body.posm .uc_ui69 .bdt, body.posm .uc_ui69 .pre_tab, body.posm .uc_ui69 .bsel, 
 body.posm .uc_ui69 .bdt_main{ flex: 1 !important; }
 body.posm .uc_ui69 .pre_tab{ justify-content: center; }
 /* Тип сүзгісі: батырма ені мен жылжитын фон бірдей (компьютердегі есеп сияқты) */
-body.posm .uc_ui69 > *:has(.bseg){ display: flex !important; justify-content: center; }
-body.posm .uc_ui69 .bseg{ display: inline-flex !important; width: auto !important; }
-body.posm .uc_ui69 .bseg_i{ flex: 0 0 56px !important; width: 56px !important; }
-body.posm .uc_ui69 .bseg_sl{ width: 56px !important; transform: translateX(calc(var(--i, 0) * 60px)) !important; }
+body.posm .uc_ui69 .bseg{ display: flex !important; width: 100% !important; }
+body.posm .uc_ui69 .bseg_i{ flex: 1 1 0 !important; width: auto !important; }
+body.posm .uc_ui69 .bseg_sl{ width: calc((100% - 8px - (var(--n, 5) - 1) * 4px) / var(--n, 5)) !important; transform: translateX(calc(var(--i, 0) * (100% + 4px))) !important; }
+body.posm .uc_ui69 .bdt_main{ justify-content: center !important; text-align: center; }
 body.posm .posm_more .acc_menu::before, body.posm .posm_more .acc_menu::after{ display: none !important; }
 body.posm .uc_ui69 > .uc_us{ max-width: none !important; }
 
@@ -362,6 +365,19 @@ body.posm .or_card .uc_uil2_mib .btn{ flex: 1 1 100% !important; }
 
 /* Категориялар: бір қатарға сыймаса келесі қатарға түседі (сырғытпай) */
 body.posm .hup_rct{ flex-wrap: wrap !important; overflow: visible !important; gap: 8px !important; padding: 10px 12px 12px !important; }
-body.posm .hup_rcti{ height: 38px !important; padding: 0 14px !important; justify-content: center; }
+body.posm .hup_rcti{ height: 44px !important; min-height: 44px !important; min-width: 44px !important; padding: 0 16px !important; font-size: 14px !important; justify-content: center; border-radius: 8px !important; }
+body.posm .hup_rct{ gap: 8px !important; }
 body.posm .posm_top{ padding-bottom: 2px; border-bottom: 1px solid var(--pm-ln); }
 body.posm .hup_rcb{ margin-top: 12px !important; }
+
+/* Тапсырыстар: сүзгілер «Сүзгі» батырмасымен ашылады */
+body.posm .uc_ui69 > .posm_flt_date{ flex: 1 1 calc(100% - 60px) !important; min-width: 0 !important; }
+body.posm .uc_ui69 > .posm_flt_btn{
+	flex: 0 0 52px !important; width: 52px !important; height: 50px; border-radius: 12px; position: relative; display: flex; align-items: center; justify-content: center;
+	background: #fff; border: 1px solid var(--bp-line, #e6e8eb); box-shadow: var(--bp-shadow, none); color: var(--pm-tx); font-size: 18px; cursor: pointer;
+}
+body.posm .uc_ui69 > .posm_flt_btn_on{ background: var(--pm-g2); border-color: var(--pm-g); color: var(--pm-g); }
+body.posm .posm_flt_dot::after{ content: ''; position: absolute; top: 9px; right: 10px; width: 9px; height: 9px; border-radius: 50%; background: #e5484d; border: 2px solid #fff; }
+body.posm .uc_ui69:not(.posm_flt_on) > *:not(.posm_flt_date):not(.posm_flt_btn){ display: none !important; }
+body.posm .bl_c:has(> .or_head){ display: none !important; }
+body.posm.posm_pg_orders .uc_ui69{ margin-top: 0 !important; }

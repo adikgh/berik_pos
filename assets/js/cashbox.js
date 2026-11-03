@@ -1173,3 +1173,23 @@ $(document).ready(function() {
    })
    window.addEventListener('scroll', hide, true)
 })();
+
+// Компьютер: себеттегі тауардың санын карточкада көрсету (телефондағыдай). Телефонда posm.js өзі істейді.
+jQuery(function ($) {
+   if ($('body').hasClass('posm') || !$('.hup_rcb').length || !$('.cash_bl1').length) return
+   function sync() {
+      var qn = {}
+      $('.cash_bl1 .uc_ui').each(function () {
+         var id = $(this).attr('data-item-id'); qn[id] = (qn[id] || 0) + (Number($(this).attr('data-qn')) || 0)
+      })
+      $('.hup_rcb .cashbox_add').each(function () {
+         var q = qn[$(this).attr('data-id')] || 0
+         $(this).toggleClass('cb_in', q > 0)
+         if (q > 0) $(this).attr('data-cbq', q); else $(this).removeAttr('data-cbq')
+      })
+   }
+   sync()
+   var mo = new MutationObserver(function () { clearTimeout(mo.t); mo.t = setTimeout(sync, 30) })
+   mo.observe($('.cash_bl1')[0], { childList: true, subtree: true, attributes: true, attributeFilter: ['data-total', 'data-qn'] })
+   mo.observe($('.hup_rcb')[0], { childList: true })
+})
