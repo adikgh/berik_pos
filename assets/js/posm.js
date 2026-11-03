@@ -25,32 +25,40 @@ jQuery(function ($) {
 		$(document).one('touchend.posm', function (ev) { $(document).off('touchmove.posm'); var dy = ev.originalEvent.changedTouches[0].clientY - y0; $s.css({ transform: '', transition: '' }); if (dy > 80) close() })
 	})
 
-	// ---------- Төменгі мәзір ----------
+	// ---------- Навигация ----------
+	// Төменгі мәзір жоқ: оң жақ астында тек «Тапсырыстар» батырмасы.
+	// Тапсырыстар бетінде жоғарыда «+» (жаңа тапсырыс) және «Мәзір» батырмалары.
 	var $acc = $('.acc_menu').first()
 	if ($('.aheader').length) {
 		var br = (($('.mp_topi[href*="/orders/"]').attr('href') || '/orders/').split('?')[1] || '')
-		var items = [
-			['cashbox', '/cashbox/', 'fa-plus-circle', T('New order', 'Жаңа тапсырыс')],
-			['orders', '/orders/' + (br ? '?' + br : ''), 'fa-receipt', T('Orders', 'Тапсырыстар')],
-			['shift', '/shift/', 'fa-cash-register', T('Shift', 'Смена')],
-			['more', 'javascript:;', 'fa-bars', T('Menu', 'Мәзір')]
-		]
-		var $nav = $('<nav class="posm_nav"></nav>')
-		items.forEach(function (it) {
-			$nav.append('<a class="posm_nav_i posm_nav_' + it[0] + (page == it[0] ? ' posm_nav_i_act' : '') + '" href="' + it[1] + '"><i class="' + (page == it[0] ? 'fas' : 'fal') + ' ' + it[2] + '"></i><span>' + it[3] + '</span></a>')
-		})
-		$nav.appendTo('body')
-		// «Мәзір»: аккаунт мәзірі төменнен ашылады
 		var $more = sheet('posm_more', T('Menu', 'Мәзір'))
 		if ($acc.length) $more.append($acc)
-		$nav.find('.posm_nav_more').on('click', function (e) { e.preventDefault(); open($more) })
 		$(document).on('click', '.posm_more .acc_open', function () { close() })
+		if (page == 'orders') {
+			var $hb = $('<div class="posm_hbtns"><a class="posm_hbtn posm_hbtn_add" href="/cashbox/" title="' + T('New order', 'Жаңа тапсырыс') + '"><i class="far fa-plus"></i></a><a class="posm_hbtn posm_hbtn_menu" href="javascript:;" title="' + T('Menu', 'Мәзір') + '"><i class="far fa-bars"></i></a></div>')
+			$('.or_head').first().append($hb)
+			$hb.find('.posm_hbtn_menu').on('click', function (e) { e.preventDefault(); open($more) })
+		} else {
+			$('body').append('<a class="posm_fab" href="/orders/' + (br ? '?' + br : '') + '" title="' + T('Orders', 'Тапсырыстар') + '"><i class="far fa-receipt"></i></a>')
+		}
 	}
 
 	// ---------- Кіру беті: менеджер таңдау + PIN-код пернетақтасы ----------
 	if ($('.loginq_block').length) {
 		document.body.classList.add('posm_pg_login')
-		$('.usign_c').first().before('<div class="posm_brand"><img src="/assets/img/logo/berik-icon.svg" alt="" width="56" height="56"><div>BERIK <b>POS</b></div><small>' + T('Mobile cashbox', 'Касса · телефон нұсқасы') + '</small></div>')
+		var hr = new Date().getHours(), hi = hr < 5 ? T('Good night', 'Қайырлы түн') : hr < 12 ? T('Good morning', 'Қайырлы таң') : hr < 18 ? T('Good afternoon', 'Қайырлы күн') : T('Good evening', 'Қайырлы кеш')
+		$('.sbl2').first().prepend('<div class="posm_hero"><div class="posm_hero_lg"><img src="/assets/img/logo/berik-icon.svg" alt="" width="64" height="64"></div><div class="posm_hero_nm">BERIK <b>POS</b></div><div class="posm_hero_hi">' + hi + ' 👋</div><div class="posm_hero_sub">' + T('Choose your name and enter your code', 'Атыңызды таңдап, жеке кодыңызды енгізіңіз') + '</div></div>')
+		// Менеджер карточкасы: аты бойынша бас әріп пен түс
+		var pal = ['#0EA768', '#1f75a8', '#e08a00', '#7a5af5', '#d64545', '#0d9488', '#c2410c', '#2563eb']
+		$('.sbl2_lroi').each(function (i) {
+			var nm = $.trim($(this).find('p').text()), parts = nm.split(/[\s\-–]+/).filter(Boolean)
+			var ini = ((parts[0] || '?')[0] + (parts[1] ? parts[1][0] : '')).toUpperCase(), h = 0
+			for (var k = 0; k < nm.length; k++) h = (h * 31 + nm.charCodeAt(k)) >>> 0
+			$(this).prepend('<span class="posm_av" style="--c:' + pal[h % pal.length] + '">' + ini + '</span>')
+			$(this).find('p').wrap('<div class="posm_mn"></div>').after('<small>' + T('Tap to sign in', 'Кіру үшін басыңыз') + '</small>')
+			$(this).css('animation-delay', (i * 50) + 'ms')
+		})
+		$('.sbl2').first().append('<div class="posm_foot"><i class="far fa-shield-check"></i> ' + T('Secure sign-in with personal code', 'Жеке кодпен қауіпсіз кіру') + '</div>')
 		var $code = $('.loginq_block .code'), $pad = $('<div class="posm_pin"><div class="posm_pin_d"><i></i><i></i><i></i><i></i></div><div class="posm_pin_k"></div></div>')
 		;['1','2','3','4','5','6','7','8','9','','0','del'].forEach(function (k) {
 			$pad.find('.posm_pin_k').append(k === '' ? '<span></span>' : '<button type="button" class="posm_pin_b" data-k="' + k + '">' + (k == 'del' ? '<i class="far fa-backspace"></i>' : k) + '</button>')
@@ -69,10 +77,19 @@ jQuery(function ($) {
 
 	// ---------- Жаңа тапсырыс ----------
 	if (page == 'cashbox' && $('.hup_r').length) {
-		// Іздеу мен категориялар жоғарыда тұрып қалады
+		// Категориялар жоғарыда тұрып қалады, іздеу экранның ең астында (бас бармақпен басуға ыңғайлы)
 		var $top = $('<div class="posm_top"></div>')
 		$('.hup_search').first().before($top)
-		$top.append($('.hup_search').first()).append($('.hup_rct').first().parent())
+		$top.append($('.hup_rct').first().parent())
+		var $bot = $('<div class="posm_bot"></div>').appendTo('body')
+		$bot.append($('.hup_search').first()).append($('.posm_fab'))
+		// Телефон пернетақтасы ашылғанда іздеу оның үстінде тұрсын
+		if (window.visualViewport) {
+			var vv = window.visualViewport, kb = function () { var d = Math.max(0, window.innerHeight - vv.height - vv.offsetTop); document.body.style.setProperty('--pm-kb', d + 'px'); document.body.classList.toggle('posm_kb', d > 80) }
+			vv.addEventListener('resize', kb); vv.addEventListener('scroll', kb)
+		}
+		// Іздегенде нәтиже басынан көрінсін
+		$('.hup_search_inp').on('input', function () { if (window.scrollY > 0) window.scrollTo({ top: 0, behavior: 'instant' }) })
 
 		// Себет терезесі
 		var $cart = sheet('posm_cart', T('Cart', 'Себет') + '<small class="posm_cart_n"></small>')
