@@ -1,11 +1,18 @@
 <? $menu = mysqli_fetch_array(db::query("select * from `site_menu` where name = '$menu_name' and type = 'admin'")); ?>
 
 <meta charset="UTF-8">
+<? if (!empty($posm)): // телефон нұсқасы ?>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<? else: ?>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<? endif ?>
 <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0"/> -->
 
 <!-- Телефоннан кіруге болмайды: экран өлшемін тексеру (ашылғанда және кішірейткенде).
      Телефонда «Компьютер нұсқасы» қосулы болса да ұстайды: құрылғының өз экраны бойынша тексереді. -->
+<? if (empty($posm)): ?>
 <script>
 (function(){
 	var MIN_W = 700, TO = '/mobile/';
@@ -42,6 +49,7 @@
 	window.addEventListener('orientationchange', later);
 })();
 </script>
+<? endif ?>
 
 <title><?=@$menu['title_'.$lang]?> | <?=@$site['name_kz']?></title>
 <meta name="description" content="<?=@$menu['disc_'.$lang]?> <?=@$site['phone_view']?>">
@@ -85,8 +93,13 @@
 <? foreach ($scss as $i): ?> <link rel="stylesheet" type="text/css" href="/assets/css/<?=$i?>.css?v=<?=$ver?>" /> <? endforeach ?>
 <? foreach ($css as $i): ?> <link rel="stylesheet" type="text/css" href="/assets/css/<?=$i?>.css?v=<?=$ver?>" /> <? endforeach ?>
 <link rel="stylesheet" type="text/css" href="/assets/css/berik.css?v=<?=$ver?>-<?=@filemtime($_SERVER['DOCUMENT_ROOT'].'/assets/css/berik.css')?>" />
+<? if (!empty($posm)): ?>
+<!-- телефон нұсқасы (posm.*) -->
+<link rel="stylesheet" type="text/css" href="/assets/css/posm.css?v=<?=$ver?>-<?=@filemtime($_SERVER['DOCUMENT_ROOT'].'/assets/css/posm.css')?>" />
+<? else: ?>
 <!-- планшет және сенсорлы моноблок (769–1366px) -->
 <link rel="stylesheet" type="text/css" href="/assets/css/tablet.css?v=<?=$ver?>-<?=@filemtime($_SERVER['DOCUMENT_ROOT'].'/assets/css/tablet.css')?>" />
+<? endif ?>
 
 
 <!-- js -->

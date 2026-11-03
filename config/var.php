@@ -65,6 +65,9 @@
    $url = explode('?', $url);
    $url = $url[0];
 
+   // posm.* домені — кассаның телефон нұсқасы (сол код, сол база). Тек сыртқы көрінісі бөлек: assets/css/posm.css, assets/js/posm.js
+   $posm = (bool)preg_match('~^posm\.~i', (string)@$_SERVER['HTTP_HOST']);
+
    // token telegram
    $token = "1581082911:AAEKW20w_-5V0Wx9tzhyThV2pjCgZtCjyc8";
 
