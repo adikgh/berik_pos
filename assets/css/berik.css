@@ -842,6 +842,8 @@ input.form_txt{ padding-left: 54px; }
 /* Көк/жасыл батырмалар: 54px */
 .btn{ height: 54px; min-height: 54px; }
 .uc_uil2_mib .btn{ height: 54px; min-height: 54px; }
+/* ✕ (btn_dd) батырмасы дөңгелек қалады: 44×44 (2026-11-10) */
+.btn.btn_dd:not(.btn_dd_54){ height: 44px; min-height: 44px; border-radius: 50%; }
 /* Жоғарғы мәзір: дөңгелек емес, басқа батырмалармен бірдей бұрыш */
 .mp_topc, .ub1_lt{ border-radius: 14px; }
 .mp_topi, .ub1_lti{ border-radius: 10px; }
@@ -878,6 +880,7 @@ input.form_txt{ padding-left: 54px; }
 .acc_drw_hd{ display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 .acc_drw_hd h4{ margin: 0; font-size: 22px; font-weight: 800; }
 .acc_drw_hd .btn{ width: 54px; padding: 0; }
+.acc_drw_hd .btn.btn_dd{ height: 54px; min-height: 54px; }
 .acc_drw_hd .btn i{ margin: 0; }
 .acc_drw .acc_hd{ padding: 12px 0 16px; margin-bottom: 4px; }
 .acc_drw .form_im{ margin-top: 16px; }

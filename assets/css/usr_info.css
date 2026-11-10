@@ -51,3 +51,19 @@
 .ui_tiers span{display:inline-flex;align-items:center;gap:6px;min-width:78px;opacity:1;color:#8a94a3;font-weight:600}
 .ui_tiers span::before{content:'\f06b';font-family:'Font Awesome 5 Pro','Font Awesome 6 Pro','Font Awesome 5 Free';font-weight:400;color:#e9a23b;font-size:12px}
 .ui_tiers > div{font-weight:700;color:#1d2433}
+/* 2026-11-10: «Өзгерту» ашылғанда блок «Сақтау» терезесі жабық тұрса да шығып кетті және тар экранда сол жақтан асып кетті.
+   Енді тек «Сақтау» терезесі ашық болса көрінеді, ені экранға сыяды. */
+.pop_bl:not(.pop_bl_act) .pop_usr_info{visibility:hidden;opacity:0;pointer-events:none}
+.pop_usr_info{width:min(480px, calc(100vw - 600px));max-width:480px}
+/* Нөмір жанындағы «Тұтынушы жайлы» белгісі (2026-11-10) */
+.tf_phone .form_im{position:relative}
+.tf_phone .btype_phone{padding-right:56px}
+.ui_open{position:absolute;right:8px;bottom:6px;width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#8a94a3;cursor:pointer;transition:.2s}
+.ui_open:hover{background:var(--gr1);color:var(--cm)}
+.ui_open_has{color:#f0ad00}
+.ui_open_has::after{content:'';position:absolute;top:7px;right:7px;width:8px;height:8px;border-radius:50%;background:#f0ad00}
+.pop_usr_info .head_c .ui_close{flex:0 0 auto}
+/* Тар экранда (≤1024) блок жасырын еді: белгімен ашқанда «Сақтау» терезесінің үстінен шығады */
+@media (max-width:1024px){
+	.pop_usr_info.pop_usr_info_act{display:flex;position:fixed;z-index:20;top:20px;left:20px;right:20px;width:auto;max-width:none;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+}

@@ -209,6 +209,7 @@
 		<div class="pop_usr_info " >
 			<div class="head_c">
 				<h4><?=t::w('Customer info', 'Тұтынушы жайлы')?></h4>
+				<div class="btn btn_dd ui_close"><i class="fal fa-times"></i></div>
 			</div>
 			<div class="pop_usr_info_c"></div>
 		</div>
@@ -296,6 +297,7 @@
 							<div class="form_span"><?=t::w('Phone:', 'Нөмір:')?></div>
 							<input type="tel" class="form_txt fr_phone btype_phone" data-lenght="11" placeholder="8 (700) 000-00-00" data-val="8<?=$cashbox_d['phone']?>" value="<?=$cashbox_d['phone']?>">
 							<i class="fal fa-phone-alt form_icon"></i>
+							<div class="ui_open" title="<?=t::w('Customer info', 'Тұтынушы жайлы')?>"><i class="fal fa-user-circle"></i></div>
 						</div>
 					</div>
 

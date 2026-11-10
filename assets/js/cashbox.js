@@ -835,26 +835,37 @@ $(document).ready(function() {
       })
    })
 
+   // Тұтынушы жайлы: кэшбэк, бүгінгі заказ, соңғы 3 заказ, сыйлық. Ештеңе болмаса блок ашылмайды
+   function usr_info_load(manual) {
+      var ph = $('.btype_phone').attr('data-val')
+      if (String(ph || '').replace(/\D+/g, '').length < 10) { if (manual) mess(w('Enter phone number', 'Нөмірді енгізіңіз')); return }
+      $.ajax({
+         url: "/cashbox/search_now.php?search_now",
+         type: "POST",
+         dataType: "html",
+         data: ({ inp: ph, oid: $('.cashbox_pay2').first().data('id') }),
+         success: function(dt){
+            if (ph != $('.btype_phone').attr('data-val')) return
+            dt = $.trim(dt)
+            $('.pop_usr_info_c').html(dt)
+            $('.pop_usr_info').toggleClass('pop_usr_info_act', dt != '')
+            $('.ui_open').toggleClass('ui_open_has', dt != '')
+            if (manual && dt == '') mess(w('No info for this number', 'Бұл нөмір бойынша ақпарат жоқ'))
+         }
+      })
+   }
    $('html').on('input', '.btype_phone', function () {
       if ($('.btype_phone').attr('data-sel') == 0) {
          $('.pop_usr_info').removeClass('pop_usr_info_act')
-      } else {
-         // Тұтынушы жайлы: кэшбэк, бүгінгі заказ, соңғы 3 заказ, сыйлық. Ештеңе болмаса блок ашылмайды
-         var ph = $('.btype_phone').attr('data-val')
-         $.ajax({
-            url: "/cashbox/search_now.php?search_now",
-            type: "POST",
-            dataType: "html",
-            data: ({ inp: ph, oid: $('.cashbox_pay2').first().data('id') }),
-            success: function(dt){
-               if (ph != $('.btype_phone').attr('data-val')) return
-               dt = $.trim(dt)
-               $('.pop_usr_info_c').html(dt)
-               $('.pop_usr_info').toggleClass('pop_usr_info_act', dt != '')
-            }
-         })
-      }
+         $('.ui_open').removeClass('ui_open_has')
+      } else usr_info_load(false)
    })
+   // Нөмір жанындағы белгі: ақпаратты ашады/жабады («Өзгерту» кезінде нөмір бұрыннан толып тұрады)
+   $('html').on('click', '.ui_open', function () {
+      if ($('.pop_usr_info').hasClass('pop_usr_info_act')) $('.pop_usr_info').removeClass('pop_usr_info_act')
+      else usr_info_load(true)
+   })
+   $('html').on('click', '.ui_close', function () { $('.pop_usr_info').removeClass('pop_usr_info_act') })
    
 
 
