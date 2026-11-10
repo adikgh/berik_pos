@@ -139,6 +139,9 @@
 		$type = @strip_tags($_POST['type']);
 		$order_type = @strip_tags($_POST['order_type']);
 		$order_branch = @strip_tags($_POST['order_branch']);
+		// Адрес тек курьер жеткізуге (1) керек: Собой, Кафе, Сервисте адрес жазылмайды
+		$no_addr = ($order_type !== '' && (int)$order_type != 1);
+		if ($no_addr) { $address = ''; $floor = ''; $apt = ''; $floor_apt = ''; }
 		$service = @mysqli_real_escape_string(db::$connect, trim(strip_tags($_POST['service'])));
 		$payment_method = @trim($_POST['payment_method']);
 		if (!in_array($payment_method, ['transfer', 'qr', 'cash', 'mixed', 'unpaid'], true)) $payment_method = '';
@@ -234,9 +237,10 @@
 
       if ($phone) $upd = db::query("UPDATE `retail_orders` SET `phone` = '$phone2', `upd_dt` = '$datetime' WHERE `id`='$id'");
       if ($address) $upd = db::query("UPDATE `retail_orders` SET `address` = '$address', `upd_dt` = '$datetime' WHERE `id`='$id'");
+      elseif ($no_addr) $upd = db::query("UPDATE `retail_orders` SET `address` = NULL, `upd_dt` = '$datetime' WHERE `id`='$id'");
       if ($add) $upd = db::query("UPDATE `retail_orders` SET `additional` = '$add', `upd_dt` = '$datetime' WHERE `id`='$id'");
       $fa_e = function ($v) { return $v === '' ? 'NULL' : "'".mysqli_real_escape_string(db::$connect, $v)."'"; };
-      if (isset($_POST['floor']) && mysqli_num_rows(db::query("SHOW COLUMNS FROM `retail_orders` LIKE 'floor_apt'"))) {
+      if ((isset($_POST['floor']) || $no_addr) && mysqli_num_rows(db::query("SHOW COLUMNS FROM `retail_orders` LIKE 'floor_apt'"))) {
          db::query("UPDATE `retail_orders` SET `floor_apt` = ".$fa_e(trim($floor_apt))." WHERE `id`='".(int)$id."'");
       }
       if ($preorder) $upd = db::query("UPDATE `retail_orders` SET `preorder_dt` = '$preorder', `ins_dt` = '$preorder:00', `upd_dt` = '$datetime' WHERE `id`='$id'");

@@ -178,3 +178,20 @@ body.b58{ width: 50mm; padding: 2px; font-size: 12px; }
 .p58 td[width="50"] { width: 44px; }
 .p58 .clens { margin-top: 14px; }
 .p58 .clens1 { font-size: 12px; }
+
+
+/* Чек редакторы (админ → Чек, company_receipt): логотип, қосымша жазулар, өлшемдер */
+.rc_logo { text-align: center; padding: 4px 0; }
+.rc_logo img { max-width: 100%; filter: grayscale(1) contrast(1.4); }
+.rc_htxt { font-size: 14px; padding: 2px 0 4px; }
+.rc_foot { margin-top: 20px; padding-top: 8px; border-top: 2px dashed #000; text-align: center; font-size: 15px; }
+.fs_s, .fs_s table { font-size: 14px; }
+.fs_l, .fs_l table { font-size: 18px; }
+.ts_s .branch_name { font-size: 28px; }
+.ts_l .branch_name { font-size: 44px; }
+.p58.fs_s, .p58.fs_s table { font-size: 11px; }
+.p58.fs_l, .p58.fs_l table { font-size: 14px; }
+.p58.ts_s .branch_name { font-size: 18px; }
+.p58.ts_l .branch_name { font-size: 28px; }
+.p58 .rc_htxt { font-size: 11px; }
+.p58 .rc_foot { font-size: 12px; margin-top: 12px; }

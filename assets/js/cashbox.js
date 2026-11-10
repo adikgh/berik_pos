@@ -740,9 +740,9 @@ $(document).ready(function() {
             data: ({ 
                id: btn.data('id'),
                phone: $('.btype_phone').attr('data-val'),
-               address: addr_full(),
-               floor: $.trim($('.btype_floor').val() || ''),
-               apt: $.trim($('.btype_apt').val() || ''),
+               address: $('.sel_type').attr('data-val') == 1 ? addr_full() : '', // адрес тек курьер жеткізуге
+               floor: $('.sel_type').attr('data-val') == 1 ? $.trim($('.btype_floor').val() || '') : '',
+               apt: $('.sel_type').attr('data-val') == 1 ? $.trim($('.btype_apt').val() || '') : '',
                add: $('.btype_add').attr('data-val'),
                preorder: $('.btype_preorder').attr('data-val'),
                total: $('.cashbox_pay_btotol_c').attr('data-val'),
@@ -805,11 +805,14 @@ $(document).ready(function() {
 
 
    // 
-   // Нөмір толық жазылса, базадағы адресті автомат қою (адрес бос болса ғана)
+   // Нөмір толық жазылса, базадағы адресті автомат қою (адрес бос болса ғана, тек курьер жеткізуде)
    var addr_auto = ''
+   // Кейін «Жеткізу» таңдалса, адрес сонда қойылады
+   $('.sel_type .form_im_slo_i').click(function(){ if ($(this).attr('data-type') == 1) $('.btype_phone').trigger('input') })
    $('html').on('input', '.btype_phone', function () {
       var ph = $(this).attr('data-val') || ''
       if ($(this).attr('data-sel') != 1 || ph.length < 11) return
+      if ((Number($('.sel_type').attr('data-val')) || 1) != 1) return
       var a = $('.btype_address')
       if (!a.length) return
       if (a.val() != '' && a.val() != addr_auto) return
