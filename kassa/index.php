@@ -62,7 +62,7 @@
                                
                                 while ($buy_d = mysqli_fetch_assoc($orders)){
                                     $allorder['total'] = $allorder['total'] + $buy_d['total'];
-								    $allorder['pay_qr'] = $allorder['pay_qr'] + $buy_d['pay_qr'];
+								    $allorder['pay_qr'] = $allorder['pay_qr'] + ((int)@$buy_d['pay_prepay'] > 0 ? (int)$buy_d['pay_prepay'] : (int)$buy_d['pay_qr']); // предоплата кез келген түрмен
 								    $allorder['pay_cash'] = $allorder['pay_cash'] + $buy_d['pay_cash'];
 								    $allorder['pay_delivery'] = $allorder['pay_delivery'] + $buy_d['pay_delivery'] + 500;
                                 }

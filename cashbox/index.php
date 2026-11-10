@@ -434,7 +434,8 @@
 					<div class="pay_box_h"><?=t::w('Payment', 'Төлем')?></div>
 					<? // Предоплата: дайын сомалар, «Толық» — жалпы сома, «+» — басқа сома
 						$qr_list = [0, 1000, 2000, 3000, 5000, 10000];
-						$qr_cur = (int)$cashbox_d['pay_qr'];
+						// pay_prepay — предоплата кез келген түрмен (аударым, QR, RED, аралас); ескі тапсырыстарда — pay_qr
+						$qr_cur = (int)@$cashbox_d['pay_prepay'] > 0 ? (int)$cashbox_d['pay_prepay'] : (int)$cashbox_d['pay_qr'];
 						$qr_custom = !in_array($qr_cur, $qr_list);
 					?>
 					<div class="cashbox_pay_btype">
@@ -453,7 +454,7 @@
 							</div>
 						</div>
 						<div class="form_im qr_inp <?=($qr_custom ? '' : 'dsp_n')?>">
-							<input type="tel" class="form_txt fr_price btype_qr" placeholder="<?=t::w('Other amount', 'Басқа сома')?>" data-val="<?=$cashbox_d['pay_qr']?>" value="<?=$cashbox_d['pay_qr']?>">
+							<input type="tel" class="form_txt fr_price btype_qr" placeholder="<?=t::w('Other amount', 'Басқа сома')?>" data-val="<?=$qr_cur?>" value="<?=$qr_cur?>">
 							<i class="fal fa-tenge form_icon"></i>
 						</div>
 						<? $qrm_cur = (!empty($cashbox_d['paid']) && in_array((string)@$cashbox_d['prepay_method'], ['transfer','qr','cash','red','mix'])) ? $cashbox_d['prepay_method'] : 'qr'; ?>
@@ -481,7 +482,7 @@
 					<div class="cashbox_pay_bsem">
 						<div class="form_im">
 							<div class="form_span"><?=t::w('Remaining:', 'Қалған сома:')?></div>
-							<div class="cashbox_pay_bsemc btype_cash fr_price" data-val="<?=$total + $cashbox_d['pay_delivery'] - $cashbox_d['pay_qr']?>"><?=$total + $cashbox_d['pay_delivery'] - $cashbox_d['pay_qr']?></div>
+							<div class="cashbox_pay_bsemc btype_cash fr_price" data-val="<?=$total + $cashbox_d['pay_delivery'] - $qr_cur?>"><?=$total + $cashbox_d['pay_delivery'] - $qr_cur?></div>
 						</div>
 						<!-- <div class="form_im">
 							<div class="form_span"><?=t::w('Total:', 'Қорытынды:')?></div>

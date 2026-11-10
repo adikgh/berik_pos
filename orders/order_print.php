@@ -147,13 +147,15 @@
         </tr>
 
 
-        <? if ($row('prepay', $cashbox_d['pay_qr'])): ?>
+        <? // Предоплата: pay_prepay (аударым, QR, RED, аралас — бәрі), ескі тапсырыстарда — pay_qr
+           $prepay_sum = (int)@$cashbox_d['pay_prepay'] > 0 ? (int)$cashbox_d['pay_prepay'] : (int)$cashbox_d['pay_qr']; ?>
+        <? if ($row('prepay', $prepay_sum)): ?>
         <tr class="tr_sep2"><td colspan="3"></td></tr>
         <tr class="tr_sep2"><td colspan="3"></td></tr>
         <tr class="tr" valign="top">
             <td align="left"><?=$L('l_prepay')?></td>
             <td align="center"></td>
-            <td align="right">- <?=$cashbox_d['pay_qr']?></td>
+            <td align="right">- <?=$prepay_sum?></td>
         </tr>
         <? endif ?>
         <? if ($on('show_topay')): ?>
