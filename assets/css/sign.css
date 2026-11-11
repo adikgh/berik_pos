@@ -143,3 +143,44 @@ body:has(.ps) .app{ min-height: 0; }
 	.ps_who_n{ margin-top: 4px; }
 	.ps_pin_t{ margin-top: 14px; }
 }
+
+/* ---------- Телефон (posm.* және тар терезе) ---------- */
+@media (max-width: 760px){
+	.ps{ display: flex; flex-direction: column; min-height: 100vh; min-height: 100svh; }
+	.ps_side{ flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; padding: calc(18px + env(safe-area-inset-top)) 18px 46px; }
+	.ps_side::before{ width: 260px; height: 260px; right: -90px; top: -150px; }
+	.ps_side::after{ display: none; }
+	.ps_logo{ width: 44px; height: 44px; border-radius: 13px; }
+	.ps_logo img{ width: 32px; height: 32px; }
+	.ps_name{ height: 44px; gap: 4px; }
+	.ps_name span{ font-size: 21px; }
+	.ps_name small{ font-size: 12px; }
+	.ps_clock{ text-align: right; }
+	.ps_time{ font-size: 26px; letter-spacing: 0; }
+	.ps_date, .ps_comp, .ps_steps{ display: none; }
+
+	.ps_main{ flex: 1; justify-content: flex-start; margin-top: -26px; padding: 26px 16px calc(64px + env(safe-area-inset-bottom)); border-radius: 26px 26px 0 0; background: #f3f6f4; z-index: 2; }
+	.ps_head{ margin-bottom: 20px; }
+	.ps_h{ margin-top: 12px; font-size: 26px; }
+	.ps_p{ font-size: 15px; }
+	.ps_warn{ margin: -6px auto 16px; }
+
+	.ps_grid{ flex-direction: column; gap: 10px; }
+	.ps_user, .ps_user:hover{ width: 100%; display: grid; grid-template-columns: 52px 1fr 30px; grid-template-areas: "av un go" "av ur go"; align-items: center; column-gap: 14px; row-gap: 4px; padding: 14px 16px; border-radius: 16px; text-align: left; transform: none; }
+	.ps_user .ps_av{ grid-area: av; width: 52px; height: 52px; box-shadow: 0 0 0 4px var(--ps-avl, #e3f5ec); }
+	.ps_user .ps_av em{ font-size: 19px; }
+	.ps_un{ grid-area: un; margin: 0; font-size: 17px; align-self: end; }
+	.ps_user .ps_ur{ grid-area: ur; justify-self: start; align-self: start; height: 22px; font-size: 12px; }
+	.ps_ugo{ grid-area: go; position: static; opacity: 1; }
+
+	.ps_pin{ max-width: 340px; }
+	.ps_back{ margin-bottom: 14px; }
+	.ps_av_lg{ width: 72px; height: 72px; }
+	.ps_av_lg em{ font-size: 26px; }
+	.ps_who_n{ margin-top: 4px; font-size: 21px; }
+	.ps_pin_t{ margin-top: 14px; }
+	.ps_dots{ margin-top: 14px; }
+	.ps_pad{ gap: 10px; }
+	.ps_pad button{ height: 60px; font-size: 24px; border-radius: 16px; }
+	.ps_made{ bottom: calc(18px + env(safe-area-inset-bottom)); }
+}
