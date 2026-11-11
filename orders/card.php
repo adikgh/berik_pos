@@ -217,8 +217,8 @@
 											<div class="oa_ad"><i class="far fa-map-marker-alt oa_ic"></i><div class="oa_txt"><b><?=$buy_d['address']?></b><? if ($fa !== ''): ?><small><?=htmlspecialchars(str_replace(', ', ' · ', $fa))?></small><? endif ?></div></div>
 											<? endif ?>
 											<? if ($show_ph): ?>
-											<? if (!isset($cab_on)) $cab_on = is_file(__DIR__.'/../config/client_link.php') && mysqli_num_rows(db::query("SHOW TABLES LIKE 'company_menu'")) && (int)@mysqli_fetch_assoc(db::query("select is_on from company_menu where company_id = '".(int)$company."'"))['is_on'] === 1; // QR меню қосулы болса — клиенттің жеке кабинет сілтемесі ?>
-											<div class="oa_ph"><i class="far fa-phone-alt oa_ic"></i><b class="fr_phone"><?=$buy_d['phone']?></b><? if ($cab_on): ?><span class="oa_cab" data-id="<?=$buy_d['id']?>" title="<?=t::w('Copy client cabinet link', 'Жеке кабинет сілтемесін көшіру')?>"><i class="far fa-link"></i><span><?=t::w('Cabinet', 'Кабинет')?></span></span><? endif ?></div>
+											<? if (!isset($cab_on)) $cab_on = mysqli_num_rows(db::query("SHOW TABLES LIKE 'company_menu'")) && (int)@mysqli_fetch_assoc(db::query("select is_on from company_menu where company_id = '".(int)$company."'"))['is_on'] === 1; // QR меню қосулы болса — клиенттің жеке кабинет сілтемесі ?>
+											<div class="oa_ph"><i class="far fa-phone-alt oa_ic"></i><b class="fr_phone"><?=$buy_d['phone']?></b><? if ($cab_on): ?><span class="oa_cab" data-id="<?=$buy_d['id']?>" title="<?=t::w('Copy client cabinet link', 'Жеке кабинет сілтемесін көшіру')?>"><i class="far fa-link"></i><span><?=t::w('Cabinet', 'Кабинет')?></span></span><span class="oa_cab oa_cab_wa" data-id="<?=$buy_d['id']?>" title="<?=t::w('Send cabinet link via WhatsApp', 'Кабинет сілтемесін WhatsApp-қа жіберу')?>"><i class="fab fa-whatsapp"></i></span><? endif ?></div>
 											<? endif ?>
 										</div>
 									</div>

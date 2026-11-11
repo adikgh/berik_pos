@@ -10,14 +10,17 @@
       $menu_on = mysqli_num_rows(db::query("SHOW TABLES LIKE 'company_menu'")) && (int)@mysqli_fetch_assoc(db::query("select is_on from company_menu where company_id = '$cmp_id'"))['is_on'] === 1;
       $ph = preg_replace('/\D+/', '', (string)@$o['phone']);
       if (strlen($ph) == 11 && ($ph[0] == '8' || $ph[0] == '7')) $ph = substr($ph, 1);
-      if (!$o || !$menu_on || !is_file(__DIR__.'/../config/client_link.php') || strlen($ph) != 10 || $ph[0] != '7') { echo json_encode(['ok' => 0]); exit(); }
+      if (!$o || !$menu_on || strlen($ph) != 10 || $ph[0] != '7') { echo json_encode(['ok' => 0]); exit(); }
       // user = әр адам (телефон 10 сан). Жоқ болса қосамыз, company_client-ке байлаймыз (касса тапсырысындағыдай)
       db::query("INSERT IGNORE INTO `user` (`name`, `phone`) VALUES ('', '$ph')");
       $u = mysqli_fetch_assoc(db::query("select id from `user` where phone = '$ph' limit 1"));
       if (!$u) { echo json_encode(['ok' => 0]); exit(); }
       if (mysqli_num_rows(db::query("SHOW TABLES LIKE 'company_client'"))) db::query("UPDATE `company_client` SET `user_id` = '".(int)$u['id']."' WHERE company_id = '$cmp_id' and phone = '$ph' and (user_id is null or user_id = 0)");
-      include_once __DIR__.'/../config/client_link.php';
-      echo json_encode(['ok' => 1, 'link' => client_link((int)$u['id'])]);
+      // Кілт базада (user.cab_token): бір рет жасалады, кейін сол сілтеме қайталанады. Баған жоқ болса өзі қосылады.
+      if (!mysqli_num_rows(db::query("SHOW COLUMNS FROM `user` LIKE 'cab_token'"))) db::query("ALTER TABLE `user` ADD COLUMN `cab_token` VARCHAR(32) NULL DEFAULT NULL COMMENT 'Жеке кабинет сілтемесінің кілті'");
+      $tok = (string)@mysqli_fetch_assoc(db::query("select cab_token from `user` where id = '".(int)$u['id']."'"))['cab_token'];
+      if (strlen($tok) != 32) { $tok = bin2hex(random_bytes(16)); db::query("UPDATE `user` SET `cab_token` = '$tok' WHERE id = '".(int)$u['id']."'"); }
+      echo json_encode(['ok' => 1, 'link' => $cab_url.'/in.php?u='.(int)$u['id'].'&t='.$tok, 'phone' => $ph]);
       exit();
    }
 

@@ -100,15 +100,25 @@ $(document).ready(function() {
    function cab_get(id, cb){
       if (cab_cache[id]) { cb && cb(cab_cache[id]); return }
       $.ajax({ url: "/orders/get.php?cab_link", type: "POST", dataType: "json", data: ({ id: id }),
-         success: function(r){ if (r && r.ok) { cab_cache[id] = r.link; cb && cb(r.link) } else cb && cb('') },
-         error: function(){ cb && cb('') } })
+         success: function(r){ if (r && r.ok) { cab_cache[id] = r; cb && cb(r) } else cb && cb(null) },
+         error: function(){ cb && cb(null) } })
    }
+   // WhatsApp: клиентке дайын хатпен ашады (кассир тек «Жіберу» басады)
+   function cab_wa(r){ return 'https://wa.me/7' + r.phone + '?text=' + encodeURIComponent('Сәлеметсіз бе! Жеке кабинетіңізге осы сілтеме арқылы кіре аласыз: ' + r.link) }
+   $('html').on('click', '.oa_cab_wa', function (e) {
+      e.stopPropagation(); e.preventDefault()
+      var id = $(this).data('id')
+      if (cab_cache[id]) { window.open(cab_wa(cab_cache[id]), '_blank'); return }
+      var w = window.open('about:blank', '_blank') // терезені бірден ашамыз, әйтпесе браузер бұғаттайды
+      cab_get(id, function(r){ if (r) { if (w) w.location = cab_wa(r); else window.open(cab_wa(r), '_blank') } else { if (w) w.close(); mess('Сілтеме жасалмады') } })
+   })
    $('html').on('mouseenter', '.oa_cab', function () { cab_get($(this).data('id')) })
-   $('html').on('click', '.oa_cab', function (e) {
+   $('html').on('click', '.oa_cab:not(.oa_cab_wa)', function (e) {
       e.stopPropagation()
       var b = $(this)
-      cab_get(b.data('id'), function(link){
-         if (!link) { mess('Сілтеме жасалмады'); return }
+      cab_get(b.data('id'), function(r){
+         if (!r) { mess('Сілтеме жасалмады'); return }
+         var link = r.link
          var $tmp = $('<input>').appendTo('body'); $tmp.val(link).select(); document.execCommand('copy'); $tmp.remove()
          if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(link).catch(function(){})
          mess('Кабинет сілтемесі көшірілді')

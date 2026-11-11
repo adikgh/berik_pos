@@ -7,7 +7,7 @@
 
 
    // setting
-   $ver = 4.056;
+   $ver = 4.057;
 
    // 
    $site_set = [
@@ -70,6 +70,9 @@
 
    // Тағам фотолары admin сайтында сақталады (product.img). Кассада мәзірдегі «Фотоларды көрсету» қосулы болса ғана шығады.
    $pr_img_url = (preg_match('~gprog\.kz$~i', (string)@$_SERVER['HTTP_HOST']) ? '//admb.gprog.kz' : '//adm.berik.c').'/assets/uploads/products/';
+
+   // Клиенттің жеке кабинеті (my сайты): касса тапсырыстарындағы «Кабинет» сілтемесі
+   $cab_url = preg_match('~gprog\.kz$~i', (string)@$_SERVER['HTTP_HOST']) ? 'https://myb.gprog.kz' : 'http://my.berik.c';
 
    // token telegram
    $token = "1581082911:AAEKW20w_-5V0Wx9tzhyThV2pjCgZtCjyc8";
