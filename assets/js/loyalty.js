@@ -20,11 +20,14 @@ $(function () {
       $('.btype_qr').trigger('input')
    }
 
+   // Компания шегі: кэшбэкпен жалпы соманың ең көбі pay_max % төленеді (0 = шек жоқ)
+   function cap(grand) { var pm = Number(info && info.pay_max) || 0; return pm > 0 ? Math.floor(grand * pm / 100) : grand }
+
    function cb_set(on) {
       if (on == cb_on) return
       if (on) {
          var grand = Number(tot.attr('data-val')) || 0
-         cb_amt = Math.max(0, Math.min(info.available, grand))
+         cb_amt = Math.max(0, Math.min(info.available, cap(grand)))
          if (!cb_amt) return
          total_add(-cb_amt)
       } else total_add(cb_amt)
@@ -51,8 +54,9 @@ $(function () {
          h += '<div class="lc_row"><div class="lc_lbl"><i class="far fa-coins"></i> ' + w('Cashback', 'Кэшбэк') + ' ' + (info.label || (info.percent.toString().replace(/\.0+$/, '') + '%')) + '</div>'
          h += '<div class="lc_val">' + w('Balance', 'Балансы') + ': <b>' + tg(info.available) + '</b></div></div>'
          if (info.available > 0) {
-            var a = cb_on ? cb_amt : Math.min(info.available, Number(tot.attr('data-val')) || 0)
+            var a = cb_on ? cb_amt : Math.min(info.available, cap(Number(tot.attr('data-val')) || 0))
             h += '<div class="form_im_slo"><div class="form_im_slo_i lc_cb ' + (cb_on ? 'form_im_slo_act' : '') + '"><i class="far fa-coins pay_ic"></i>' + w('Pay with cashback', 'Кэшбэкпен төлеу') + ' −' + tg(a) + '</div></div>'
+            if (info.pay_max > 0) h += '<div class="lc_row"><small>' + w('Cashback can cover up to ', 'Кэшбэкпен соманың ең көбі ') + info.pay_max + w('% of the order', '% төленеді') + '</small></div>'
          }
       }
       if (info.gift) {
