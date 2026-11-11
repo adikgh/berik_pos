@@ -99,7 +99,7 @@
       // 2-бөлім: өзгерістер (қысқаша)
       $ch_rows = [];
       if (order_log_on()) {
-         $lbl = ['created' => t::w('Created', 'Жасалды'), 'order_type' => t::w('Type', 'Түрі'), 'courier' => t::w('Courier', 'Курьер'), 'branch_id' => t::w('Branch', 'Точка'), 'phone' => t::w('Phone', 'Номер'), 'address' => t::w('Address', 'Адрес'), 'floor_apt' => t::w('Floor / apt', 'Этаж / кв'), 'additional' => t::w('Notes', 'Қосымша'), 'preorder_dt' => t::w('Preorder', 'Предзаказ'), 'total' => t::w('Total', 'Жалпы'), 'pay_delivery' => t::w('Delivery', 'Доставка'), 'pay_qr' => t::w('Prepayment', 'Предоплата'), 'pay_cash' => t::w('Cash', 'Нал'), 'pay_prepay' => t::w('Prepayment', 'Предоплата'), 'prepay_method' => t::w('Prepay type', 'Предоплата түрі'), 'payment_method' => t::w('Payment', 'Төлем'), 'pay_transfer' => t::w('Transfer', 'Аударым'), 'pay_red' => 'RED', 'service' => t::w('Service', 'Сервис'), 'items' => t::w('Items', 'Тағамдар'), 'refuse_reason' => t::w('Refusal reason', 'Отказ себебі'), 'kept_sum' => t::w('Kept money', 'Бізде қалды')];
+         $lbl = ['created' => t::w('Created', 'Жасалды'), 'order_type' => t::w('Type', 'Түрі'), 'courier' => t::w('Courier', 'Курьер'), 'branch_id' => t::w('Branch', 'Точка'), 'phone' => t::w('Phone', 'Номер'), 'address' => t::w('Address', 'Адрес'), 'floor_apt' => t::w('Floor / apt', 'Этаж / кв'), 'additional' => t::w('Notes', 'Қосымша'), 'preorder_dt' => t::w('Preorder', 'Предзаказ'), 'total' => t::w('Total', 'Жалпы'), 'pay_delivery' => t::w('Delivery', 'Доставка'), 'pay_qr' => t::w('Prepayment', 'Предоплата'), 'pay_cash' => t::w('Cash', 'Нал'), 'pay_prepay' => t::w('Prepayment', 'Предоплата'), 'prepay_method' => t::w('Prepay type', 'Предоплата түрі'), 'payment_method' => t::w('Payment', 'Төлем'), 'pay_transfer' => t::w('Transfer', 'Аударым'), 'pay_red' => 'RED', 'service' => t::w('Service', 'Сервис'), 'items' => t::w('Items', 'Тағамдар'), 'refuse_reason' => t::w('Refusal reason', 'Отказ себебі'), 'kept_sum' => t::w('Kept money', 'Бізде қалды'), 'promo_name' => t::w('Promotion', 'Акция'), 'promo_discount' => t::w('Promotion discount', 'Акция жеңілдігі')];
          $pm = ['transfer' => t::w('Transfer', 'Аударым'), 'qr' => 'Kaspi QR', 'cash' => t::w('Cash', 'Қолма-қол'), 'mixed' => t::w('Mixed', 'Аралас'), 'unpaid' => t::w('Unpaid', 'Төленбеген'), 'red' => 'RED', 'mix' => t::w('Mixed', 'Аралас')];
          $types = []; $tq = db::query("select id, name from retail_orders_type"); while ($t = mysqli_fetch_assoc($tq)) $types[$t['id']] = $t['name'];
          $hv = function ($f, $v) use ($pm, $types) {
@@ -109,7 +109,7 @@
             if ($f == 'courier') { $u = fun::user($v); return @$u['name'] ?: $v; }
             if ($f == 'branch_id') { $b = fun::branch($v); return @$b['name'] ?: $v; }
             if ($f == 'payment_method' || $f == 'prepay_method') return @$pm[$v] ?: $v;
-            if (in_array($f, ['total','pay_delivery','pay_qr','pay_cash','pay_prepay','pay_transfer','pay_red','kept_sum'])) return number_format((float)$v, 0, '', ' ').' тг';
+            if (in_array($f, ['total','pay_delivery','pay_qr','pay_cash','pay_prepay','pay_transfer','pay_red','kept_sum','promo_discount'])) return number_format((float)$v, 0, '', ' ').' тг';
             if ($f == 'phone' && strlen(preg_replace('/\D/', '', $v)) == 10) { $p = preg_replace('/\D/', '', $v); return '8 ('.substr($p,0,3).') '.substr($p,3,3).'-'.substr($p,6,2).'-'.substr($p,8,2); }
             return $v;
          };

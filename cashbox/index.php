@@ -43,6 +43,12 @@
 	$js = ['cashbox'];
 	$lc_on = loyalty::on() && loyalty::any($company); // кэшбэк не сыйлық қосулы болса ғана
 	if ($lc_on) { $css[] = 'loyalty'; $js[] = 'loyalty'; }
+	// Акциялар: админ жасаған % жеңілдік (бүгін белсенділері). Өзгертуде бұрынғы акция өшірілсе де тізімде қалады.
+	require_once "../config/promo.php";
+	$pr_list = promo::active($company);
+	$pr_cur = promo::on() ? (int)@$cashbox_d['promo_id'] : 0;
+	if ($pr_cur && !in_array($pr_cur, array_map('intval', array_column($pr_list, 'id')))) $pr_list[] = ['id' => $pr_cur, 'name' => $cashbox_d['promo_name'], 'percent' => $cashbox_d['promo_percent']];
+	if ($pr_list) { $css[] = 'promo'; $js[] = 'promo'; }
 ?>
 <? include "../block/header.php"; ?>
 
@@ -424,6 +430,16 @@
 						<div class="form_im_slo " data-type-name="RED" data-nall="">
 							<div class="form_im_slo_i form_im_slo_red btype_red " data-type="<?=$red_pct?>"><i class="far fa-percent pay_ic"></i>RED <?=$red_pct?>%</div>
 						</div>
+					</div>
+					<? endif ?>
+					<? if ($pr_list): // Акция: тағам сомасынан % жеңілдік ?>
+					<div class="form_im form_imss sel_promo" data-val="<?=$pr_cur?>">
+						<div class="form_span"><?=t::w('Promotion:', 'Акция:')?></div>
+						<div class="form_im_slo "><div class="form_im_slo_i <?=(!$pr_cur ? 'form_im_slo_act' : '')?>" data-type="0" data-pct="0"><?=t::w('No promotion', 'Жоқ')?></div></div>
+						<? foreach ($pr_list as $pr): ?>
+							<div class="form_im_slo "><div class="form_im_slo_i <?=((int)$pr['id'] == $pr_cur ? 'form_im_slo_act' : '')?>" data-type="<?=(int)$pr['id']?>" data-pct="<?=promo::pct($pr['percent'])?>"><i class="far fa-tags pay_ic"></i><?=htmlspecialchars(promo::label($pr['name'], $pr['percent']))?></div></div>
+						<? endforeach ?>
+						<div class="promo_info dsp_n"></div>
 					</div>
 					<? endif ?>
 					<? if ($lc_on): ?><div class="lc_box dsp_n" data-oid="<?=$cashbox_id?>"></div><? endif ?>

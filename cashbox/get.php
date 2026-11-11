@@ -289,6 +289,19 @@
          }
       }
 
+      // Акция (касса promo.js promo=1 жібергенде): жеңілдікті сервер тағам сомасынан қайта есептейді,
+      // касса шегергенімен айырмасы болса жалпы сомаға түзетеді
+      $pr_disc = 0; $pr_name = '';
+      if (isset($_POST['promo'])) {
+         require_once "../config/promo.php";
+         if (promo::on()) {
+            $pr_disc = promo::order_save($company, $id, (int)@$_POST['promo_id']);
+            $pr_diff = max(0, (int)@$_POST['promo_disc']) - $pr_disc;
+            if ($pr_diff) { $total = max(0, (int)$total + $pr_diff); db::query("UPDATE `retail_orders` SET `total` = '".(int)$total."' WHERE `id` = '".(int)$id."'"); }
+            if ($pr_disc) { $pr_o = mysqli_fetch_assoc(db::query("select promo_name, promo_percent from retail_orders where id = '".(int)$id."'")); $pr_name = promo::label($pr_o['promo_name'], $pr_o['promo_percent']); }
+         }
+      }
+
       // Лоялдық: кэшбэкпен төлеу және сыйлық (касса loyalty.js lc=1 жібергенде ғана)
       $lc_cb = 0; $lc_gift = '';
       if (isset($_POST['lc']) && loyalty::on()) {
@@ -308,7 +321,7 @@
             order_log($id, 'created', '', '#'.$cashbox_number);
             order_log($id, 'status', '', @$log_after['order_status']);
          } else {
-            foreach (['order_type','branch_id','phone','address','floor_apt','additional','preorder_dt','total','pay_delivery','pay_qr','pay_cash','pay_prepay','prepay_method','payment_method','pay_transfer','pay_red','service','order_status'] as $lf) {
+            foreach (['order_type','branch_id','phone','address','floor_apt','additional','preorder_dt','total','pay_delivery','pay_qr','pay_cash','pay_prepay','prepay_method','payment_method','pay_transfer','pay_red','service','promo_name','promo_discount','order_status'] as $lf) {
                if (array_key_exists($lf, (array)$log_after)) order_log($id, $lf == 'order_status' ? 'status' : $lf, @$log_before[$lf], @$log_after[$lf]);
             }
          }
@@ -379,6 +392,7 @@
          if ($items_sum) $txt .= "<b>Тауар сомасы:</b> ".$tg_sum($items_sum)."\n";
          if ((int)$delivery) $txt .= "<b>Жеткізу:</b> ".$tg_sum($delivery)."\n";
          if ($red) $txt .= "<b>RED:</b> ".$tg_sum($red)."\n";
+         if ($pr_disc) $txt .= "<b>Акция (".$tg($pr_name)."):</b> −".$tg_sum($pr_disc)."\n";
          if (loyalty::$gift_discount) $txt .= "<b>Сыйлық жеңілдігі:</b> −".$tg_sum(loyalty::$gift_discount)."\n";
          if ($lc_cb) $txt .= "<b>Кэшбэкпен:</b> −".$tg_sum($lc_cb)."\n";
          $txt .= "<b>Жалпы:</b> ".$tg_sum($total)."\n";

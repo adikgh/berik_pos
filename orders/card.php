@@ -141,6 +141,13 @@
 												<div class="uc_uil2_trt3 fr_price"><?=$buy_d['pay_delivery']?></div>
 											</div>
 											<? endif ?>
+											<? if (!class_exists('promo')) require_once $_SERVER['DOCUMENT_ROOT'].'/config/promo.php'; $pr_p = promo::on() ? promo::of($buy_d) : null; if ($pr_p): // Акция ?>
+											<div class="uc_uil2_trt or_promo">
+												<div class="uc_uil2_trt1"><i class="far fa-tags"></i> <?=htmlspecialchars($pr_p['label'])?></div>
+												<div class="uc_uil2_trt2">-</div>
+												<div class="uc_uil2_trt3 fr_price"><?=$pr_p['sum']?></div>
+											</div>
+											<? endif ?>
 										</div>
 										<div class="or_paybox">
 										<div class="uc_uil2_trb">

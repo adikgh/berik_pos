@@ -115,6 +115,19 @@ $(function () {
       setTimeout(function () { if (g) gift_set(true); if (c) cb_set(true); render() }, 0)
    })
 
+   // Акция өзгерсе (promo.js): сыйлық пен кэшбэкті алып, жаңа сомадан қайта шегереміз
+   var pr_g = false, pr_c = false
+   $(document).on('promo:before', function () {
+      pr_g = gift_on; pr_c = cb_on
+      if (cb_on) cb_set(false)
+      if (gift_on) gift_set(false)
+   })
+   $(document).on('promo:after', function () {
+      if (pr_g) gift_set(true)
+      if (pr_c) cb_set(true)
+      pr_g = pr_c = false
+   })
+
    // Сақтағанда: кэшбэк сомасы мен сыйлық белгісін қосып жібереміз (info жүктелмесе — ештеңе жібермейміз, бұрынғысы қалады)
    $.ajaxPrefilter(function (o) {
       if (!o.url || o.url.indexOf('cashbox_pay') < 0 || !info || !info.on) return

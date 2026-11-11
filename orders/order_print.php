@@ -30,6 +30,10 @@
         }
     }
 
+    // Акция (config/promo.php): тапсырыстағы жеңілдік
+    require_once "../config/promo.php";
+    $promo_of = function ($o) { return promo::on() ? promo::of($o) : null; };
+
     // Чек баптауы: админдегі «Чек» беті (company_receipt). Жоқ болса бұрынғы чек.
     require_once "../config/receipt.php";
     $rc = receipt::get(@$cashbox_d['company_id']);
@@ -122,6 +126,12 @@
             <td align="left"><?=$L('l_delivery')?></td>
             <td align="center"></td>
             <td align="right"><?=$cashbox_d['pay_delivery']?></td>
+        </tr>
+        <? endif ?>
+        <? $pr_p = $promo_of(@$cashbox_d); if ($pr_p): // Акция жеңілдігі ?>
+        <tr class="tr" valign="top">
+            <td align="left" colspan="2">Акция: <?=htmlspecialchars($pr_p['label'])?></td>
+            <td align="right">- <?=$pr_p['sum']?></td>
         </tr>
         <? endif ?>
         <? if ($lc_p && $lc_p['gift'] !== ''): ?>

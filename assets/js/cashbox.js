@@ -637,6 +637,7 @@ $(document).ready(function() {
    $('html').on('input', '.btype_delivery', function () {
       delivery = Number($('.btype_delivery').attr('data-val'))
       sum = Number($('.cashbox_pay_btotol_c').attr('data-on-val'))
+      if (window.promo_amt) sum -= promo_amt() // акция жеңілдігі (promo.js)
       $('.cashbox_pay_btotol_c').attr('data-val', delivery + sum)
       $('.cashbox_pay_btotol_c').html((delivery + sum) + ' тг')
       $('.btype_qr').val(0 + ' тг')
@@ -939,7 +940,8 @@ $(document).ready(function() {
          dlv: $('.sel_dlv .form_im_slo_act').attr('data-type'), qr: $('.sel_qr .form_im_slo_act').attr('data-type'),
          qrm: $('.sel_qrm').attr('data-val'), pay: $('.sel_pay').attr('data-val'), srv: $('.sel_srv').attr('data-val'),
          given: $('.sel_given .form_im_slo_act').attr('data-type'),
-         red: $('.form_im_slo_red').hasClass('form_im_slo_act'), f: {}, mix: {}
+         red: $('.form_im_slo_red').hasClass('form_im_slo_act'), f: {}, mix: {},
+         promo: $('.sel_promo').attr('data-val')
       }
       $.each(draft_inputs, function(i, sel){ d.f[sel] = [$(sel).val(), $(sel).attr('data-val')] })
       $('.btype_mix').each(function(){ d.mix[$(this).attr('data-name')] = [$(this).val(), $(this).attr('data-val')] })
@@ -956,6 +958,7 @@ $(document).ready(function() {
       draft_click('.sel_branch', d.branch)
       draft_click('.sel_type', d.type)
       $.each(['.btype_phone', '.btype_address', '.btype_add', '.btype_preorder'], function(i, sel){ draft_set(sel, d.f[sel]) })
+      draft_click('.sel_promo', d.promo) // акция (жеткізуден бұрын)
       // Жеткізу (өзгерсе предоплата 0-ге түседі, сондықтан алдымен)
       draft_click('.sel_dlv', d.dlv)
       if (d.dlv == 'add') { draft_set('.btype_delivery', d.f['.btype_delivery']); $('.btype_delivery').trigger('input'); $('.btype_delivery').attr('data-val', (d.f['.btype_delivery'] || [])[1]) ; $('.btype_delivery').trigger('input') }
@@ -997,8 +1000,11 @@ $(document).ready(function() {
          var red = $('.form_im_slo_red'), red_on = red.hasClass('form_im_slo_act')
          if (red_on) red.click()
          var dl = Number($('.btype_delivery').attr('data-val')) || 0, pre = Number($('.btype_qr').attr('data-val')) || 0
-         $('.cashbox_pay_btotol_c').attr('data-on-val', T).attr('data-val', T + dl).html((T + dl) + ' тг')
-         $('.btype_cash').attr('data-val', T + dl - pre).html((T + dl - pre) + ' тг')
+         $('.cashbox_pay_btotol_c').attr('data-on-val', T)
+         var pa = window.promo_amt ? promo_amt(T) : 0 // акция жеңілдігі жаңа тағам сомасынан
+         $('.cashbox_pay_btotol_c').attr('data-val', T + dl - pa).html((T + dl - pa) + ' тг')
+         $('.btype_cash').attr('data-val', T + dl - pa - pre).html((T + dl - pa - pre) + ' тг')
+         if (window.promo_set) promo_set(pa)
          if (red_on) red.click()
          if (typeof qr_full_label == 'function') qr_full_label()
          if (typeof pay_mix_rest == 'function') pay_mix_rest()
