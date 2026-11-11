@@ -1092,10 +1092,10 @@ body:not(.or_list) .or_card .uc_uil2 > .or_btns{ margin-top: auto; }
 .oa_txt b{ font-size: 16px; font-weight: 800; color: #1d2433; line-height: 22px; }
 .oa_txt small{ font-size: 14px; color: #5b6573; }
 .oa_ph{ align-items: center; }
-.oa_cab{ margin-left: auto; display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border-radius: 9px; background: #f3f7fb; border: 1px solid #e1eaf2; color: #1f75a8; font-size: 13px; font-weight: 600; cursor: pointer; transition: .15s; white-space: nowrap; }
+.oa_cab{ margin-left: auto; display: inline-flex; align-items: center; gap: 6px; height: 44px; min-width: 44px; padding: 0 14px; border-radius: 12px; background: #f3f7fb; border: 1px solid #e1eaf2; color: #1f75a8; font-size: 15px; font-weight: 700; cursor: pointer; transition: .15s; white-space: nowrap; }
 .oa_cab:hover{ background: #e4f0f8; border-color: #c5dcec; }
 .oa_cab:active{ transform: scale(.95); }
-.oa_cab_wa{ margin-left: 6px; padding: 0; width: 30px; justify-content: center; font-size: 17px; color: #1faa53; background: #eefaf2; border-color: #cdeedb; }
+.oa_cab_wa{ margin-left: 8px; padding: 0; width: 44px; justify-content: center; font-size: 22px; color: #1faa53; background: #eefaf2; border-color: #cdeedb; }
 .oa_cab_wa:hover{ background: #dcf5e6; border-color: #b4e5c8; }
 .oa_cab_ok{ background: #e8f7ef; border-color: #bfe6cf; color: #0EA768; }
 .oa_ph b{ font-size: 15px; font-weight: 800; color: #1d2433; line-height: 22px; }
