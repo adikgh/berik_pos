@@ -95,6 +95,28 @@ $(document).ready(function() {
    })
    $(window).on('scroll resize', function(){ $('.oh_pop').removeClass('oh_open') })
 
+   // Жеке кабинет сілтемесі: тышқан келгенде алдын ала алады, басқанда көшіреді
+   var cab_cache = {}
+   function cab_get(id, cb){
+      if (cab_cache[id]) { cb && cb(cab_cache[id]); return }
+      $.ajax({ url: "/orders/get.php?cab_link", type: "POST", dataType: "json", data: ({ id: id }),
+         success: function(r){ if (r && r.ok) { cab_cache[id] = r.link; cb && cb(r.link) } else cb && cb('') },
+         error: function(){ cb && cb('') } })
+   }
+   $('html').on('mouseenter', '.oa_cab', function () { cab_get($(this).data('id')) })
+   $('html').on('click', '.oa_cab', function (e) {
+      e.stopPropagation()
+      var b = $(this)
+      cab_get(b.data('id'), function(link){
+         if (!link) { mess('Сілтеме жасалмады'); return }
+         var $tmp = $('<input>').appendTo('body'); $tmp.val(link).select(); document.execCommand('copy'); $tmp.remove()
+         if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(link).catch(function(){})
+         mess('Кабинет сілтемесі көшірілді')
+         b.addClass('oa_cab_ok').find('i').attr('class', 'far fa-check')
+         setTimeout(function(){ b.removeClass('oa_cab_ok').find('i').attr('class', 'far fa-link') }, 1800)
+      })
+   })
+
    // Тағамдар тізімі: 2-еуден көп болса ашу/жабу
    $('html').on('click', '.or_more', function () {
       var b = $(this), card = b.closest('.or_card').toggleClass('or_items_open')

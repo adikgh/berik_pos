@@ -2,6 +2,25 @@
    require_once "../config/loyalty.php";
    if ($user_id) loyalty::sync($company); // кэшбэк: аяқталған/отказ тапсырыстарды реттеу (15 секундта бір рет)
    
+   // Клиенттің жеке кабинет сілтемесі (my сайтына парольсіз кіру). Тек QR меню қосулы компанияда.
+   if (isset($_GET['cab_link'])) {
+      header('Content-Type: application/json; charset=utf-8');
+      $oid = (int)@$_POST['id']; $cmp_id = (int)$company;
+      $o = $user_id && $oid ? mysqli_fetch_assoc(db::query("select id, phone from retail_orders where id = '$oid' and company_id = '$cmp_id' limit 1")) : null;
+      $menu_on = mysqli_num_rows(db::query("SHOW TABLES LIKE 'company_menu'")) && (int)@mysqli_fetch_assoc(db::query("select is_on from company_menu where company_id = '$cmp_id'"))['is_on'] === 1;
+      $ph = preg_replace('/\D+/', '', (string)@$o['phone']);
+      if (strlen($ph) == 11 && ($ph[0] == '8' || $ph[0] == '7')) $ph = substr($ph, 1);
+      if (!$o || !$menu_on || !is_file(__DIR__.'/../config/client_link.php') || strlen($ph) != 10 || $ph[0] != '7') { echo json_encode(['ok' => 0]); exit(); }
+      // user = әр адам (телефон 10 сан). Жоқ болса қосамыз, company_client-ке байлаймыз (касса тапсырысындағыдай)
+      db::query("INSERT IGNORE INTO `user` (`name`, `phone`) VALUES ('', '$ph')");
+      $u = mysqli_fetch_assoc(db::query("select id from `user` where phone = '$ph' limit 1"));
+      if (!$u) { echo json_encode(['ok' => 0]); exit(); }
+      if (mysqli_num_rows(db::query("SHOW TABLES LIKE 'company_client'"))) db::query("UPDATE `company_client` SET `user_id` = '".(int)$u['id']."' WHERE company_id = '$cmp_id' and phone = '$ph' and (user_id is null or user_id = 0)");
+      include_once __DIR__.'/../config/client_link.php';
+      echo json_encode(['ok' => 1, 'link' => client_link((int)$u['id'])]);
+      exit();
+   }
+
    // returns
 	if(isset($_GET['return_sn'])) {
 		$id = strip_tags($_POST['id']);
