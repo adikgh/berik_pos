@@ -150,7 +150,7 @@
 
 			<? endif ?>
 
-			<div class="ps_made"><i class="fas fa-heart"></i> <?=t::w('Made at #gprog', '#gprog-та жасалған')?></div>
+			<div class="ps_made"><a class="gprog_bl gp_made" href="https://gprog.kz" target="_blank" rel="noopener"><span>#gprog-та</span><span class="gprog_heart"><i class="fas fa-heart"></i></span><span>жасалған</span></a></div>
 		</main>
 	</div>
 
