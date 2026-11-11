@@ -4,6 +4,7 @@
 	<!-- main js -->
 	<? foreach ($sjs as $i): ?> <script src="/assets/js/<?=$i?>.js?v=<?=$ver?>"></script> <? endforeach ?>
 	<? foreach ($js as $i): ?> <script src="/assets/js/<?=$i?>.js?v=<?=$ver?>-<?=@filemtime($_SERVER['DOCUMENT_ROOT'].'/assets/js/'.$i.'.js')?>"></script> <? endforeach ?>
+	<? if (!empty($user_id) && empty($posm)): // сайттан (QR меню) келген жаңа тапсырыс: терезе + дыбыс ?> <script>var BP_CID = <?=(int)@$company?></script><script src="/assets/js/notify.js?v=<?=@filemtime($_SERVER['DOCUMENT_ROOT'].'/assets/js/notify.js')?>"></script> <? endif ?>
 	<? if (!empty($posm)): // телефон нұсқасы ?> <script src="/assets/js/posm.js?v=<?=$ver?>-<?=@filemtime($_SERVER['DOCUMENT_ROOT'].'/assets/js/posm.js')?>"></script> <? endif ?>
 		
 </body>

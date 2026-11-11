@@ -40,7 +40,7 @@
 							<div class="uc_ui or_card or_t<?=$ot?><?=(@$buy_d['payment_method'] == 'unpaid' ? ' or_unpaid_c' : '')?>" data-oid="<?=$buy_d['id']?>"<?=(@$buy_d['preorder_dt'] && (int)$buy_d['order_status'] == 1 ? ' data-pre-left="'.(strtotime($buy_d['preorder_dt']) - time()).'"' : '')?> style="--st:<?=$st_clr?>;">
 								<div class="uc_uil2" >
 									<div class="uc_uil2_top">
-										<div class="uc_uil2_nmb"><?=$branch_d['code']?><?=$buy_d['number']?></div>
+										<div class="uc_uil2_nmb"><?=$branch_d['code']?><?=$buy_d['number']?><? if (in_array((string)@$buy_d['source'], ['qr', 'my'], true)): // сайттан келген ?><span class="or_src" title="<?=($buy_d['source'] == 'qr' ? 'QR меню' : 'Жеке кабинет')?>"><?=($buy_d['source'] == 'qr' ? 'QR' : 'Сайт')?></span><? endif ?></div>
 										<div class="uc_uil2_topc">
 											<div class="uc_uil2_date or_meta">
 												<? // Предзаказ: негізгі уақыт — қабылданған уақыт (тарихтағы «Жасалды»), жанында қызыл таймер + предзаказ уақыты
