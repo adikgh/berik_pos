@@ -1,0 +1,140 @@
+/* Касса кіру беті (тек index.php). JS: assets/js/sign.js */
+body:has(.ps){ background: #f3f6f4; }
+body:has(.ps) .app{ min-height: 0; }
+
+.ps{
+	--ps-g: #0EA768; --ps-g2: #0c8f59; --ps-gl: #e3f5ec;
+	--ps-tx: #1d2330; --ps-mu: #7a818c; --ps-ln: #e3e8e5;
+	display: grid; grid-template-columns: minmax(340px, 38%) 1fr;
+	min-height: 100vh; min-height: 100svh;
+	font-family: 'Nunito', sans-serif; color: var(--ps-tx);
+}
+
+/* ---------- Сол жақ ---------- */
+.ps_side{
+	position: relative; overflow: hidden;
+	display: flex; flex-direction: column; justify-content: space-between; gap: 40px;
+	padding: 44px 48px 40px; color: #fff;
+	background: linear-gradient(155deg, #15b877 0%, #0EA768 42%, #08744a 100%);
+}
+.ps_side::before, .ps_side::after{ content: ''; position: absolute; border-radius: 50%; pointer-events: none; }
+.ps_side::before{ width: 520px; height: 520px; right: -220px; top: -180px; background: rgba(255,255,255,.08); }
+.ps_side::after{ width: 360px; height: 360px; left: -140px; bottom: -150px; background: rgba(255,255,255,.06); }
+.ps_side > *{ position: relative; z-index: 1; }
+
+.ps_brand{ display: flex; align-items: center; gap: 14px; }
+.ps_logo{ width: 56px; height: 56px; border-radius: 16px; background: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(0,0,0,.12); }
+.ps_logo img{ display: block; width: 40px; height: 40px; }
+.ps_name{ display: flex; flex-direction: column; gap: 5px; line-height: 1; }
+.ps_name span{ font-style: italic; font-weight: 900; font-size: 26px; letter-spacing: .3px; }
+.ps_name b{ font-weight: 800; color: #d8ffe9; }
+.ps_name small{ font-size: 13px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; opacity: .8; }
+
+.ps_time{ font-size: 88px; line-height: 1; font-weight: 800; letter-spacing: -2px; font-variant-numeric: tabular-nums; }
+.ps_date{ margin-top: 12px; font-size: 20px; font-weight: 600; color: rgba(255,255,255,.88); }
+.ps_date::first-letter{ text-transform: uppercase; }
+.ps_comp{ display: inline-flex; align-items: center; gap: 9px; margin-top: 26px; height: 40px; padding: 0 18px; border-radius: 40px; background: rgba(255,255,255,.16); font-size: 16px; font-weight: 700; backdrop-filter: blur(4px); }
+
+.ps_steps{ list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.ps_steps li{ display: flex; align-items: center; gap: 14px; font-size: 16px; font-weight: 600; color: rgba(255,255,255,.95); }
+.ps_steps i{ width: 34px; height: 34px; flex: none; border-radius: 11px; background: rgba(255,255,255,.16); display: flex; align-items: center; justify-content: center; font-style: normal; font-weight: 800; font-size: 15px; }
+
+/* ---------- Оң жақ ---------- */
+.ps_main{ position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 48px 64px; }
+.ps_step{ display: none; width: 100%; max-width: 760px; }
+.ps_step.ps_on{ display: block; animation: ps_in .28s ease both; }
+@keyframes ps_in{ from{ opacity: 0; transform: translateY(10px) } to{ opacity: 1; transform: none } }
+
+.ps_head{ text-align: center; margin-bottom: 34px; }
+.ps_badge{ display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 14px; border-radius: 32px; background: var(--ps-gl); color: var(--ps-g); font-size: 14px; font-weight: 700; }
+.ps_h{ margin: 16px 0 8px; font-size: 34px; line-height: 1.2; font-weight: 800; color: var(--ps-tx); }
+.ps_p{ margin: 0; font-size: 16px; line-height: 1.45; color: var(--ps-mu); }
+
+.ps_warn{ display: flex; align-items: center; justify-content: center; gap: 8px; max-width: 460px; margin: -14px auto 26px; padding: 11px 16px; border-radius: 12px; background: #fff6e5; color: #9a6400; font-size: 14px; font-weight: 600; }
+
+.ps_grid{ display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; }
+.ps_user{
+	position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; width: 220px;
+	padding: 28px 16px 22px; border: 1.5px solid var(--ps-ln); border-radius: 20px; background: #fff;
+	font: inherit; color: inherit; cursor: pointer; text-align: center;
+	box-shadow: 0 2px 6px rgba(20,40,30,.04);
+	transition: border-color .15s, box-shadow .15s, transform .12s;
+}
+.ps_user:hover, .ps_user:focus-visible{ outline: none; border-color: var(--ps-g); box-shadow: 0 14px 34px rgba(14,167,104,.16); transform: translateY(-2px); }
+.ps_user:active{ transform: scale(.98); }
+.ps_un{ margin-top: 10px; font-size: 18px; font-weight: 800; line-height: 1.25; word-break: break-word; }
+.ps_ur{ display: inline-flex; align-items: center; height: 26px; padding: 0 11px; border-radius: 26px; background: #f1f4f2; color: #5d6570; font-size: 13px; font-weight: 700; }
+.ps_ur:empty{ display: none; }
+.ps_ugo{ position: absolute; right: 16px; top: 16px; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--ps-gl); color: var(--ps-g); font-size: 13px; opacity: 0; transition: opacity .15s; }
+.ps_user:hover .ps_ugo, .ps_user:focus-visible .ps_ugo{ opacity: 1; }
+
+/* Аватар: фото болмаса — бас әріптер */
+.ps_av{ position: relative; width: 84px; height: 84px; flex: none; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; background: var(--ps-av, #0EA768); color: #fff; box-shadow: 0 0 0 5px var(--ps-avl, #e3f5ec); }
+.ps_av em{ font-style: normal; font-size: 30px; font-weight: 800; letter-spacing: .5px; }
+.ps_av img{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ps_av0{ --ps-av: #0EA768; --ps-avl: #e3f5ec; }
+.ps_av1{ --ps-av: #2f80ed; --ps-avl: #e5effd; }
+.ps_av2{ --ps-av: #f2994a; --ps-avl: #fdf0e4; }
+.ps_av3{ --ps-av: #9b51e0; --ps-avl: #f2e9fb; }
+.ps_av4{ --ps-av: #14a3b8; --ps-avl: #e2f5f8; }
+.ps_av5{ --ps-av: #e5484d; --ps-avl: #fce8e9; }
+.ps_av_lg{ width: 96px; height: 96px; }
+.ps_av_lg em{ font-size: 34px; }
+
+.ps_empty{ max-width: 420px; margin: 0 auto; padding: 34px 26px; border: 1.5px dashed #cfd8d3; border-radius: 20px; text-align: center; color: var(--ps-mu); }
+.ps_empty i{ font-size: 36px; color: #b6c0ba; }
+.ps_empty p{ margin: 12px 0 0; font-size: 15px; line-height: 1.5; }
+
+/* ---------- PIN ---------- */
+.ps_pin{ max-width: 380px; text-align: center; }
+.ps_back{ display: inline-flex; align-items: center; gap: 8px; height: 38px; margin-bottom: 22px; padding: 0 14px; border: 0; border-radius: 38px; background: #fff; color: #5d6570; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,.06); transition: color .15s, background .15s; }
+.ps_back:hover{ color: var(--ps-g); background: var(--ps-gl); }
+.ps_who{ display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.ps_who_n{ margin-top: 10px; font-size: 24px; font-weight: 800; line-height: 1.2; }
+.ps_pin_t{ margin-top: 22px; }
+
+.ps_dots{ display: flex; justify-content: center; gap: 16px; margin-top: 18px; }
+.ps_dots i{ width: 18px; height: 18px; border-radius: 50%; border: 2px solid #cdd5d0; background: transparent; transition: background .12s, border-color .12s, transform .12s; }
+.ps_dots i.on{ background: var(--ps-g); border-color: var(--ps-g); transform: scale(1.08); }
+.ps_dots.ps_bad i{ border-color: #e5484d; background: #e5484d; }
+.ps_dots.ps_bad{ animation: ps_shake .4s; }
+.ps_dots.ps_wait i.on{ animation: ps_pulse .8s infinite alternate; }
+@keyframes ps_shake{ 20%,60%{ transform: translateX(-8px) } 40%,80%{ transform: translateX(8px) } }
+@keyframes ps_pulse{ to{ opacity: .4 } }
+.ps_err{ min-height: 22px; margin-top: 12px; font-size: 14px; font-weight: 700; color: #e5484d; }
+
+.ps_pad{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 10px; }
+.ps_pad button{
+	height: 68px; border: 1.5px solid var(--ps-ln); border-radius: 18px; background: #fff;
+	font: inherit; font-size: 26px; font-weight: 700; color: var(--ps-tx); cursor: pointer;
+	-webkit-tap-highlight-color: transparent; user-select: none;
+	transition: background .1s, border-color .1s, transform .08s;
+}
+.ps_pad button:hover{ border-color: #bfe6d3; background: #f7fcf9; }
+.ps_pad button:active, .ps_pad button.ps_hit{ background: var(--ps-gl); border-color: var(--ps-g); transform: scale(.96); }
+.ps_pad .ps_pad_f{ background: transparent; border-color: transparent; color: #8a919b; font-size: 22px; }
+.ps_pad .ps_pad_f:hover{ background: #eef2f0; border-color: transparent; color: var(--ps-tx); }
+
+/* Күй беттері (сілтеме қате / мерзім бітті) */
+.ps_state{ max-width: 440px; text-align: center; }
+.ps_state_i{ width: 84px; height: 84px; margin: 0 auto; border-radius: 26px; display: flex; align-items: center; justify-content: center; background: var(--ps-gl); color: var(--ps-g); font-size: 36px; }
+.ps_state_i_r{ background: #fce8e9; color: #e5484d; }
+
+.ps_made{ position: absolute; left: 0; right: 0; bottom: 22px; text-align: center; font-size: 13px; color: #a0a6ae; }
+.ps_made i{ color: #e5484d; font-size: 11px; margin-right: 3px; display: inline-block; animation: ps_beat 1.4s ease-in-out infinite; }
+@keyframes ps_beat{ 0%,40%,100%{ transform: scale(1) } 20%{ transform: scale(1.25) } }
+
+/* ---------- Планшет / моноблок ---------- */
+@media (max-width: 1100px){
+	.ps{ grid-template-columns: 300px 1fr; }
+	.ps_side{ padding: 34px 30px 30px; }
+	.ps_time{ font-size: 64px; }
+	.ps_main{ padding: 36px 32px 60px; }
+	.ps_user{ width: 190px; }
+}
+@media (max-height: 760px){
+	.ps_steps{ display: none; }
+	.ps_pad button{ height: 58px; }
+	.ps_who_n{ margin-top: 4px; }
+	.ps_pin_t{ margin-top: 14px; }
+}
