@@ -25,10 +25,11 @@ body:has(.ps) .app{ min-height: 0; }
 .ps_brand{ display: flex; align-items: center; gap: 14px; }
 .ps_logo{ width: 56px; height: 56px; border-radius: 16px; background: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(0,0,0,.12); }
 .ps_logo img{ display: block; width: 40px; height: 40px; }
-.ps_name{ display: flex; flex-direction: column; gap: 5px; line-height: 1; }
-.ps_name span{ font-style: italic; font-weight: 900; font-size: 26px; letter-spacing: .3px; }
+.ps_name{ height: 56px; display: flex; flex-direction: column; justify-content: center; gap: 6px; font-style: italic; }
+.ps_name > *{ display: block; line-height: 1; }
+.ps_name span{ font-weight: 900; font-size: 26px; letter-spacing: .3px; }
 .ps_name b{ font-weight: 800; color: #d8ffe9; }
-.ps_name small{ font-size: 13px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; opacity: .8; }
+.ps_name small{ font-size: 14px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; opacity: .8; }
 
 .ps_time{ font-size: 88px; line-height: 1; font-weight: 800; letter-spacing: -2px; font-variant-numeric: tabular-nums; }
 .ps_date{ margin-top: 12px; font-size: 20px; font-weight: 600; color: rgba(255,255,255,.88); }
