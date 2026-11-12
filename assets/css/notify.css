@@ -1,0 +1,175 @@
+/* Сайттан (QR меню / жеке кабинет) келген жаңа тапсырыс хабары. Белгілері: block/modal.php, логикасы: assets/js/notify.js */
+
+/* ---------- Хабарлар орны (экранның жоғарғы ортасы) ---------- */
+.onn_box{
+	position: fixed;
+	left: 50%;
+	top: 14px;
+	z-index: 99999;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	width: 440px;
+	max-width: calc(100vw - 32px);
+	transform: translateX(-50%);
+	pointer-events: none;
+}
+.onn_box > *{ pointer-events: auto; }
+
+/* ---------- Хабар ---------- */
+.onn{
+	position: relative;
+	overflow: hidden;
+	padding: 14px 16px 18px 16px;
+	background: var(--bp-card);
+	border-left: 6px solid var(--bp-green);
+	border-radius: 18px;
+	box-shadow: 0 18px 50px rgba(0,0,0,.25), 0 0 0 1px rgba(16,169,106,.15);
+	animation: onn_in .55s cubic-bezier(.18,1.25,.4,1) both;
+}
+.onn_t{
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	color: var(--bp-green);
+	font-size: 13px;
+	font-weight: 800;
+	letter-spacing: .3px;
+	text-transform: uppercase;
+}
+.onn_t > i{ flex: none; font-size: 16px; animation: onn_bell 1s ease-in-out infinite; }
+.onn_tt{ flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.onn_x{ flex: none; padding: 2px 4px; color: #999; font-size: 20px; line-height: 1; cursor: pointer; }
+.onn_n{ margin: 6px 0 2px; color: var(--bp-text); font-size: 24px; font-weight: 900; }
+.onn_d{ color: #333; font-size: 15px; }
+.onn_d b{ font-weight: 800; }
+.onn_m{ margin-top: 4px; color: #777; font-size: 13px; }
+.onn_m:empty{ display: none; }
+
+/* Батырмалар */
+.onn_b{ display: flex; gap: 8px; margin-top: 12px; }
+.onn_b span{
+	flex: 1;
+	padding: 11px;
+	border-radius: 11px;
+	font-size: 15px;
+	font-weight: 800;
+	text-align: center;
+	cursor: pointer;
+	transition: transform .1s;
+}
+.onn_b span:active{ transform: scale(.97); }
+.onn_open{ background: var(--bp-green); color: #fff; }
+.onn_open:hover{ background: var(--bp-green-h); }
+.onn_ok{ background: var(--bp-pill); color: #333; }
+.onn_ok:hover{ background: var(--bp-pill-h); }
+
+/* Таймер: дөңгелек + астындағы жолақ */
+.onn_rg{ position: relative; flex: none; width: 30px; height: 30px; }
+.onn_rg svg{ width: 30px; height: 30px; transform: rotate(-90deg); }
+.onn_rg circle{ fill: none; stroke-width: 3; }
+.onn_rg .bg{ stroke: #e7f7ef; }
+.onn_rg .fg{ stroke: var(--bp-green); stroke-linecap: round; transition: stroke-dashoffset .25s linear; }
+.onn_rg b{
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--bp-green);
+	font-size: 12px;
+	font-weight: 800;
+	text-transform: none;
+}
+.onn_tm{ position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: #e7f7ef; }
+.onn_tm i{ display: block; height: 100%; width: 100%; background: linear-gradient(90deg, var(--bp-green), #3ddc97); transition: width .25s linear; }
+/* Бет белсенді емес (терезе артта не тышқан бетте жоқ): таймер сұр, тоқтап тұр */
+.onn_pause .onn_rg b{ color: #bbb; }
+.onn_pause .onn_rg .fg{ stroke: #bbb; }
+.onn_pause .onn_tm i{ background: #ccc; }
+
+/* ---------- Ұшу: хабар «Тапсырыстар» батырмасына ---------- */
+.onn_fly{ position: fixed; z-index: 100000; margin: 0; pointer-events: none; will-change: transform, opacity, filter; animation: none; }
+.onn_dot{
+	position: fixed;
+	z-index: 100001;
+	width: 12px;
+	height: 12px;
+	margin: -6px 0 0 -6px;
+	border-radius: 50%;
+	background: var(--bp-green);
+	box-shadow: 0 0 12px 4px rgba(16,169,106,.6);
+	pointer-events: none;
+}
+
+/* ---------- «Тапсырыстар» батырмасындағы сан ---------- */
+.mp_topi.onn_has{ position: relative; overflow: visible; }
+.onn_cnt{
+	display: none;
+	position: absolute;
+	top: -8px;
+	right: -8px;
+	z-index: 2;
+	min-width: 22px;
+	height: 22px;
+	padding: 0 6px;
+	border-radius: 11px;
+	background: var(--bp-red);
+	box-shadow: 0 0 0 2px #fff;
+	color: #fff;
+	font-size: 12px;
+	font-weight: 900;
+	line-height: 22px;
+	text-align: center;
+	animation: onn_pulse 1.6s ease-in-out infinite;
+}
+.onn_has .onn_cnt{ display: block; }
+.onn_cnt.onn_bump{ animation: onn_bump .6s cubic-bezier(.2,1.6,.4,1); }
+.mp_topi.onn_hit{ animation: onn_hit .5s ease; }
+.onn_ripple{
+	position: absolute;
+	inset: -4px;
+	border: 3px solid var(--bp-green);
+	border-radius: 40px;
+	pointer-events: none;
+	animation: onn_rip .7s ease-out forwards;
+}
+
+/* ---------- Windows хабарламасына рұқсат жолағы ---------- */
+.onn_perm{
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 12px;
+	background: #1f2937;
+	border-radius: 14px;
+	box-shadow: 0 10px 30px rgba(0,0,0,.25);
+	color: #fff;
+	font-size: 14px;
+}
+.onn_perm b{ flex: 1; font-weight: 700; }
+.onn_perm span{ padding: 7px 12px; background: var(--bp-green); border-radius: 9px; font-weight: 800; white-space: nowrap; cursor: pointer; }
+.onn_perm i{ padding: 0 4px; font-style: normal; opacity: .7; cursor: pointer; }
+
+/* ---------- Тапсырыстар тізімі ---------- */
+.or_src{
+	display: inline-block;
+	margin-left: 6px;
+	padding: 2px 7px;
+	border-radius: 7px;
+	background: #e7f7ef;
+	color: var(--bp-green);
+	font-size: 11px;
+	font-weight: 800;
+	vertical-align: middle;
+	white-space: nowrap;
+}
+.or_card.onn_hl{ box-shadow: 0 0 0 3px var(--bp-green) !important; transition: box-shadow .3s; }
+
+/* ---------- Анимациялар ---------- */
+@keyframes onn_in{ 0%{ opacity: 0; transform: translateY(-70px) scale(.9); } 100%{ opacity: 1; transform: none; } }
+@keyframes onn_bell{ 0%, 100%{ transform: rotate(0); } 25%{ transform: rotate(-15deg); } 75%{ transform: rotate(15deg); } }
+@keyframes onn_pulse{ 0%, 100%{ transform: scale(1); } 50%{ transform: scale(1.12); } }
+@keyframes onn_bump{ 0%{ transform: scale(1); } 35%{ transform: scale(1.9); } 100%{ transform: scale(1); } }
+@keyframes onn_hit{ 0%{ transform: scale(1); } 30%{ transform: scale(1.08); } 60%{ transform: scale(.97); } 100%{ transform: scale(1); } }
+@keyframes onn_rip{ 0%{ opacity: .9; transform: scale(1); } 100%{ opacity: 0; transform: scale(1.35); } }

@@ -1,200 +1,282 @@
-// Сайттан (QR меню / жеке кабинет) келген жаңа тапсырыс: касса жоғарғы жағында хабар + дыбыс,
-// «Тапсырыстар» батырмасында сан, рұқсат берілсе Windows хабарламасы.
-// Әр 10 секунд сайын /orders/online.php сұралады. «Көрдім» немесе «Ашу» басылғанша дыбыс 20 сек сайын қайталанады.
-(function () {
-	if (window.__onNotify) return; window.__onNotify = true
-	var KEY = 'bp_online_last_' + (window.BP_CID || 0), LIFE = 10000, srvCnt = 0, EVERY = 10000, RING = 20000, RING_MAX = 15
-	var last = 0, box, ac, ringT, ringN = 0, baseTitle = document.title, busy = false
+// Сайттан (QR меню / жеке кабинет) келген жаңа тапсырыс хабары.
+// Белгілері: block/modal.php (.onn_box, template.onn_tpl), «Тапсырыстар» батырмасындағы сан: block/menu.php (.onn_cnt), стилі: assets/css/notify.css
+//  - экранда бір хабар тұрады; бірнеше келсе, ескілері кезекпен «Тапсырыстар»-ға ұшады, соңғысы қалады;
+//  - 10 сек таймер тек бет белсенді болғанда (терезе алдыңғы жақта, тышқан бетте) жүреді, біткенде хабар «Тапсырыстар»-ға ұшады;
+//  - дыбыс тапсырыс ашылғанша («Ашу» не «Тапсырыстар» беті) не статусы «Жаңа»-дан өзгергенше әр 5 сек шығады;
+//  - рұқсат берілсе Windows хабарламасы.
+// Әр 10 секунд сайын /orders/online.php сұралады.
+$(document).ready(function() {
 
+	var box = $('.onn_box')
+	if (!box.length || window.__onNotify) return
+	window.__onNotify = true
+
+	var cid = box.data('cid') || 0
+	var KEY = 'bp_online_last_' + cid, OPEN_KEY = 'bp_online_open_' + cid
+	var LIFE = (box.data('life') || 10) * 1000, EVERY = 10000, RING = 5000, QUICK = 900
+	var tpl = $('.onn_tpl').html()
+	var btn = $('.mp_topi[href^="/orders/"]').first()
+	var last = +get(KEY) || 0, cur = null, queue = [], flying = 0, srvCnt = 0, newIds = []
+	var ringT = null, ac = null, busy = false, first = true, mouseIn = false, baseTitle = document.title
+
+
+
+	// localStorage (жеке режимде қате берсе де бет істей берсін)
 	function get(k) { try { return localStorage.getItem(k) } catch (e) { return null } }
 	function set(k, v) { try { localStorage.setItem(k, v) } catch (e) {} }
 
-	// Стиль (head-ке тиіспеу үшін осы жерде)
-	var css = document.createElement('style')
-	css.textContent = '' +
-		'.onn_box{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:99999;display:flex;flex-direction:column;gap:10px;width:420px;max-width:calc(100vw - 32px);font-family:Nunito,Arial,sans-serif}' +
-		'.onn{position:relative;overflow:hidden;background:#fff;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.22);border-left:6px solid #0EA768;padding:14px 16px 16px 14px;animation:onn_in .35s cubic-bezier(.2,.9,.3,1.2)}' +
-		'.onn_t{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;color:#0EA768;text-transform:uppercase;letter-spacing:.3px}' +
-		'.onn_t i{font-size:16px;animation:onn_bell 1s ease-in-out infinite}' +
-		'.onn_x{margin-left:auto;color:#999;cursor:pointer;font-size:18px;line-height:1;padding:2px 4px}' +
-		'.onn_n{font-size:22px;font-weight:800;color:#1a1a1a;margin:6px 0 2px}' +
-		'.onn_d{font-size:15px;color:#333}.onn_d b{font-weight:800}' +
-		'.onn_m{font-size:13px;color:#777;margin-top:4px}' +
-		'.onn_b{display:flex;gap:8px;margin-top:12px}' +
-		'.onn_tm{position:absolute;left:0;right:0;bottom:0;height:4px;background:#e7f7ef}.onn_tm i{display:block;height:100%;width:100%;background:#0EA768;transform-origin:left;animation:onn_tm linear forwards}' +
-		'.onn:hover .onn_tm i{animation-play-state:paused}' +
-		'.onn_sec{margin-left:6px;font-size:12px;font-weight:700;color:#999;text-transform:none;letter-spacing:0}' +
-		'.onn_fly{position:fixed;z-index:100000;pointer-events:none;transition:transform .7s cubic-bezier(.5,0,.3,1),opacity .7s ease;transform-origin:center}' +
-		'.onn_cnt.onn_bump{animation:onn_bump .5s ease}' +
-		'@keyframes onn_tm{from{transform:scaleX(1)}to{transform:scaleX(0)}}' +
-		'@keyframes onn_bump{0%{transform:scale(1)}40%{transform:scale(1.7)}100%{transform:scale(1)}}' +
-		'.onn_b span{flex:1;text-align:center;padding:10px;border-radius:10px;font-weight:700;cursor:pointer;font-size:15px}' +
-		'.onn_open{background:#0EA768;color:#fff}.onn_ok{background:#f1f3f2;color:#333}' +
-		'.or_src{display:inline-block;margin-left:6px;padding:2px 7px;border-radius:7px;background:#e7f7ef;color:#0EA768;font-size:11px;font-weight:800;vertical-align:middle;white-space:nowrap}' +
-		'.or_card.onn_hl{box-shadow:0 0 0 3px #0EA768 !important;transition:box-shadow .3s}' +
-		'@keyframes onn_in{from{opacity:0;transform:translateY(-40px)}to{opacity:1;transform:none}}' +
-		'.onn_cnt{position:absolute;top:-7px;right:-7px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:#E5484D;color:#fff;font-size:12px;font-weight:800;line-height:20px;text-align:center;box-shadow:0 0 0 2px #fff;animation:onn_pulse 1.6s ease-in-out infinite}' +
-		'.mp_topi.onn_has{position:relative}' +
-		'@keyframes onn_pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}' +
-		'.onn_perm{display:flex;align-items:center;gap:10px;background:#1f2937;color:#fff;border-radius:14px;padding:10px 12px;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}' +
-		'.onn_perm b{flex:1;font-weight:700}.onn_perm span{background:#0EA768;border-radius:9px;padding:7px 12px;font-weight:800;cursor:pointer;white-space:nowrap}.onn_perm i{cursor:pointer;opacity:.7;font-style:normal;padding:0 4px}' +
-		'@keyframes onn_bell{0%,100%{transform:rotate(0)}25%{transform:rotate(-15deg)}75%{transform:rotate(15deg)}}'
-	document.head.appendChild(css)
+	// «Ашу» басылған тапсырыстар (дыбыс солар үшін тоқтайды)
+	function opened() { try { return JSON.parse(get(OPEN_KEY) || '[]') } catch (e) { return [] } }
+	function markOpened(ids) {
+		var o = opened()
+		$.each(ids, function(i, id) { if (o.indexOf(id) < 0) o.push(id) })
+		set(OPEN_KEY, JSON.stringify(o.slice(-300)))
+		ring(false)
+	}
+	function pending() {
+		var o = opened()
+		return $.grep(newIds, function(id) { return o.indexOf(id) < 0 })
+	}
 
-	// Дыбыс: браузер дыбысты адам бетке бір рет басқаннан кейін ғана рұқсат етеді
+	function money(v) { return String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ₸' }
+
+
+
+	// ---------- Дыбыс (браузер адам бетке бір рет басқаннан кейін ғана рұқсат етеді) ----------
 	function audio() {
 		if (!ac) { var A = window.AudioContext || window.webkitAudioContext; if (A) try { ac = new A() } catch (e) {} }
 		if (ac && ac.state === 'suspended') ac.resume()
 		return ac
 	}
-	function unlock() { audio() }
-	document.addEventListener('pointerdown', unlock, true)
-	document.addEventListener('keydown', unlock, true)
+	$(document).on('pointerdown keydown', audio)
 
-	function ding() {
+	function tone(seq, vol) {
 		var a = audio(); if (!a) return
 		var t = a.currentTime
-		;[[880, 0], [1320, .18], [880, .5], [1320, .68]].forEach(function (n) {
-			var o = a.createOscillator(), g = a.createGain()
+		$.each(seq, function(i, n) {
+			var o = a.createOscillator(), g = a.createGain(), len = n[2] || .3
 			o.type = 'sine'; o.frequency.value = n[0]
 			g.gain.setValueAtTime(0.0001, t + n[1])
-			g.gain.exponentialRampToValueAtTime(0.5, t + n[1] + 0.02)
-			g.gain.exponentialRampToValueAtTime(0.0001, t + n[1] + 0.3)
+			g.gain.exponentialRampToValueAtTime(vol, t + n[1] + 0.02)
+			g.gain.exponentialRampToValueAtTime(0.0001, t + n[1] + len)
 			o.connect(g); g.connect(a.destination)
-			o.start(t + n[1]); o.stop(t + n[1] + 0.32)
+			o.start(t + n[1]); o.stop(t + n[1] + len + .02)
 		})
 	}
-	function ring() {
-		clearTimeout(ringT)
-		var n = box ? box.querySelectorAll('.onn').length : 0
-		if (!n) { ringN = 0; document.title = baseTitle; return }
-		ding(); ringN++
+	function ding() { tone([[880, 0], [1320, .18], [880, .5], [1320, .68]], .5) }
+	function plop() { tone([[1568, 0, .12], [2093, .07, .18]], .25) } // хабар «Тапсырыстар»-ға түскенде
+
+	// now = true: бірден шырылдайды (жаңа тапсырыс келді); әйтпесе жүріп тұрған циклды бұзбаймыз
+	function ring(now) {
+		var n = pending().length
+		if (!n) { clearTimeout(ringT); ringT = null; document.title = baseTitle; return }
 		document.title = '(' + n + ') Жаңа тапсырыс!'
-		if (ringN < RING_MAX) ringT = setTimeout(ring, RING)
+		if (ringT && !now) return
+		clearTimeout(ringT)
+		;(function loop() {
+			if (!pending().length) { ringT = null; document.title = baseTitle; return }
+			ding(); ringT = setTimeout(loop, RING)
+		})()
 	}
 
-	function money(v) { return String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ₸' }
-	function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] }) }
 
-	// fly = true: хабар «Тапсырыстар» батырмасына ұшып барып, сан +1 болады
-	function close(el, fly) {
-		if (el._gone) return; el._gone = true
-		clearInterval(el._t)
-		try { if (el._n && !fly) el._n.close() } catch (e) {}
-		var a = fly && document.querySelector('.mp_topi[href^="/orders/"]')
-		if (a) {
-			var r = el.getBoundingClientRect(), t = a.getBoundingClientRect()
-			var f = el.cloneNode(true); f.classList.add('onn_fly'); f.style.animation = 'none'
-			f.style.left = r.left + 'px'; f.style.top = r.top + 'px'; f.style.width = r.width + 'px'; f.style.margin = '0'
-			document.body.appendChild(f)
-			el.remove()
-			var dx = (t.left + t.width - 10) - (r.left + r.width / 2), dy = (t.top + 4) - (r.top + r.height / 2)
-			requestAnimationFrame(function () { requestAnimationFrame(function () {
-				f.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(.06)'; f.style.opacity = '.3'
-			}) })
-			setTimeout(function () { f.remove(); renderBadge(true) }, 720)
-		} else { el.remove(); renderBadge(false) }
-		if (!box.querySelector('.onn')) { clearTimeout(ringT); ringN = 0; document.title = baseTitle }
-	}
 
-	function mkbox() { if (!box) { box = document.createElement('div'); box.className = 'onn_box'; document.body.appendChild(box) } return box }
-
-	// «Тапсырыстар» батырмасындағы сан (әлі «Жаңа» тұрған сайт тапсырыстары)
-	function badge(n) { srvCnt = n; renderBadge(false) }
+	// ---------- «Тапсырыстар» батырмасындағы сан ----------
+	// Экранда тұрған, кезектегі не ұшып бара жатқан хабарлар әлі «түспеген», сондықтан саннан шегеріледі
 	function renderBadge(bump) {
-		var open = box ? box.querySelectorAll('.onn').length : 0, n = Math.max(0, srvCnt - open)
-		var a = document.querySelector('.mp_topi[href^="/orders/"]'); if (!a) return
-		var b = a.querySelector('.onn_cnt')
-		if (!n) { if (b) b.remove(); a.classList.remove('onn_has'); return }
-		if (!b) { b = document.createElement('span'); b.className = 'onn_cnt'; a.appendChild(b); a.classList.add('onn_has') }
+		var n = Math.max(0, srvCnt - (cur ? 1 : 0) - queue.length - flying)
+		var b = btn.find('.onn_cnt')
+		btn.toggleClass('onn_has', n > 0).attr('title', n ? 'Сайттан жаңа тапсырыс: ' + n : null)
 		var v = n > 99 ? '99+' : String(n)
-		if (b.textContent !== v && bump) { b.classList.remove('onn_bump'); void b.offsetWidth; b.classList.add('onn_bump') }
-		b.textContent = v
-		a.title = 'Сайттан жаңа тапсырыс: ' + n
+		if (bump && b.text() !== v) { b.removeClass('onn_bump'); void b[0].offsetWidth; b.addClass('onn_bump') }
+		b.text(v)
 	}
 
-	// Windows хабарламасына рұқсат сұрайтын жолақ (бір рет; тек https-те жұмыс істейді)
-	function askPerm() {
-		try {
-			if (!window.Notification || !window.isSecureContext || Notification.permission !== 'default' || get('onn_perm_no')) return
-		} catch (e) { return }
-		var p = document.createElement('div'); p.className = 'onn_perm'
-		p.innerHTML = '<b>🔔 Сайттан тапсырыс келгенде Windows хабарламасы шықсын ба?</b><span>Қосу</span><i title="Кейін">×</i>'
-		p.querySelector('span').onclick = function () { try { Notification.requestPermission().then(function () { p.remove() }) } catch (e) { p.remove() } }
-		p.querySelector('i').onclick = function () { set('onn_perm_no', '1'); p.remove() }
-		mkbox().insertBefore(p, box.firstChild)
+
+
+	// ---------- Бет белсенді ме: терезе алдыңғы жақта және тышқан бетте ----------
+	$(document).on('mousemove', function() { mouseIn = true })
+	$(document).on('mouseout', function(e) { if (!e.relatedTarget) mouseIn = false })
+	$(window).on('blur', function() { mouseIn = false })
+	function active() { return !document.hidden && document.hasFocus() && mouseIn }
+
+
+
+	// ---------- Ұшу: доға бойымен «Тапсырыстар»-ға, кішірейіп, бұрылып ----------
+	function curve(p, cx, cy, tx, ty) { var q = 1 - p; return [2 * q * p * cx + p * p * tx, 2 * q * p * cy + p * p * ty] }
+
+	function fly(el, done) {
+		if (!btn.length || !el[0].isConnected || !el[0].animate) { el.remove(); done && done(); return }
+		var r = el[0].getBoundingClientRect(), t = btn[0].getBoundingClientRect()
+		var f = el.clone().addClass('onn_fly').css({ left: r.left, top: r.top, width: r.width }).appendTo('body')
+		var dot = $('<div class="onn_dot"></div>').css({ left: r.left + r.width / 2, top: r.top + r.height / 2 }).appendTo('body')
+		el.remove(); flying++
+		var tx = (t.left + t.width - 12) - (r.left + r.width / 2), ty = (t.top + 6) - (r.top + r.height / 2)
+		var cx = tx * .35, cy = -90 // доғаның биіктігі
+		var kf = [], dk = []
+		for (var i = 0; i <= 12; i++) {
+			var p = i / 12, xy = curve(p, cx, cy, tx, ty)
+			var s = p < .15 ? 1 + p * .6 : Math.max(.04, 1.09 - (p - .15) * 1.25)
+			kf.push({ transform: 'translate(' + xy[0] + 'px,' + xy[1] + 'px) scale(' + s + ') rotate(' + (-8 * p) + 'deg)', opacity: p < .8 ? 1 : 1 - (p - .8) * 4, filter: 'blur(' + (p > .6 ? (p - .6) * 4 : 0) + 'px)', offset: p })
+			dk.push({ transform: 'translate(' + xy[0] + 'px,' + xy[1] + 'px)', opacity: p < .3 ? p * 3 : 1, offset: p })
+		}
+		dot[0].animate(dk, { duration: 900, easing: 'cubic-bezier(.55,0,.35,1)', fill: 'forwards' })
+		f[0].animate(kf, { duration: 850, easing: 'cubic-bezier(.55,0,.35,1)', fill: 'forwards' }).onfinish = function() {
+			f.remove(); dot.remove(); flying--
+			btn.removeClass('onn_hit'); void btn[0].offsetWidth; btn.addClass('onn_hit')
+			var rp = $('<span class="onn_ripple"></span>').appendTo(btn.addClass('onn_has'))
+			setTimeout(function() { rp.remove() }, 750)
+			plop(); renderBadge(true)
+			done && done()
+		}
 	}
 
-	function show(o) {
-		mkbox()
-		if (box.querySelector('[data-id="' + o.id + '"]')) return
-		var el = document.createElement('div')
-		el.className = 'onn'; el.setAttribute('data-id', o.id)
-		el.innerHTML = '<div class="onn_t"><i class="far fa-bell"></i>Сайттан жаңа тапсырыс · ' + esc(o.src) + '<span class="onn_sec">' + (LIFE / 1000) + ' с</span><span class="onn_x" title="Жабу">×</span></div>' +
-			'<div class="onn_n">№' + esc(o.number) + '</div>' +
-			'<div class="onn_d">' + esc(o.type) + ' · <b>' + money(o.total) + '</b> · ' + esc(o.time) + '</div>' +
-			(o.note ? '<div class="onn_m">' + esc(o.note) + '</div>' : '') +
-			'<div class="onn_b"><span class="onn_open">Ашу</span><span class="onn_ok">Көрдім</span></div>' +
-			'<div class="onn_tm"><i style="animation-duration:' + LIFE + 'ms"></i></div>'
-		el.querySelector('.onn_x').onclick = el.querySelector('.onn_ok').onclick = function () { try { if (el._n) el._n.close() } catch (e) {} close(el, true) }
-		el.querySelector('.onn_open').onclick = function () { close(el); openOrder(o.id) }
-		box.appendChild(el)
-		// 10 секунд таймер: тышқан үстінде тұрса тоқтайды, біткенде «Тапсырыстар»-ға ұшады
-		var left = LIFE, sec = el.querySelector('.onn_sec'), hover = false
-		el.onmouseenter = function () { hover = true }; el.onmouseleave = function () { hover = false }
-		el._t = setInterval(function () {
-			if (hover) return
-			left -= 250
-			sec.textContent = Math.max(0, Math.ceil(left / 1000)) + ' с'
-			if (left <= 0) close(el, true)
-		}, 250)
 
-		// Windows хабарламасы (касса басқа терезеде тұрса), рұқсат берілген болса
+
+	// ---------- Хабар ----------
+	function card(o) {
+		var el = $(tpl).attr('data-id', o.id)
+		el.find('.onn_src').text(o.src)
+		el.find('.onn_num').text(o.number)
+		el.find('.onn_type').text(o.type)
+		el.find('.onn_sum').text(money(o.total))
+		el.find('.onn_time').text(o.time)
+		el.find('.onn_m').text(o.note || '')
+		el.find('.onn_sec').text(LIFE / 1000)
+		var C = 2 * Math.PI * 12
+		el.find('.fg').attr({ 'stroke-dasharray': C, 'stroke-dashoffset': 0 })
+		el.data('C', C)
+		return el
+	}
+
+	// Windows хабарламасы (рұқсат берілсе)
+	function osNote(o, el) {
 		try {
-			if (window.Notification && Notification.permission === 'granted') {
-				var n = new Notification('Жаңа тапсырыс №' + o.number + ' · ' + o.src, { body: o.type + ' · ' + money(o.total) + (o.note ? '\n' + o.note : ''), tag: 'onn' + o.id, requireInteraction: true, icon: '/assets/img/logo/apple-touch-icon.png' })
-				n.onclick = function () { window.focus(); n.close(); close(el); openOrder(o.id) }
-				el._n = n
-			}
+			if (!window.Notification || Notification.permission !== 'granted') return
+			var n = new Notification('Жаңа тапсырыс №' + o.number + ' · ' + o.src, { body: o.type + ' · ' + money(o.total) + (o.note ? '\n' + o.note : ''), tag: 'onn' + o.id, requireInteraction: true, icon: '/assets/img/logo/apple-touch-icon.png' })
+			n.onclick = function() { window.focus(); n.close(); openOrder(o.id) }
+			el.data('n', n)
 		} catch (e) {}
 	}
 
-	// Тапсырыстар бетінде болсақ, тізімді жаңартып, карточканы белгілейміз
-	function openOrder(id) {
-		var url = '/orders/?hl=' + id
-		location.href = url
-	}
-	function highlight() {
-		var m = /[?&]hl=(\d+)/.exec(location.search); if (!m) return
-		var c = document.querySelector('.or_card[data-oid="' + m[1] + '"]'); if (!c) return
-		c.scrollIntoView({ block: 'center' }); c.classList.add('onn_hl')
-		setTimeout(function () { c.classList.remove('onn_hl') }, 6000)
+	// Экрандағы хабар «Тапсырыстар»-ға ұшады
+	function dismiss(cb) {
+		if (!cur) { cb && cb(); return }
+		var el = cur; cur = null
+		clearInterval(el.data('t'))
+		fly(el, cb)
 	}
 
-	function poll() {
-		if (busy) return; busy = true
-		var x = new XMLHttpRequest()
-		x.open('GET', '/orders/online.php?after=' + last + '&_=' + Date.now())
-		x.onload = function () {
-			busy = false
-			var d; try { d = JSON.parse(x.responseText) } catch (e) { return }
-			if (!d || !d.ok) return
-			var got = false, top = 0
-			;(d.items || []).forEach(function (o) { show(o); got = true; if (o.id > top) top = o.id })
-			// Бірінші рет — тек осыдан кейінгілер; Жаңа емес (өңделіп қойған) тапсырыстарды өткізіп жібереміз
-			last = Math.max(+d.last || 0, top)
-			badge(+d.cnt || 0)
-			set(KEY, last)
-			if (got) ring()
+	// Кезек: экранда бір хабар. Артында тағы бар болса, қазіргісі қысқа көрінеді де ұшады
+	function next() {
+		if (cur || !queue.length) return
+		var o = queue.shift()
+		var el = card(o).appendTo(box)
+		cur = el
+		osNote(o, el)
+		if (queue.length) { setTimeout(function() { if (cur === el) dismiss(next) }, QUICK); return }
+
+		var left = LIFE, hover = false, C = el.data('C')
+		el.on('mouseenter', function() { hover = true }).on('mouseleave', function() { hover = false })
+		el.data('t', setInterval(function() {
+			if (queue.length) { if (cur === el) dismiss(next); return } // жаңасы келді — бұл ұшады
+			var run = active() && !hover
+			el.toggleClass('onn_pause', !run)
+			if (!run) return
+			left -= 250
+			var p = Math.max(0, left / LIFE)
+			el.find('.fg').attr('stroke-dashoffset', C * (1 - p))
+			el.find('.onn_sec').text(Math.max(0, Math.ceil(left / 1000)))
+			el.find('.onn_tm i').css('width', (p * 100) + '%')
+			if (left <= 0 && cur === el) dismiss(next)
+		}, 250))
+	}
+
+	function add(items) {
+		$.each(items, function(i, o) {
+			if (box.find('.onn[data-id="' + o.id + '"]').length || $.grep(queue, function(q) { return q.id === o.id }).length) return
+			queue.push(o)
+		})
+		if (cur && queue.length) dismiss(next)
+		else next()
+		renderBadge(false)
+	}
+
+	// Батырмалар
+	box.on('click', '.onn_x, .onn_ok', function() {
+		var el = $(this).closest('.onn')
+		try { el.data('n') && el.data('n').close() } catch (e) {}
+		if (cur && el[0] === cur[0]) dismiss(next)
+	})
+	box.on('click', '.onn_open', function() {
+		var el = $(this).closest('.onn')
+		try { el.data('n') && el.data('n').close() } catch (e) {}
+		openOrder(+el.attr('data-id'))
+	})
+
+
+
+	// ---------- Windows хабарламасына рұқсат (бір рет; тек https) ----------
+	try {
+		if (window.Notification && window.isSecureContext && Notification.permission === 'default' && !get('onn_perm_no')) $('.onn_perm').removeClass('dsp_n')
+	} catch (e) {}
+	$('.onn_perm_on').on('click', function() {
+		try { Notification.requestPermission().then(function() { $('.onn_perm').remove() }) } catch (e) { $('.onn_perm').remove() }
+	})
+	$('.onn_perm_no').on('click', function() { set('onn_perm_no', '1'); $('.onn_perm').remove() })
+
+
+
+	// ---------- Ашу ----------
+	function openOrder(id) { markOpened([id]); location.href = '/orders/?hl=' + id }
+	function onOrdersPage() { return /^\/orders\/?(index\.php)?$/.test(location.pathname) }
+
+	var hl = /[?&]hl=(\d+)/.exec(location.search)
+	if (hl) {
+		var oc = $('.or_card[data-oid="' + hl[1] + '"]')
+		if (oc.length) {
+			oc[0].scrollIntoView({ block: 'center' }); oc.addClass('onn_hl')
+			setTimeout(function() { oc.removeClass('onn_hl') }, 6000)
 		}
-		x.onerror = function () { busy = false }
-		x.send()
 	}
 
-	last = +get(KEY) || 0
-	function ready() { highlight(); askPerm() }
-	if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ready); else ready()
-	poll(); setInterval(poll, EVERY)
-	// Басқа қойындыда «Көрдім» басылса да, осы жерде қайта шықпауы үшін last ортақ
-	window.addEventListener('storage', function (e) { if (e.key === KEY && +e.newValue > last) last = +e.newValue })
-})()
+
+
+	// ---------- Сұрау ----------
+	function poll() {
+		if (busy) return
+		busy = true
+		$.ajax({
+			url: '/orders/online.php',
+			data: { after: last },
+			dataType: 'json',
+			cache: false,
+			success: function(d) {
+				if (!d || !d.ok) return
+				var items = d.items || [], top = 0
+				$.each(items, function(i, o) { if (o.id > top) top = o.id })
+				last = Math.max(+d.last || 0, top)
+				set(KEY, last)
+				newIds = $.map(d.ids || [], Number)
+				// «Тапсырыстар» бетін ашқанда, сол кездегі жаңа тапсырыстар көрінді деп саналады
+				if (first && onOrdersPage()) markOpened($.grep(newIds, function(id) { return !$.grep(items, function(o) { return o.id === id }).length }))
+				first = false
+				srvCnt = +d.cnt || 0
+				if (items.length) add(items)
+				else renderBadge(false)
+				ring(items.length > 0)
+			},
+			complete: function() { busy = false }
+		})
+	}
+	poll()
+	setInterval(poll, EVERY)
+
+	// Басқа қойындыда ашылса, мұнда да дыбыс тоқтайды
+	$(window).on('storage', function(e) {
+		var k = e.originalEvent.key, v = e.originalEvent.newValue
+		if (k === KEY && +v > last) last = +v
+		if (k === OPEN_KEY) ring(false)
+	})
+
+})

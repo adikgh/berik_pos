@@ -93,6 +93,7 @@
 <? foreach ($scss as $i): ?> <link rel="stylesheet" type="text/css" href="/assets/css/<?=$i?>.css?v=<?=$ver?>" /> <? endforeach ?>
 <? foreach ($css as $i): ?> <link rel="stylesheet" type="text/css" href="/assets/css/<?=$i?>.css?v=<?=$ver?>" /> <? endforeach ?>
 <link rel="stylesheet" type="text/css" href="/assets/css/berik.css?v=<?=$ver?>-<?=@filemtime($_SERVER['DOCUMENT_ROOT'].'/assets/css/berik.css')?>" />
+<? if (!empty($user_id) && empty($posm)): // сайттан келген тапсырыс хабары ?><link rel="stylesheet" type="text/css" href="/assets/css/notify.css?v=<?=$ver?>-<?=@filemtime($_SERVER['DOCUMENT_ROOT'].'/assets/css/notify.css')?>" /><? endif ?>
 <? if (!empty($posm)): ?>
 <!-- телефон нұсқасы (posm.*) -->
 <link rel="stylesheet" type="text/css" href="/assets/css/posm.css?v=<?=$ver?>-<?=@filemtime($_SERVER['DOCUMENT_ROOT'].'/assets/css/posm.css')?>" />

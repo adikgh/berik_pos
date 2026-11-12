@@ -13,7 +13,7 @@
 					<div class="mp_top">
 						<div class="mp_topc">
 							<a class="mp_topi <?=($menu_name=='cashbox'?'mp_topi_act':'')?>" href="/cashbox/"><i class="fal fa-plus-circle"></i><span><?=t::w('New order', 'Жаңадан қосу')?></span></a>
-							<a class="mp_topi <?=($menu_name=='orders'?'mp_topi_act':'')?>" href="/orders/?branch=<?=$branch?>"><i class="fal fa-receipt"></i><span><?=t::w('Orders', 'Тапсырыстар')?></span></a>
+							<a class="mp_topi <?=($menu_name=='orders'?'mp_topi_act':'')?>" href="/orders/?branch=<?=$branch?>"><i class="fal fa-receipt"></i><span><?=t::w('Orders', 'Тапсырыстар')?></span><b class="onn_cnt"></b></a>
 							<!-- <a class="mp_topi <?=($menu_name=='orders'?'mp_topi_act':'')?>" href="/orders/all.php">Тапсырыстар</a> -->
 							<!-- <a class="mp_topi <?=($menu_name=='main'?'mp_topi_act':'')?>" href="/kassa/">Касса</a> -->
 							<!-- <a class="mp_topi <?=($menu_name=='products'?'mp_topi_act':'')?>" href="/products/">Тауар</a> -->

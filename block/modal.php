@@ -39,3 +39,38 @@
 		</div>
 	</a>
 <? endif ?>
+
+<!-- Сайттан (QR меню / жеке кабинет) келген жаңа тапсырыс хабары. Стилі: assets/css/notify.css, логикасы: assets/js/notify.js -->
+<? if (!empty($user_id) && empty($posm)): ?>
+	<div class="onn_box" data-cid="<?=(int)@$company?>" data-life="10">
+		<!-- Windows хабарламасына рұқсат (тек https-те шығады) -->
+		<div class="onn_perm dsp_n">
+			<b>🔔 Сайттан тапсырыс келгенде Windows хабарламасы шықсын ба?</b>
+			<span class="onn_perm_on">Қосу</span>
+			<i class="onn_perm_no" title="Кейін">×</i>
+		</div>
+	</div>
+
+	<!-- Бір хабардың үлгісі: JS көшіріп толтырады -->
+	<template class="onn_tpl">
+		<div class="onn">
+			<div class="onn_t">
+				<i class="far fa-bell"></i>
+				<span class="onn_tt">Сайттан жаңа тапсырыс · <span class="onn_src"></span></span>
+				<span class="onn_rg" title="Бет белсенді болғанда санайды">
+					<svg viewBox="0 0 30 30"><circle class="bg" cx="15" cy="15" r="12"/><circle class="fg" cx="15" cy="15" r="12"/></svg>
+					<b class="onn_sec">10</b>
+				</span>
+				<span class="onn_x" title="Жабу">×</span>
+			</div>
+			<div class="onn_n">№<span class="onn_num"></span></div>
+			<div class="onn_d"><span class="onn_type"></span> · <b class="onn_sum"></b> · <span class="onn_time"></span></div>
+			<div class="onn_m"></div>
+			<div class="onn_b">
+				<span class="onn_open">Ашу</span>
+				<span class="onn_ok">Көрдім</span>
+			</div>
+			<div class="onn_tm"><i></i></div>
+		</div>
+	</template>
+<? endif ?>
