@@ -17,6 +17,8 @@
 
 	$after = (int)@$_GET['after'];
 	$last = (int)@mysqli_fetch_row(db::query("select max(o.id) from retail_orders o where $where"))[0];
+	// «Тапсырыстар» батырмасындағы сан: әлі «Жаңа» тұрған сайт тапсырыстары (соңғы 12 сағат)
+	$cnt = (int)@mysqli_fetch_row(db::query("select count(*) from retail_orders o where $where and o.order_status = 1 and o.ins_dt > '".date('Y-m-d H:i:s', time() - 12 * 3600)."'"))[0];
 	$items = [];
 	if ($after > 0) {
 		$since = date('Y-m-d H:i:s', time() - 6 * 3600);
@@ -35,4 +37,4 @@
 			];
 		}
 	}
-	echo json_encode(['ok' => true, 'last' => $last, 'items' => $items], JSON_UNESCAPED_UNICODE);
+	echo json_encode(['ok' => true, 'last' => $last, 'cnt' => $cnt, 'items' => $items], JSON_UNESCAPED_UNICODE);
