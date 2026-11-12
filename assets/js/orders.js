@@ -548,6 +548,7 @@ $(document).ready(function() {
          data: d,
          success: function(data){
             if (data == 'yes') { mess('Төлем қабылданды, тапсырыс аяқталды'); if (window.oh_cache) delete window.oh_cache[oid]; window.or_card_refresh(oid) }
+            else if (data == 'yes_open') { mess('Төлем қабылданды, тапсырыс дайындалуда'); if (window.oh_cache) delete window.oh_cache[oid]; window.or_card_refresh(oid) }
             else if (data == 'already') { mess('Бұл тапсырыс төленген'); window.or_card_refresh(oid) }
             else if (data == 'locked') { mess('Жабық тапсырысты өзгертуге болмайды'); window.or_card_refresh(oid) }
             else if (data == 'sum') { card.removeClass('or_busy'); mess('Сомалардың қосындысы жалпы сомаға тең болуы керек') }

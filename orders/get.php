@@ -212,7 +212,8 @@
       exit();
 	}
 
-   // Төленбеген тапсырыс: «Төледі» — төлем түрі жазылып, тапсырыс аяқталады
+   // Төленбеген тапсырыс: «Төледі» — төлем түрі жазылады.
+   // Кафе (және сервис): тапсырыс аяқталады. Жеткізу (1) мен өзі алып кету (2): аяқталмайды, «Жаңа» болса «Дайындалуда» (8) болады, басқа статус өзгермейді
    if(isset($_GET['mark_paid'])) {
       $order_id = (int)@$_POST['order_id'];
       $m = @trim($_POST['method']);
@@ -243,12 +244,15 @@
       if ($red) { $cols['total'] = $total; if (mysqli_num_rows(db::query("SHOW COLUMNS FROM `retail_orders` LIKE 'pay_red'"))) $cols['pay_red'] = $red; }
       $set = '';
       foreach ($cols as $c => $v) $set .= "`$c` = '$v', ";
-      $upd = db::query("UPDATE `retail_orders` SET $set`payment_method` = '$m', `paid` = 1, `order_status` = 4, `upd_dt` = '$datetime' WHERE id = '$order_id'");
+      $st_old = (int)@$old['order_status'];
+      if (in_array((int)@$old['order_type'], [1, 2])) $st_new = ($st_old == 1 || !$st_old) ? 8 : $st_old;
+      else $st_new = 4;
+      $upd = db::query("UPDATE `retail_orders` SET $set`payment_method` = '$m', `paid` = 1, `order_status` = '$st_new', `upd_dt` = '$datetime' WHERE id = '$order_id'");
       if (!$upd) { echo 'none'; exit(); }
       order_log($order_id, 'payment_method', 'unpaid', $m);
       foreach ($cols as $c => $v) if ((int)@$old[$c] != $v) order_log($order_id, $c, @$old[$c], $v);
-      if ((int)@$old['order_status'] != 4) order_log($order_id, 'status', @$old['order_status'], 4);
-      echo 'yes';
+      if ($st_old != $st_new) order_log($order_id, 'status', @$old['order_status'], $st_new);
+      echo $st_new == 4 ? 'yes' : 'yes_open';
       exit();
    }
 
