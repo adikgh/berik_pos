@@ -3,7 +3,7 @@
 // Әр 10 секунд сайын /orders/online.php сұралады. «Көрдім» немесе «Ашу» басылғанша дыбыс 20 сек сайын қайталанады.
 (function () {
 	if (window.__onNotify) return; window.__onNotify = true
-	var KEY = 'bp_online_last_' + (window.BP_CID || 0), EVERY = 10000, RING = 20000, RING_MAX = 15
+	var KEY = 'bp_online_last_' + (window.BP_CID || 0), LIFE = 10000, srvCnt = 0, EVERY = 10000, RING = 20000, RING_MAX = 15
 	var last = 0, box, ac, ringT, ringN = 0, baseTitle = document.title, busy = false
 
 	function get(k) { try { return localStorage.getItem(k) } catch (e) { return null } }
@@ -13,7 +13,7 @@
 	var css = document.createElement('style')
 	css.textContent = '' +
 		'.onn_box{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:99999;display:flex;flex-direction:column;gap:10px;width:420px;max-width:calc(100vw - 32px);font-family:Nunito,Arial,sans-serif}' +
-		'.onn{background:#fff;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.22);border-left:6px solid #0EA768;padding:14px 16px 14px 14px;animation:onn_in .35s cubic-bezier(.2,.9,.3,1.2)}' +
+		'.onn{position:relative;overflow:hidden;background:#fff;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.22);border-left:6px solid #0EA768;padding:14px 16px 16px 14px;animation:onn_in .35s cubic-bezier(.2,.9,.3,1.2)}' +
 		'.onn_t{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;color:#0EA768;text-transform:uppercase;letter-spacing:.3px}' +
 		'.onn_t i{font-size:16px;animation:onn_bell 1s ease-in-out infinite}' +
 		'.onn_x{margin-left:auto;color:#999;cursor:pointer;font-size:18px;line-height:1;padding:2px 4px}' +
@@ -21,6 +21,13 @@
 		'.onn_d{font-size:15px;color:#333}.onn_d b{font-weight:800}' +
 		'.onn_m{font-size:13px;color:#777;margin-top:4px}' +
 		'.onn_b{display:flex;gap:8px;margin-top:12px}' +
+		'.onn_tm{position:absolute;left:0;right:0;bottom:0;height:4px;background:#e7f7ef}.onn_tm i{display:block;height:100%;width:100%;background:#0EA768;transform-origin:left;animation:onn_tm linear forwards}' +
+		'.onn:hover .onn_tm i{animation-play-state:paused}' +
+		'.onn_sec{margin-left:6px;font-size:12px;font-weight:700;color:#999;text-transform:none;letter-spacing:0}' +
+		'.onn_fly{position:fixed;z-index:100000;pointer-events:none;transition:transform .7s cubic-bezier(.5,0,.3,1),opacity .7s ease;transform-origin:center}' +
+		'.onn_cnt.onn_bump{animation:onn_bump .5s ease}' +
+		'@keyframes onn_tm{from{transform:scaleX(1)}to{transform:scaleX(0)}}' +
+		'@keyframes onn_bump{0%{transform:scale(1)}40%{transform:scale(1.7)}100%{transform:scale(1)}}' +
 		'.onn_b span{flex:1;text-align:center;padding:10px;border-radius:10px;font-weight:700;cursor:pointer;font-size:15px}' +
 		'.onn_open{background:#0EA768;color:#fff}.onn_ok{background:#f1f3f2;color:#333}' +
 		'.or_src{display:inline-block;margin-left:6px;padding:2px 7px;border-radius:7px;background:#e7f7ef;color:#0EA768;font-size:11px;font-weight:800;vertical-align:middle;white-space:nowrap}' +
@@ -69,21 +76,40 @@
 	function money(v) { return String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ₸' }
 	function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] }) }
 
-	function close(el) {
-		try { if (el._n) el._n.close() } catch (e) {}
-		el.remove()
+	// fly = true: хабар «Тапсырыстар» батырмасына ұшып барып, сан +1 болады
+	function close(el, fly) {
+		if (el._gone) return; el._gone = true
+		clearInterval(el._t)
+		try { if (el._n && !fly) el._n.close() } catch (e) {}
+		var a = fly && document.querySelector('.mp_topi[href^="/orders/"]')
+		if (a) {
+			var r = el.getBoundingClientRect(), t = a.getBoundingClientRect()
+			var f = el.cloneNode(true); f.classList.add('onn_fly'); f.style.animation = 'none'
+			f.style.left = r.left + 'px'; f.style.top = r.top + 'px'; f.style.width = r.width + 'px'; f.style.margin = '0'
+			document.body.appendChild(f)
+			el.remove()
+			var dx = (t.left + t.width - 10) - (r.left + r.width / 2), dy = (t.top + 4) - (r.top + r.height / 2)
+			requestAnimationFrame(function () { requestAnimationFrame(function () {
+				f.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(.06)'; f.style.opacity = '.3'
+			}) })
+			setTimeout(function () { f.remove(); renderBadge(true) }, 720)
+		} else { el.remove(); renderBadge(false) }
 		if (!box.querySelector('.onn')) { clearTimeout(ringT); ringN = 0; document.title = baseTitle }
 	}
 
 	function mkbox() { if (!box) { box = document.createElement('div'); box.className = 'onn_box'; document.body.appendChild(box) } return box }
 
 	// «Тапсырыстар» батырмасындағы сан (әлі «Жаңа» тұрған сайт тапсырыстары)
-	function badge(n) {
+	function badge(n) { srvCnt = n; renderBadge(false) }
+	function renderBadge(bump) {
+		var open = box ? box.querySelectorAll('.onn').length : 0, n = Math.max(0, srvCnt - open)
 		var a = document.querySelector('.mp_topi[href^="/orders/"]'); if (!a) return
 		var b = a.querySelector('.onn_cnt')
 		if (!n) { if (b) b.remove(); a.classList.remove('onn_has'); return }
 		if (!b) { b = document.createElement('span'); b.className = 'onn_cnt'; a.appendChild(b); a.classList.add('onn_has') }
-		b.textContent = n > 99 ? '99+' : n
+		var v = n > 99 ? '99+' : String(n)
+		if (b.textContent !== v && bump) { b.classList.remove('onn_bump'); void b.offsetWidth; b.classList.add('onn_bump') }
+		b.textContent = v
 		a.title = 'Сайттан жаңа тапсырыс: ' + n
 	}
 
@@ -104,14 +130,24 @@
 		if (box.querySelector('[data-id="' + o.id + '"]')) return
 		var el = document.createElement('div')
 		el.className = 'onn'; el.setAttribute('data-id', o.id)
-		el.innerHTML = '<div class="onn_t"><i class="far fa-bell"></i>Сайттан жаңа тапсырыс · ' + esc(o.src) + '<span class="onn_x" title="Жабу">×</span></div>' +
+		el.innerHTML = '<div class="onn_t"><i class="far fa-bell"></i>Сайттан жаңа тапсырыс · ' + esc(o.src) + '<span class="onn_sec">' + (LIFE / 1000) + ' с</span><span class="onn_x" title="Жабу">×</span></div>' +
 			'<div class="onn_n">№' + esc(o.number) + '</div>' +
 			'<div class="onn_d">' + esc(o.type) + ' · <b>' + money(o.total) + '</b> · ' + esc(o.time) + '</div>' +
 			(o.note ? '<div class="onn_m">' + esc(o.note) + '</div>' : '') +
-			'<div class="onn_b"><span class="onn_open">Ашу</span><span class="onn_ok">Көрдім</span></div>'
-		el.querySelector('.onn_x').onclick = el.querySelector('.onn_ok').onclick = function () { close(el) }
+			'<div class="onn_b"><span class="onn_open">Ашу</span><span class="onn_ok">Көрдім</span></div>' +
+			'<div class="onn_tm"><i style="animation-duration:' + LIFE + 'ms"></i></div>'
+		el.querySelector('.onn_x').onclick = el.querySelector('.onn_ok').onclick = function () { try { if (el._n) el._n.close() } catch (e) {} close(el, true) }
 		el.querySelector('.onn_open').onclick = function () { close(el); openOrder(o.id) }
 		box.appendChild(el)
+		// 10 секунд таймер: тышқан үстінде тұрса тоқтайды, біткенде «Тапсырыстар»-ға ұшады
+		var left = LIFE, sec = el.querySelector('.onn_sec'), hover = false
+		el.onmouseenter = function () { hover = true }; el.onmouseleave = function () { hover = false }
+		el._t = setInterval(function () {
+			if (hover) return
+			left -= 250
+			sec.textContent = Math.max(0, Math.ceil(left / 1000)) + ' с'
+			if (left <= 0) close(el, true)
+		}, 250)
 
 		// Windows хабарламасы (касса басқа терезеде тұрса), рұқсат берілген болса
 		try {
