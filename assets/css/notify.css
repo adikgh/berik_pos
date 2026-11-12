@@ -22,7 +22,6 @@
 	overflow: hidden;
 	padding: 14px 16px 18px 16px;
 	background: var(--bp-card);
-	border-left: 6px solid var(--bp-green);
 	border-radius: 18px;
 	box-shadow: 0 18px 50px rgba(0,0,0,.25), 0 0 0 1px rgba(16,169,106,.15);
 	animation: onn_in .55s cubic-bezier(.18,1.25,.4,1) both;
@@ -39,7 +38,21 @@
 }
 .onn_t > i{ flex: none; font-size: 16px; animation: onn_bell 1s ease-in-out infinite; }
 .onn_tt{ flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-.onn_x{ flex: none; padding: 2px 4px; color: #999; font-size: 20px; line-height: 1; cursor: pointer; }
+.onn_x{
+	flex: none;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 34px;
+	height: 34px;
+	margin: -8px -8px -8px 0;
+	border-radius: 50%;
+	color: #999;
+	font-size: 22px;
+	line-height: 1;
+	cursor: pointer;
+}
+.onn_x:hover{ background: var(--bp-pill); color: var(--bp-text); }
 .onn_n{ margin: 6px 0 2px; color: var(--bp-text); font-size: 24px; font-weight: 900; }
 .onn_d{ color: #333; font-size: 15px; }
 .onn_d b{ font-weight: 800; }
@@ -64,28 +77,10 @@
 .onn_ok{ background: var(--bp-pill); color: #333; }
 .onn_ok:hover{ background: var(--bp-pill-h); }
 
-/* Таймер: дөңгелек + астындағы жолақ */
-.onn_rg{ position: relative; flex: none; width: 30px; height: 30px; }
-.onn_rg svg{ width: 30px; height: 30px; transform: rotate(-90deg); }
-.onn_rg circle{ fill: none; stroke-width: 3; }
-.onn_rg .bg{ stroke: #e7f7ef; }
-.onn_rg .fg{ stroke: var(--bp-green); stroke-linecap: round; transition: stroke-dashoffset .25s linear; }
-.onn_rg b{
-	position: absolute;
-	inset: 0;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	color: var(--bp-green);
-	font-size: 12px;
-	font-weight: 800;
-	text-transform: none;
-}
+/* Таймер: астындағы жолақ */
 .onn_tm{ position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: #e7f7ef; }
 .onn_tm i{ display: block; height: 100%; width: 100%; background: linear-gradient(90deg, var(--bp-green), #3ddc97); transition: width .25s linear; }
 /* Бет белсенді емес (терезе артта не тышқан бетте жоқ): таймер сұр, тоқтап тұр */
-.onn_pause .onn_rg b{ color: #bbb; }
-.onn_pause .onn_rg .fg{ stroke: #bbb; }
 .onn_pause .onn_tm i{ background: #ccc; }
 
 /* ---------- Ұшу: хабар «Тапсырыстар» батырмасына ---------- */

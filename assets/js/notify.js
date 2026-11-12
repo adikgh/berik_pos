@@ -2,7 +2,8 @@
 // Белгілері: block/modal.php (.onn_box, template.onn_tpl), «Тапсырыстар» батырмасындағы сан: block/menu.php (.onn_cnt), стилі: assets/css/notify.css
 //  - экранда бір хабар тұрады; бірнеше келсе, ескілері кезекпен «Тапсырыстар»-ға ұшады, соңғысы қалады;
 //  - 10 сек таймер тек бет белсенді болғанда (терезе алдыңғы жақта, тышқан бетте) жүреді, біткенде хабар «Тапсырыстар»-ға ұшады;
-//  - дыбыс тапсырыс ашылғанша («Ашу» не «Тапсырыстар» беті) не статусы «Жаңа»-дан өзгергенше әр 5 сек шығады;
+//  - «Көрдім» / × басса — дыбыс тоқтайды; хабар өзі (таймермен) кетсе, тапсырыс ашылғанша не статусы өзгергенше дыбыс шыға береді:
+//    бірден, 3 сек, 10 сек, сосын 15 сек сайын 5 рет, сосын тоқтайды;
 //  - рұқсат берілсе Windows хабарламасы.
 // Әр 10 секунд сайын /orders/online.php сұралады.
 $(document).ready(function() {
@@ -13,7 +14,8 @@ $(document).ready(function() {
 
 	var cid = box.data('cid') || 0
 	var KEY = 'bp_online_last_' + cid, OPEN_KEY = 'bp_online_open_' + cid
-	var LIFE = (box.data('life') || 10) * 1000, EVERY = 10000, RING = 5000, QUICK = 900
+	var LIFE = (box.data('life') || 10) * 1000, EVERY = 10000, QUICK = 900
+	var STEPS = [3000, 10000, 15000, 15000, 15000, 15000, 15000] // дыбыс: бірден, 3 сек, 10 сек, сосын 15 сек сайын 5 рет, сосын тоқтайды
 	var tpl = $('.onn_tpl').html()
 	var btn = $('.mp_topi[href^="/orders/"]').first()
 	var last = +get(KEY) || 0, cur = null, queue = [], flying = 0, srvCnt = 0, newIds = []
@@ -25,7 +27,7 @@ $(document).ready(function() {
 	function get(k) { try { return localStorage.getItem(k) } catch (e) { return null } }
 	function set(k, v) { try { localStorage.setItem(k, v) } catch (e) {} }
 
-	// «Ашу» басылған тапсырыстар (дыбыс солар үшін тоқтайды)
+	// «Ашу», «Көрдім» не × басылған тапсырыстар (дыбыс солар үшін тоқтайды)
 	function opened() { try { return JSON.parse(get(OPEN_KEY) || '[]') } catch (e) { return [] } }
 	function markOpened(ids) {
 		var o = opened()
@@ -64,18 +66,21 @@ $(document).ready(function() {
 		})
 	}
 	function ding() { tone([[880, 0], [1320, .18], [880, .5], [1320, .68]], .5) }
-	function plop() { tone([[1568, 0, .12], [2093, .07, .18]], .25) } // хабар «Тапсырыстар»-ға түскенде
 
-	// now = true: бірден шырылдайды (жаңа тапсырыс келді); әйтпесе жүріп тұрған циклды бұзбаймыз
+	// now = true: жаңа тапсырыс келді — ескі цикл тоқтап, жаңасы басынан басталады; әйтпесе жүріп тұрған циклды бұзбаймыз
 	function ring(now) {
 		var n = pending().length
 		if (!n) { clearTimeout(ringT); ringT = null; document.title = baseTitle; return }
 		document.title = '(' + n + ') Жаңа тапсырыс!'
 		if (ringT && !now) return
 		clearTimeout(ringT)
+		var step = 0
 		;(function loop() {
 			if (!pending().length) { ringT = null; document.title = baseTitle; return }
-			ding(); ringT = setTimeout(loop, RING)
+			ding()
+			// 5 рет 15 сек өтті — бұл тапсырыстар үшін енді үндемейді (бет жаңарса да), жаңа тапсырыс келгенде қайта басталады
+			if (step >= STEPS.length) { ringT = null; markOpened(pending()); return }
+			ringT = setTimeout(loop, STEPS[step++])
 		})()
 	}
 
@@ -126,7 +131,7 @@ $(document).ready(function() {
 			btn.removeClass('onn_hit'); void btn[0].offsetWidth; btn.addClass('onn_hit')
 			var rp = $('<span class="onn_ripple"></span>').appendTo(btn.addClass('onn_has'))
 			setTimeout(function() { rp.remove() }, 750)
-			plop(); renderBadge(true)
+			renderBadge(true)
 			done && done()
 		}
 	}
@@ -142,10 +147,6 @@ $(document).ready(function() {
 		el.find('.onn_sum').text(money(o.total))
 		el.find('.onn_time').text(o.time)
 		el.find('.onn_m').text(o.note || '')
-		el.find('.onn_sec').text(LIFE / 1000)
-		var C = 2 * Math.PI * 12
-		el.find('.fg').attr({ 'stroke-dasharray': C, 'stroke-dashoffset': 0 })
-		el.data('C', C)
 		return el
 	}
 
@@ -176,7 +177,7 @@ $(document).ready(function() {
 		osNote(o, el)
 		if (queue.length) { setTimeout(function() { if (cur === el) dismiss(next) }, QUICK); return }
 
-		var left = LIFE, hover = false, C = el.data('C')
+		var left = LIFE, hover = false
 		el.on('mouseenter', function() { hover = true }).on('mouseleave', function() { hover = false })
 		el.data('t', setInterval(function() {
 			if (queue.length) { if (cur === el) dismiss(next); return } // жаңасы келді — бұл ұшады
@@ -184,10 +185,7 @@ $(document).ready(function() {
 			el.toggleClass('onn_pause', !run)
 			if (!run) return
 			left -= 250
-			var p = Math.max(0, left / LIFE)
-			el.find('.fg').attr('stroke-dashoffset', C * (1 - p))
-			el.find('.onn_sec').text(Math.max(0, Math.ceil(left / 1000)))
-			el.find('.onn_tm i').css('width', (p * 100) + '%')
+			el.find('.onn_tm i').css('width', (Math.max(0, left / LIFE) * 100) + '%')
 			if (left <= 0 && cur === el) dismiss(next)
 		}, 250))
 	}
@@ -203,9 +201,11 @@ $(document).ready(function() {
 	}
 
 	// Батырмалар
+	// «Көрдім» / × — көрді деп саналады: дыбыс тоқтайды, хабар «Тапсырыстар»-ға ұшады
 	box.on('click', '.onn_x, .onn_ok', function() {
 		var el = $(this).closest('.onn')
 		try { el.data('n') && el.data('n').close() } catch (e) {}
+		markOpened([+el.attr('data-id')])
 		if (cur && el[0] === cur[0]) dismiss(next)
 	})
 	box.on('click', '.onn_open', function() {

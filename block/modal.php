@@ -57,10 +57,6 @@
 			<div class="onn_t">
 				<i class="far fa-bell"></i>
 				<span class="onn_tt">Сайттан жаңа тапсырыс · <span class="onn_src"></span></span>
-				<span class="onn_rg" title="Бет белсенді болғанда санайды">
-					<svg viewBox="0 0 30 30"><circle class="bg" cx="15" cy="15" r="12"/><circle class="fg" cx="15" cy="15" r="12"/></svg>
-					<b class="onn_sec">10</b>
-				</span>
 				<span class="onn_x" title="Жабу">×</span>
 			</div>
 			<div class="onn_n">№<span class="onn_num"></span></div>
