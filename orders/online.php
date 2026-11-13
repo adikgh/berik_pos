@@ -17,17 +17,18 @@
 
 	$after = (int)@$_GET['after'];
 	$last = (int)@mysqli_fetch_row(db::query("select max(o.id) from retail_orders o where $where"))[0];
-	// «Тапсырыстар» батырмасындағы сан: әлі «Жаңа» тұрған сайт тапсырыстары (соңғы 12 сағат)
+	// «Тапсырыстар» батырмасындағы сан: бүгін келіп, әлі «Жаңа» тұрған сайт тапсырыстары
 	// ids — дыбыс осы тапсырыстар ашылғанша (не статусы өзгергенше) шығады
 	$ids = [];
-	$qn = db::query("select o.id from retail_orders o where $where and o.order_status = 1 and o.ins_dt > '".date('Y-m-d H:i:s', time() - 12 * 3600)."' order by o.id desc limit 100");
+	// Тапсырыстар тізіміндей: тек бүгінгі касса күні (06:00-ден, config/var.php $start_cdate / $end_cdate)
+	$day = "o.ins_dt >= '$start_cdate' and o.ins_dt < '$end_cdate'";
+	$qn = db::query("select o.id from retail_orders o where $where and o.order_status = 1 and $day order by o.id desc limit 100");
 	while ($r = mysqli_fetch_row($qn)) $ids[] = (int)$r[0];
 	$cnt = count($ids);
 	$items = [];
 	if ($after > 0) {
-		$since = date('Y-m-d H:i:s', time() - 6 * 3600);
 		$q = db::query("select o.id, o.number, o.total, o.order_type, o.source, o.ins_dt, o.additional, b.code from retail_orders o left join company_branch b on b.id = o.branch_id
-			where o.id > '$after' and $where and o.order_status = 1 and o.ins_dt > '$since' order by o.id asc limit 20");
+			where o.id > '$after' and $where and o.order_status = 1 and $day order by o.id asc limit 20");
 		$tn = [1 => 'Жеткізу', 2 => 'Өзі алып кетеді', 3 => 'Сервис', 4 => 'Үстел (кафе)'];
 		while ($r = mysqli_fetch_assoc($q)) {
 			$items[] = [
