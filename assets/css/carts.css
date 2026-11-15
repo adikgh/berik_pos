@@ -1,0 +1,65 @@
+/* Бірнеше касса қатары: себеттің үстіндегі Касса-1, Касса-2 ... табтары (config/carts.php) */
+.ctab_bar{
+	display: flex; align-items: center; gap: 6px;
+	flex-shrink: 0;
+	padding: 8px 10px;
+	border-bottom: 1px solid var(--bp-line, #e7e7e7);
+	overflow-x: auto; overflow-y: hidden;
+	scrollbar-width: thin;
+	-webkit-overflow-scrolling: touch;
+}
+.ctab{
+	flex-shrink: 0;
+	display: flex; align-items: center; gap: 8px;
+	height: 44px; padding: 0 8px 0 14px;
+	border-radius: 10px;
+	border: 2px solid transparent;
+	background: var(--bp-pill, #f5f5f5);
+	color: var(--bp-text, #222);
+	font-size: 15px; font-weight: 700;
+	white-space: nowrap;
+	text-decoration: none;
+	touch-action: manipulation; -webkit-tap-highlight-color: transparent; user-select: none;
+	transition: .2s;
+}
+.ctab:hover{ background: var(--bp-pill-h, #ececec); }
+.ctab:active{ transform: scale(.96); }
+.ctab_act, .ctab_act:hover{ background: #e3f5ec; border-color: var(--bp-green, #10a96a); color: var(--bp-green, #10a96a); }
+.ctab_n{
+	min-width: 24px; height: 24px; padding: 0 7px;
+	border-radius: 12px;
+	display: flex; align-items: center; justify-content: center;
+	background: #fff; color: var(--bp-text, #222);
+	font-size: 12px; font-weight: 800;
+	font-variant-numeric: tabular-nums;
+}
+.ctab_act .ctab_n{ background: var(--bp-green, #10a96a); color: #fff; }
+.ctab_empty .ctab_n{ display: none; }
+.ctab_x{
+	width: 28px; height: 28px;
+	border-radius: 8px;
+	display: flex; align-items: center; justify-content: center;
+	font-style: normal; font-size: 20px; line-height: 1;
+	color: var(--bp-muted, #8a8f98);
+}
+.ctab_x:hover{ background: var(--bp-red-bg, #fdeced); color: var(--bp-red, #e5484d); }
+.ctab_empty:not(:has(.ctab_x)){ padding-right: 14px; }
+.ctab_add{
+	flex-shrink: 0;
+	width: 76px; height: 44px;
+	border-radius: 10px;
+	border: 2px dashed var(--bp-line, #e7e7e7);
+	display: flex; align-items: center; justify-content: center;
+	color: var(--bp-green, #10a96a); font-size: 18px;
+	text-decoration: none;
+	touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+}
+.ctab_add:hover{ border-color: var(--bp-green, #10a96a); background: #f2fbf7; }
+.ctab_cnt{
+	margin-left: auto; flex-shrink: 0;
+	padding: 0 4px;
+	color: var(--bp-muted, #8a8f98);
+	font-size: 12px; font-weight: 700;
+	font-variant-numeric: tabular-nums;
+}
+.ctab_busy{ opacity: .5; pointer-events: none; }

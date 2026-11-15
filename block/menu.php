@@ -12,7 +12,12 @@
 				<div class="ahead">
 					<div class="mp_top">
 						<div class="mp_topc">
-							<a class="mp_topi <?=($menu_name=='cashbox'?'mp_topi_act':'')?>" href="/cashbox/"><i class="fal fa-plus-circle"></i><span><?=t::w('New order', 'Жаңадан қосу')?></span></a>
+							<? // Бірнеше касса қатары қосулы болса «Жаңадан қосу» ашық кассалар тізімін ашады (config/carts.php)
+								require_once __DIR__.'/../config/carts.php';
+								$mc_mx = carts::max($company);
+								if ($mc_mx && empty($mc_list)) $mc_list = carts::open($user_id, $company);
+							?>
+							<a class="mp_topi <?=($menu_name=='cashbox'?'mp_topi_act':'')?> <?=($mc_mx?'mc_dd_btn':'')?>" href="/cashbox/"><i class="fal fa-plus-circle"></i><span><?=t::w('New order', 'Жаңадан қосу')?></span><? if ($mc_mx): ?><i class="fal fa-angle-down mc_car"></i><? endif ?></a>
 							<a class="mp_topi <?=($menu_name=='orders'?'mp_topi_act':'')?>" href="/orders/?branch=<?=$branch?>"><i class="fal fa-receipt"></i><span><?=t::w('Orders', 'Тапсырыстар')?></span><b class="onn_cnt"></b></a>
 							<!-- <a class="mp_topi <?=($menu_name=='orders'?'mp_topi_act':'')?>" href="/orders/all.php">Тапсырыстар</a> -->
 							<!-- <a class="mp_topi <?=($menu_name=='main'?'mp_topi_act':'')?>" href="/kassa/">Касса</a> -->
@@ -22,6 +27,25 @@
 							<!-- <a class="mp_topi <?=($menu_name=='return'?'mp_topi_act':'')?>" href="/return/">Возврат</a> -->
 							<!-- <a class="mp_topi <?=($menu_name=='main'?'mp_topi_act':'')?>" href="/change/">Смена</a> -->
 						</div>
+						<? if ($mc_mx): ?>
+							<div class="mc_dd">
+								<div class="mc_dd_h"><?=t::w('Open kassas', 'Ашық кассалар')?></div>
+								<div class="mc_dd_l">
+									<? foreach ($mc_list as $mc_no => $mc_d): ?>
+										<a class="mc_dd_i <?=(($menu_name=='cashbox' && $mc_no == @$_SESSION['cart_no']) ? 'mc_dd_cur' : '')?>" href="/cashbox/?cart=<?=$mc_no?>">
+											<b><?=t::w('Kassa', 'Касса')?>-<?=$mc_no?></b>
+											<span><?=((int)$mc_d['cnt'] ? (int)$mc_d['cnt'].' '.t::w('items', 'тағам') : t::w('empty', 'бос'))?></span>
+											<em><?=((int)$mc_d['cnt'] ? number_format((int)$mc_d['total'], 0, '', ' ').' тг' : '')?></em>
+										</a>
+									<? endforeach ?>
+								</div>
+								<? if (count($mc_list) < $mc_mx): ?>
+									<a class="mc_dd_i mc_dd_new" href="/cashbox/?cart=new"><i class="fal fa-plus"></i> <?=t::w('Open new kassa', 'Жаңа касса ашу')?> (<?=count($mc_list)?>/<?=$mc_mx?>)</a>
+								<? else: ?>
+									<div class="mc_dd_i mc_dd_full"><?=t::w('All kassas are open', 'Барлық касса ашық')?> (<?=$mc_mx?>/<?=$mc_mx?>)</div>
+								<? endif ?>
+							</div>
+						<? endif ?>
 					</div>
 					<div class="ub1_lx">
 						<div class="ub1_lt" href="/user/">
@@ -97,6 +121,36 @@
 			})
 		})()
 	</script>
+	<? if ($mc_mx): ?>
+	<style>
+		/* «Жаңадан қосу»: ашық кассалар тізімі */
+		.mp_top{ position: relative; }
+		.mc_car{ font-size: 13px !important; margin-left: 2px; transition: .2s; }
+		.mc_dd_open .mc_car{ transform: rotate(180deg); }
+		.mc_dd{ display: none; position: absolute; top: calc(100% + 8px); left: 0; z-index: 9000; width: 330px; max-width: calc(100vw - 24px); background: #fff; border-radius: 14px; box-shadow: 0 12px 32px rgba(0,0,0,.16); padding: 8px; }
+		.mc_dd_on .mc_dd{ display: block; }
+		.mc_dd_h{ margin: 6px 10px 8px; font-size: 12px; color: var(--bp-muted, #8a8f98); text-transform: uppercase; letter-spacing: .5px; font-weight: 700; }
+		.mc_dd_l{ max-height: 360px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
+		.mc_dd_i{ display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 12px; border-radius: 10px; color: var(--bp-text, #222); text-decoration: none; font-size: 15px; }
+		.mc_dd_i:hover{ background: var(--bp-pill, #f5f5f5); }
+		.mc_dd_cur, .mc_dd_cur:hover{ background: #e3f5ec; }
+		.mc_dd_i b{ min-width: 76px; font-weight: 800; }
+		.mc_dd_i span{ flex: 1; color: var(--bp-muted, #8a8f98); font-size: 14px; }
+		.mc_dd_i em{ font-style: normal; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+		.mc_dd_new, .mc_dd_full{ margin-top: 6px; border-top: 1px solid var(--bp-line, #e7e7e7); border-radius: 0 0 10px 10px; font-weight: 800; }
+		.mc_dd_new{ color: var(--bp-green, #10a96a); }
+		.mc_dd_full{ color: var(--bp-muted, #8a8f98); }
+	</style>
+	<script>
+		// «Жаңадан қосу» басылғанда ашық кассалар тізімі ашылады, сыртын басса жабылады
+		document.addEventListener('click', function(e){
+			var top = document.querySelector('.mp_top'); if (!top) return
+			var btn = e.target.closest('.mc_dd_btn')
+			if (btn) { e.preventDefault(); var on = !top.classList.contains('mc_dd_on'); top.classList.toggle('mc_dd_on', on); btn.classList.toggle('mc_dd_open', on); return }
+			if (!e.target.closest('.mc_dd')) { top.classList.remove('mc_dd_on'); var b = document.querySelector('.mc_dd_btn'); if (b) b.classList.remove('mc_dd_open') }
+		})
+	</script>
+	<? endif ?>
 	<script>
 		// Аккаунт мәзірі: ішін басқанда жабылмайды, сыртын басқанда жабылады
 		document.addEventListener('click', function(e){

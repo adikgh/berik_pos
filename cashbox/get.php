@@ -3,6 +3,21 @@
    require_once "../config/loyalty.php";
    
    
+   // Касса қатарын жабу: тек өз, төленбеген және бос кассасы өшіріледі
+   if(isset($_GET['cart_close'])) {
+      require_once "../config/carts.php";
+      $no = (int)@$_POST['no'];
+      if (!$user_id || !$no || !carts::on($company)) exit('0');
+      $cl = mysqli_fetch_assoc(db::query("select id from retail_orders where user_id = '$user_id' and company_id = '$company' and paid = 0 and cart_no = '$no' limit 1"));
+      if (!$cl) exit('0');
+      $cid = (int)$cl['id'];
+      if (mysqli_num_rows(db::query("select id from retail_orders_products where order_id = '$cid' limit 1"))) exit('full');
+      if (count(carts::open($user_id, $company)) < 2) exit('0');
+      db::query("DELETE FROM `retail_orders` WHERE `id` = '$cid' and paid = 0");
+      if ((int)@$_SESSION['cart_no'] == $no) unset($_SESSION['cart_no']);
+      exit('yes');
+   }
+
    // 
 	if(isset($_GET['cashbox_add'])) {
       $pid = strip_tags($_POST['id']);

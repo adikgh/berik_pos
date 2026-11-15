@@ -13,7 +13,29 @@
 	}
 
 
-	if (@$_GET['id']) {
+	// Бірнеше касса қатары (Касса-1, Касса-2 ...): компанияда қосулы болса, өзгертуде (?id=) емес
+	require_once "../config/carts.php";
+	$mc_max = !@$_GET['id'] ? carts::max($company) : 0;
+	$mc_list = []; $mc_cur = 0;
+	if ($mc_max) {
+		$mc_list = carts::open($user_id, $company);
+		if (!$mc_list) { // бұрынғы бір ғана төленбеген тапсырыс болса, ол Касса-1 болады
+			$mc_old = mysqli_fetch_assoc(db::query("select id from retail_orders where user_id = '$user_id' and company_id = '$company' and paid = 0 and (cart_no is null or cart_no = 0) order by id desc limit 1"));
+			if ($mc_old) { db::query("UPDATE `retail_orders` SET `cart_no` = 1 WHERE `id` = '".(int)$mc_old['id']."'"); $mc_list = carts::open($user_id, $company); }
+		}
+		if (isset($_GET['cart'])) { // ?cart=new жаңа касса ашады, ?cart=N сол кассаға ауысады
+			if ($_GET['cart'] === 'new') {
+				$mc_no = carts::free_no($mc_list, $mc_max);
+				if ($mc_no) { carts::create($user_id, $company, $branch, $mc_no); $_SESSION['cart_no'] = $mc_no; }
+			} elseif (isset($mc_list[(int)$_GET['cart']])) $_SESSION['cart_no'] = (int)$_GET['cart'];
+			header('location: /cashbox/'); exit();
+		}
+		if (!$mc_list) { carts::create($user_id, $company, $branch, 1); $mc_list = carts::open($user_id, $company); }
+		$mc_cur = (int)@$_SESSION['cart_no'];
+		if (!isset($mc_list[$mc_cur])) { reset($mc_list); $mc_cur = (int)key($mc_list); }
+		$_SESSION['cart_no'] = $mc_cur;
+		$cashbox = db::query("select * from retail_orders where id = '".(int)$mc_list[$mc_cur]['id']."'");
+	} elseif (@$_GET['id']) {
 		$cashbox_id = $_GET['id'];
 		$cashbox = db::query("select * from retail_orders where id = '$cashbox_id'");
 	} else $cashbox = db::query("select * from retail_orders where user_id = '$user_id' and paid = 0 order by id desc limit 1");
@@ -41,6 +63,7 @@
 	$site_set['swiper'] = true;
 	$css = ['cashbox', 'usr_info'];
 	$js = ['cashbox'];
+	if ($mc_max) { $css[] = 'carts'; $js[] = 'carts'; }
 	$lc_on = loyalty::on() && loyalty::any($company); // кэшбэк не сыйлық қосулы болса ғана
 	if ($lc_on) { $css[] = 'loyalty'; $js[] = 'loyalty'; }
 	// Акциялар: админ жасаған % жеңілдік (бүгін белсенділері). Өзгертуде бұрынғы акция өшірілсе де тізімде қалады.
@@ -90,6 +113,19 @@
 			</div>
 
 			<div class="cash_bl1">
+
+				<? if ($mc_max): ?>
+					<? // Касса қатарлары: себеттің үстінде. Себет фонда жаңарғанда бұл да жаңарады (тағам саны) ?>
+					<div class="ctab_bar">
+						<? foreach ($mc_list as $mc_no => $mc_d): ?>
+							<a class="ctab <?=($mc_no == $mc_cur ? 'ctab_act' : '')?> <?=((int)$mc_d['cnt'] ? '' : 'ctab_empty')?>" href="/cashbox/?cart=<?=$mc_no?>"><span><?=t::w('Kassa', 'Касса')?>-<?=$mc_no?></span><b class="ctab_n"><?=(int)$mc_d['cnt']?></b><? if (!(int)$mc_d['cnt'] && count($mc_list) > 1): ?><i class="ctab_x" data-no="<?=$mc_no?>" title="<?=htmlspecialchars(t::w('Close kassa', 'Кассаны жабу'))?>">&times;</i><? endif ?></a>
+						<? endforeach ?>
+						<? if (count($mc_list) < $mc_max): ?>
+							<a class="ctab_add" href="/cashbox/?cart=new" title="<?=htmlspecialchars(t::w('Open new kassa', 'Жаңа касса ашу'))?>"><i class="fal fa-plus"></i></a>
+						<? endif ?>
+						<span class="ctab_cnt"><?=count($mc_list)?>/<?=$mc_max?></span>
+					</div>
+				<? endif ?>
 
 				<div class="cash_bl1_l">
 					<div class="uc_uh">
