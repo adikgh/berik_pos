@@ -23,16 +23,17 @@
 			$mc_old = mysqli_fetch_assoc(db::query("select id from retail_orders where user_id = '$user_id' and company_id = '$company' and paid = 0 and (cart_no is null or cart_no = 0) order by id desc limit 1"));
 			if ($mc_old) { db::query("UPDATE `retail_orders` SET `cart_no` = 1 WHERE `id` = '".(int)$mc_old['id']."'"); $mc_list = carts::open($user_id, $company); }
 		}
-		if (isset($_GET['cart'])) { // ?cart=new жаңа касса ашады, ?cart=N сол кассаға ауысады
-			if ($_GET['cart'] === 'new') {
-				$mc_no = carts::free_no($mc_list, $mc_max);
-				if ($mc_no) { carts::create($user_id, $company, $branch, $mc_no); $_SESSION['cart_no'] = $mc_no; }
-			} elseif (isset($mc_list[(int)$_GET['cart']])) $_SESSION['cart_no'] = (int)$_GET['cart'];
-			header('location: /cashbox/'); exit();
+		// ?cart=new жаңа касса ашады; ?cart=N сол кассаны ашады (нөмір адрес жолында қалады,
+		// сондықтан әр браузер вкладкасы өз кассасында тұрады, бір-біріне кедергі жасамайды)
+		if (@$_GET['cart'] === 'new') {
+			$mc_no = carts::free_no($mc_list, $mc_max);
+			if ($mc_no) { carts::create($user_id, $company, $branch, $mc_no); $_SESSION['cart_no'] = $mc_no; header('location: /cashbox/?cart='.$mc_no); }
+			else header('location: /cashbox/');
+			exit();
 		}
 		if (!$mc_list) { carts::create($user_id, $company, $branch, 1); $mc_list = carts::open($user_id, $company); }
-		$mc_cur = (int)@$_SESSION['cart_no'];
-		if (!isset($mc_list[$mc_cur])) { reset($mc_list); $mc_cur = (int)key($mc_list); }
+		$mc_cur = isset($_GET['cart']) ? (int)$_GET['cart'] : (int)@$_SESSION['cart_no'];
+		if (!isset($mc_list[$mc_cur])) { reset($mc_list); $mc_cur = (int)key($mc_list); if (isset($_GET['cart'])) { header('location: /cashbox/?cart='.$mc_cur); exit(); } } // төленген/жабылған касса болса, біріншісіне
 		$_SESSION['cart_no'] = $mc_cur;
 		$cashbox = db::query("select * from retail_orders where id = '".(int)$mc_list[$mc_cur]['id']."'");
 	} elseif (@$_GET['id']) {

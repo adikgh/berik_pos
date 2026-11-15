@@ -34,13 +34,13 @@
 									<? foreach ($mc_list as $mc_no => $mc_d): ?>
 										<a class="mc_dd_i <?=(($menu_name=='cashbox' && $mc_no == @$_SESSION['cart_no']) ? 'mc_dd_cur' : '')?>" href="/cashbox/?cart=<?=$mc_no?>">
 											<b><?=t::w('Kassa', 'Касса')?>-<?=$mc_no?></b>
-											<span><?=((int)$mc_d['cnt'] ? (int)$mc_d['cnt'].' '.t::w('items', 'тағам') : t::w('empty', 'бос'))?></span>
+											<span><?=((int)$mc_d['cnt'] ? (int)$mc_d['cnt'].' '.t::w('Kassa items', 'тағам') : t::w('empty', 'бос'))?></span>
 											<em><?=((int)$mc_d['cnt'] ? number_format((int)$mc_d['total'], 0, '', ' ').' тг' : '')?></em>
 										</a>
 									<? endforeach ?>
 								</div>
 								<? if (count($mc_list) < $mc_mx): ?>
-									<a class="mc_dd_i mc_dd_new" href="/cashbox/?cart=new"><i class="fal fa-plus"></i> <?=t::w('Open new kassa', 'Жаңа касса ашу')?> (<?=count($mc_list)?>/<?=$mc_mx?>)</a>
+									<a class="mc_dd_i mc_dd_new" href="/cashbox/?cart=new" target="_blank"><i class="fal fa-plus"></i> <?=t::w('Open new kassa', 'Жаңа касса ашу')?> (<?=count($mc_list)?>/<?=$mc_mx?>)</a>
 								<? else: ?>
 									<div class="mc_dd_i mc_dd_full"><?=t::w('All kassas are open', 'Барлық касса ашық')?> (<?=$mc_mx?>/<?=$mc_mx?>)</div>
 								<? endif ?>
