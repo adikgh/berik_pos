@@ -256,6 +256,70 @@
       exit();
    }
 
+   // Сайттан (QR меню / жеке кабинет) келген жаңа тапсырысты қабылдау: предоплата (кез келген түрмен), статус «Дайындалуда» (8), чекті касса JS-і ашады.
+   // Жеткізу / Өзімен: предоплата pay_prepay + prepay_method, қалғаны pay_cash (курьерге / алғанда). Кафе / сервис: не толық төлем, не кейін («Төледі» қалады).
+   if(isset($_GET['accept_order'])) {
+      $order_id = (int)@$_POST['order_id'];
+      $old = order_row($order_id);
+      if (!$old || (int)@$old['company_id'] != (int)$company) { echo 'none'; exit(); }
+      if (!in_array((string)@$old['source'], ['qr', 'my'], true)) { echo 'none'; exit(); }
+      if ((int)@$old['order_status'] != 1) { echo 'not_new'; exit(); }
+      $ot = (int)@$old['order_type']; $total = (int)$old['total'];
+      $cols = []; $st_new = 8;
+      if (@$old['payment_method'] == 'unpaid') {
+         $amt = max(0, (int)@$_POST['amount']);
+         $m = @trim($_POST['method']);
+         if ($amt > 0 && !in_array($m, ['qr', 'transfer', 'cash', 'red', 'mix'], true)) { echo 'none'; exit(); }
+         if ($amt > $total) { echo 'sum'; exit(); }
+         $has_tr = (bool)mysqli_num_rows(db::query("SHOW COLUMNS FROM `retail_orders` LIKE 'pay_transfer'"));
+         $has_pre = (bool)mysqli_num_rows(db::query("SHOW COLUMNS FROM `retail_orders` LIKE 'pay_prepay'"));
+         $has_prm = (bool)mysqli_num_rows(db::query("SHOW COLUMNS FROM `retail_orders` LIKE 'prepay_method'"));
+         $red = 0;
+         if ($amt > 0 && $m == 'red') { // RED: тек толық сомаға, company.red пайызы қосылады, ақша Kaspi арқылы (pay_qr)
+            if ($amt != $total) { echo 'red_full'; exit(); }
+            $cm = fun::company($company); $red_pct = isset($cm['red']) ? (int)$cm['red'] : 10;
+            if ($red_pct <= 0) { echo 'none'; exit(); }
+            $red = (int)round($total * $red_pct / 100);
+            $total += $red; $amt = $total;
+         }
+         $mx = ['cash' => 0, 'qr' => 0, 'transfer' => 0];
+         if ($amt > 0) {
+            if ($m == 'mix') { // Аралас: бөліктерінің қосындысы предоплата сомасына тең
+               $mx = ['cash' => max(0, (int)@$_POST['cash']), 'qr' => max(0, (int)@$_POST['qr']), 'transfer' => max(0, (int)@$_POST['transfer'])];
+               if (array_sum($mx) != $amt || count(array_filter($mx)) < 2) { echo 'sum'; exit(); }
+            } else $mx[$m == 'red' ? 'qr' : $m] = $amt;
+            if ($mx['transfer'] && !$has_tr) { echo 'none'; exit(); }
+         }
+         if ($ot == 1 || $ot == 2) {
+            $rest = $total - $amt; // курьерге / алғанда — қолма-қол деп жазылады (кассадағы сақтаудағыдай)
+            $pay = $mx; $pay['cash'] += $rest;
+            $kinds = array_keys(array_filter($pay));
+            $cols['pay_cash'] = $pay['cash']; $cols['pay_qr'] = $pay['qr'];
+            if ($has_tr) $cols['pay_transfer'] = $pay['transfer'];
+            if ($has_pre) $cols['pay_prepay'] = $amt;
+            if ($has_prm) $cols['prepay_method'] = $amt > 0 ? $m : null;
+            $cols['payment_method'] = count($kinds) > 1 ? 'mixed' : ($kinds ? $kinds[0] : 'cash');
+            $cols['paid'] = 1;
+         } elseif ($amt > 0) { // Кафе / сервис: тек толық төлем
+            if ($amt != $total) { echo 'cafe_full'; exit(); }
+            $kinds = array_keys(array_filter($mx));
+            $cols['pay_cash'] = $mx['cash']; $cols['pay_qr'] = $mx['qr'];
+            if ($has_tr) $cols['pay_transfer'] = $mx['transfer'];
+            $cols['payment_method'] = count($kinds) > 1 ? 'mixed' : $kinds[0];
+            $cols['paid'] = 1;
+         }
+         if ($red) { $cols['total'] = $total; if (mysqli_num_rows(db::query("SHOW COLUMNS FROM `retail_orders` LIKE 'pay_red'"))) $cols['pay_red'] = $red; }
+      }
+      $set = '';
+      foreach ($cols as $c => $v) $set .= "`$c` = ".($v === null ? 'NULL' : "'".mysqli_real_escape_string(db::$connect, (string)$v)."'").", ";
+      $upd = db::query("UPDATE `retail_orders` SET $set`order_status` = '$st_new', `upd_dt` = '$datetime' WHERE id = '$order_id' and order_status = 1");
+      if (!$upd) { echo 'none'; exit(); }
+      foreach ($cols as $c => $v) if ((string)@$old[$c] !== (string)$v) order_log($order_id, $c, @$old[$c], $v);
+      order_log($order_id, 'status', @$old['order_status'], $st_new);
+      echo 'yes';
+      exit();
+   }
+
    // 
 	if(isset($_GET['change_type'])) {
 		$id = strip_tags($_POST['id']);

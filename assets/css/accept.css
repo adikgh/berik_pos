@@ -1,0 +1,80 @@
+/* Сайттан (QR меню / жеке кабинет) келген тапсырыс: «Қабылдау» батырмасы (card.php) және терезесі (orders/accept_pop.php) */
+.or_acc{ height: 54px; margin-right: 8px; padding: 0 18px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; border-radius: 14px; background: #12a150; border: 1px solid #12a150; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; transition: .15s; user-select: none; white-space: nowrap; animation: oacc_pulse 1.6s ease-in-out infinite; }
+.or_acc i{ font-size: 18px; }
+.or_acc:hover{ background: #0f8c45; border-color: #0f8c45; }
+.or_acc:active{ transform: scale(.94); }
+@keyframes oacc_pulse{ 0%, 100%{ box-shadow: 0 0 0 0 rgba(18,161,80,.45); } 50%{ box-shadow: 0 0 0 7px rgba(18,161,80,0); } }
+
+.oacc_bg{ position: fixed; inset: 0; z-index: 100001; display: none; align-items: center; justify-content: center; padding: 16px; background: rgba(15,25,40,.45); opacity: 0; transition: opacity .18s; }
+.oacc_bg.oacc_vis{ display: flex; }
+.oacc_bg.oacc_on{ opacity: 1; }
+.oacc{ width: 470px; max-width: 100%; max-height: calc(100vh - 32px); overflow-y: auto; box-sizing: border-box; background: #fff; border-radius: 20px; padding: 20px; box-shadow: 0 24px 60px rgba(15,25,40,.28); transform: translateY(10px) scale(.98); transition: transform .18s; --ac: #12a150; --ab: #e9f7ef; }
+.oacc_on .oacc{ transform: none; }
+.oacc_h{ display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
+.oacc_h > div{ flex: 1; min-width: 0; }
+.oacc_h > div > b{ display: block; font-size: 18px; font-weight: 800; color: #1d2433; line-height: 1.3; }
+.oacc_h small{ display: block; margin-top: 4px; font-size: 13px; color: #8a94a3; line-height: 1.4; }
+.oacc_h small b{ color: #1d2433; font-weight: 800; }
+.oacc_ic{ flex: 0 0 44px; width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; background: var(--ab); color: var(--ac); font-size: 19px; }
+.oacc_x{ flex: 0 0 34px; width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #8a94a3; cursor: pointer; transition: .15s; }
+.oacc_x:hover{ background: #f2f5f8; color: #1d2433; }
+
+.oacc_lbl{ font-size: 13px; font-weight: 700; color: #8a94a3; margin: 0 2px 8px; }
+.oacc_lbl_cafe, .oacc_t_cafe{ display: none; }
+.oacc_cafe .oacc_lbl_pre, .oacc_cafe .oacc_t_pre{ display: none; }
+.oacc_cafe .oacc_lbl_cafe{ display: block; }
+.oacc_cafe .oacc_t_cafe{ display: inline; }
+.oacc_cafe .oacc_custom{ display: none; }
+.oacc_nopay .oacc_pay{ display: none; }
+
+.oacc_amt{ display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.oacc_ab{ height: 50px; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0 10px; border: 1px solid #e1e8ee; border-radius: 14px; background: #fafcfd; font-size: 14px; font-weight: 700; color: #26323f; cursor: pointer; transition: .15s; user-select: none; text-align: center; }
+.oacc_ab:hover{ border-color: var(--ac); }
+.oacc_ab.on{ background: var(--ab); border-color: var(--ac); color: var(--ac); }
+.oacc_in_w{ position: relative; margin-bottom: 14px; }
+.oacc_in_w input.oacc_in{ width: 100%; box-sizing: border-box; height: 52px; padding: 0 46px 0 16px; border: 1px solid #dfe7ee; border-radius: 12px; background: #fafcfd; font-size: 20px; font-weight: 800; color: #1d2433; outline: none; transition: .15s; }
+.oacc_in_w input.oacc_in::placeholder{ font-size: 15px; font-weight: 600; color: #a6afbb; }
+.oacc_in_w > span{ position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-size: 16px; font-weight: 700; color: #8a94a3; }
+.oacc .oacc_in:focus, .oacc .oacc_mx_in:focus{ border-color: var(--ac); background: #fff; box-shadow: 0 0 0 3px var(--ab); }
+.oacc_cafe .oacc_amt{ margin-bottom: 14px; }
+
+.oacc_m{ display: none; margin-bottom: 12px; }
+.oacc_m_on .oacc_m{ display: block; }
+.oacc_ml{ display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.oacc_mo{ --pc: #12a150; --pb: #e9f7ef; height: 54px; display: flex; align-items: center; gap: 10px; padding: 0 12px; border: 1px solid #e6edf3; border-radius: 14px; background: #fafcfd; font-size: 14px; font-weight: 600; color: #26323f; cursor: pointer; transition: .15s; line-height: 1.2; white-space: nowrap; user-select: none; }
+.oacc_mo[data-m="qr"]{ --pc: #e5484d; --pb: #fdecec; }
+.oacc_mo[data-m="transfer"]{ --pc: #1f75a8; --pb: #e7f1f8; }
+.oacc_mo[data-m="mix"]{ --pc: #8e4ec6; --pb: #f3ecfa; }
+.oacc_mo[data-m="red"]{ --pc: #d9480f; --pb: #fdeee6; grid-column: 1 / -1; }
+.oacc_mo > i{ flex: 0 0 34px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--pb); color: var(--pc); font-size: 15px; }
+.oacc_mo:hover{ border-color: var(--pc); background: #fff; }
+.oacc_mo.on{ border-color: var(--pc); background: var(--pb); box-shadow: 0 0 0 2px var(--pb); }
+.oacc_red b{ margin-left: auto; font-size: 14px; font-weight: 800; color: #d9480f; }
+.oacc_red.oacc_dis{ display: none; }
+
+.oacc_mx{ display: none; margin-top: 10px; padding: 12px; border: 1px solid #eef2f6; border-radius: 14px; background: #fafcfd; }
+.oacc_mx_on .oacc_mx{ display: block; }
+.oacc_mx_r{ display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.oacc_mx_r span{ display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: #26323f; }
+.oacc_mx_r span i{ width: 18px; text-align: center; color: #8a94a3; }
+.oacc_mx_in{ width: 150px; height: 42px; box-sizing: border-box; padding: 0 12px; border: 1px solid #dfe7ee; border-radius: 10px; background: #fff; font-size: 16px; font-weight: 700; color: #1d2433; text-align: right; outline: none; transition: .15s; }
+.oacc_mx_rest{ display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; color: #8a94a3; }
+.oacc_mx_rest b{ color: #1d2433; }
+.oacc_mx_rest.oacc_ok_r b{ color: #12a150; }
+.oacc_mx_rest.oacc_bad b{ color: #e5484d; }
+
+.oacc_rest{ display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; border-radius: 12px; background: #f4f7fa; font-size: 14px; font-weight: 600; color: #4a5562; margin-bottom: 12px; }
+.oacc_rest b{ font-size: 16px; font-weight: 800; color: #1d2433; white-space: nowrap; }
+.oacc_rest.dsp_n{ display: none; }
+
+.oacc_print{ display: flex; align-items: center; gap: 10px; padding: 4px 2px; font-size: 14px; font-weight: 600; color: #26323f; cursor: pointer; user-select: none; }
+.oacc_print input{ width: 18px; height: 18px; accent-color: #12a150; cursor: pointer; }
+.oacc_err{ min-height: 18px; margin-top: 6px; font-size: 13px; font-weight: 600; color: #e5484d; }
+.oacc_btns{ display: grid; grid-template-columns: 1fr 1.3fr; gap: 10px; margin-top: 6px; }
+.oacc_no, .oacc_ok{ height: 52px; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: .15s; user-select: none; }
+.oacc_no{ border: 1px solid #e1e8ee; background: #fff; color: #4a5562; }
+.oacc_no:hover{ background: #f4f7fa; }
+.oacc_ok{ background: var(--ac); color: #fff; }
+.oacc_ok:hover{ filter: brightness(.94); }
+.oacc_ok:active, .oacc_no:active{ transform: scale(.97); }
+.oacc_busy .oacc_ok{ opacity: .6; pointer-events: none; }

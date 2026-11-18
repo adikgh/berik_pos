@@ -96,8 +96,8 @@
 	// site setting
 	$menu_name = 'orders';
 	$pod_menu_name = 'main';
-	$css = ['orders'];
-	$js = ['orders'];
+	$css = ['orders', 'accept'];
+	$js = ['orders', 'accept'];
 ?>
 <? include "../block/header.php"; ?>
 
@@ -294,6 +294,8 @@
 
 
 <? include "../block/footer.php"; ?>
+
+	<? include __DIR__."/accept_pop.php"; // сайттан келген тапсырысты қабылдау терезесі ?>
 
 	<!--  -->
 	<div class="pop_bl pop_bl2 cashbox_pay_block">
