@@ -45,7 +45,7 @@
 			</div>
 		</div>
 
-		<label class="oacc_print"><input type="checkbox" class="oacc_pr" checked><span><?=t::w('Print receipt', 'Чек шығару')?></span></label>
+		<div class="oacc_print oacc_pr_on"><i class="oacc_cb far fa-check"></i><span><?=t::w('Print receipt', 'Чек шығару')?></span></div>
 		<div class="oacc_err"></div>
 		<div class="oacc_btns">
 			<span class="oacc_no"><?=t::w('Cancel', 'Бас тарту')?></span>

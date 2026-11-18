@@ -67,8 +67,10 @@
 .oacc_rest b{ font-size: 16px; font-weight: 800; color: #1d2433; white-space: nowrap; }
 .oacc_rest.dsp_n{ display: none; }
 
-.oacc_print{ display: flex; align-items: center; gap: 10px; padding: 4px 2px; font-size: 14px; font-weight: 600; color: #26323f; cursor: pointer; user-select: none; }
-.oacc_print input{ width: 18px; height: 18px; accent-color: #12a150; cursor: pointer; }
+.oacc_print{ display: inline-flex; align-items: center; gap: 10px; padding: 6px 2px; font-size: 14px; font-weight: 600; color: #26323f; cursor: pointer; user-select: none; }
+.oacc_cb{ flex: 0 0 24px; width: 24px; height: 24px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid #cfd8e1; border-radius: 7px; background: #fff; color: transparent; font-size: 13px; transition: .15s; }
+.oacc_print:hover .oacc_cb{ border-color: #12a150; }
+.oacc_pr_on .oacc_cb{ background: #12a150; border-color: #12a150; color: #fff; }
 .oacc_err{ min-height: 18px; margin-top: 6px; font-size: 13px; font-weight: 600; color: #e5484d; }
 .oacc_btns{ display: grid; grid-template-columns: 1fr 1.3fr; gap: 10px; margin-top: 6px; }
 .oacc_no, .oacc_ok{ height: 52px; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: .15s; user-select: none; }

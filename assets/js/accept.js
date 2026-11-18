@@ -18,7 +18,7 @@ $(document).ready(function() {
       bg.find('.oacc_red_s').text(fmt(st.total + Math.round(st.total * st.red / 100)) + ' тг')
       bg.find('.oacc_in, .oacc_mx_in').val('')
       bg.find('.oacc_err').text('')
-      bg.find('.oacc_pr').prop('checked', true)
+      bg.find('.oacc_print').addClass('oacc_pr_on')
       box.toggleClass('oacc_cafe', st.cafe).toggleClass('oacc_nopay', !st.unpaid).removeClass('oacc_busy')
       set_amt(0, '0')
       bg.addClass('oacc_vis'); setTimeout(function(){ bg.addClass('oacc_on') }, 10)
@@ -70,6 +70,7 @@ $(document).ready(function() {
    })
    bg.on('click', '.oacc_mo', function () { set_m($(this).attr('data-m')); bg.find('.oacc_err').text('') })
    bg.on('input', '.oacc_mx_in', function () { var v = num($(this).val()); $(this).val(v ? fmt(v) : ''); mx_calc() })
+   bg.on('click', '.oacc_print', function () { $(this).toggleClass('oacc_pr_on') }) // «Чек шығару» белгісі
    bg.on('click', '.oacc_no, .oacc_x', close)
    bg.on('mousedown', function(e){ if (e.target === bg[0]) close() })
    $(document).on('keydown', function(e){ if (e.key == 'Escape' && bg.hasClass('oacc_vis')) close() })
@@ -87,7 +88,7 @@ $(document).ready(function() {
          d.amount = st.amt; d.method = st.m
       }
       // Чек терезесі басқан сәтте ашылады (кейін ашса браузер бөгеуі мүмкін), жауап келгенде чек жүктеледі
-      var win = bg.find('.oacc_pr').is(':checked') ? window.open('', 'mywin', 'width=570,height=570,left=250,top=50') : null
+      var win = bg.find('.oacc_print').hasClass('oacc_pr_on') ? window.open('', 'mywin', 'width=570,height=570,left=250,top=50') : null
       var oid = st.id
       box.addClass('oacc_busy')
       $.ajax({
