@@ -122,7 +122,7 @@
 							<a class="ctab <?=($mc_no == $mc_cur ? 'ctab_act' : '')?> <?=((int)$mc_d['cnt'] ? '' : 'ctab_empty')?>" href="/cashbox/?cart=<?=$mc_no?>"><span><?=t::w('Kassa', 'Касса')?>-<?=$mc_no?></span><b class="ctab_n"><?=(int)$mc_d['cnt']?></b><? if (!(int)$mc_d['cnt'] && count($mc_list) > 1): ?><i class="ctab_x" data-no="<?=$mc_no?>" title="<?=htmlspecialchars(t::w('Close kassa', 'Кассаны жабу'))?>">&times;</i><? endif ?></a>
 						<? endforeach ?>
 						<? if (count($mc_list) < $mc_max): ?>
-							<a class="ctab_add" href="/cashbox/?cart=new" title="<?=htmlspecialchars(t::w('Open new kassa', 'Жаңа касса ашу'))?>"><i class="fal fa-plus"></i></a>
+							<a class="ctab_add" href="/cashbox/?cart=new" target="_blank" title="<?=htmlspecialchars(t::w('Open new kassa', 'Жаңа касса ашу'))?>"><i class="fal fa-plus"></i></a>
 						<? endif ?>
 						<span class="ctab_cnt"><?=count($mc_list)?>/<?=$mc_max?></span>
 					</div>

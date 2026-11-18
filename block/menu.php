@@ -127,6 +127,9 @@
 		.mp_top{ position: relative; }
 		.mc_car{ font-size: 13px !important; margin-left: 2px; transition: .2s; }
 		.mc_dd_open .mc_car{ transform: rotate(180deg); }
+		.mc_dd_btn{ position: relative; overflow: hidden; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+		.mc_dd_btn.mc_hold::after{ content: ''; position: absolute; left: 0; bottom: 0; height: 3px; width: 0; background: currentColor; opacity: .6; animation: mc_hold 5s linear forwards; }
+		@keyframes mc_hold{ from{ width: 0 } to{ width: 100% } }
 		.mc_dd{ display: none; position: absolute; top: calc(100% + 8px); left: 0; z-index: 9000; width: 330px; max-width: calc(100vw - 24px); background: #fff; border-radius: 14px; box-shadow: 0 12px 32px rgba(0,0,0,.16); padding: 8px; }
 		.mc_dd_on .mc_dd{ display: block; }
 		.mc_dd_h{ margin: 6px 10px 8px; font-size: 12px; color: var(--bp-muted, #8a8f98); text-transform: uppercase; letter-spacing: .5px; font-weight: 700; }
@@ -142,13 +145,26 @@
 		.mc_dd_full{ color: var(--bp-muted, #8a8f98); }
 	</style>
 	<script>
-		// «Жаңадан қосу» басылғанда ашық кассалар тізімі ашылады, сыртын басса жабылады
-		document.addEventListener('click', function(e){
-			var top = document.querySelector('.mp_top'); if (!top) return
-			var btn = e.target.closest('.mc_dd_btn')
-			if (btn) { e.preventDefault(); var on = !top.classList.contains('mc_dd_on'); top.classList.toggle('mc_dd_on', on); btn.classList.toggle('mc_dd_open', on); return }
-			if (!e.target.closest('.mc_dd')) { top.classList.remove('mc_dd_on'); var b = document.querySelector('.mc_dd_btn'); if (b) b.classList.remove('mc_dd_open') }
-		})
+		// «Жаңадан қосу»: бір басса — кәдімгі сілтеме; 5 секунд басып тұрса — ашық кассалар тізімі ашылады
+		(function(){
+			var HOLD = 5000, tm = null, held = false
+			function btn(){ return document.querySelector('.mc_dd_btn') }
+			function open(on){ var t = document.querySelector('.mp_top'), b = btn(); if (!t) return; t.classList.toggle('mc_dd_on', on); if (b) b.classList.toggle('mc_dd_open', on) }
+			function stop(){ if (tm) { clearTimeout(tm); tm = null } var b = btn(); if (b) b.classList.remove('mc_hold') }
+			document.addEventListener('pointerdown', function(e){
+				var b = e.target.closest('.mc_dd_btn'); if (!b || e.button > 0) return
+				held = false; stop(); b.classList.add('mc_hold')
+				tm = setTimeout(function(){ tm = null; held = true; b.classList.remove('mc_hold'); open(true) }, HOLD)
+			})
+			document.addEventListener('pointerup', stop)
+			document.addEventListener('pointercancel', stop)
+			document.addEventListener('pointermove', function(e){ if (tm && !e.target.closest('.mc_dd_btn')) stop() })
+			document.addEventListener('contextmenu', function(e){ if (e.target.closest('.mc_dd_btn')) e.preventDefault() })
+			document.addEventListener('click', function(e){
+				if (e.target.closest('.mc_dd_btn')) { if (held) { e.preventDefault(); held = false } return } // қысқа басу: сілтеме өзі ашылады
+				if (!e.target.closest('.mc_dd')) open(false)
+			})
+		})()
 	</script>
 	<? endif ?>
 	<script>
