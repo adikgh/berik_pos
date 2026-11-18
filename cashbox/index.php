@@ -35,6 +35,7 @@
 		$mc_cur = isset($_GET['cart']) ? (int)$_GET['cart'] : (int)@$_SESSION['cart_no'];
 		if (!isset($mc_list[$mc_cur])) { reset($mc_list); $mc_cur = (int)key($mc_list); if (isset($_GET['cart'])) { header('location: /cashbox/?cart='.$mc_cur); exit(); } } // төленген/жабылған касса болса, біріншісіне
 		$_SESSION['cart_no'] = $mc_cur;
+		if (!isset($_GET['cart'])) { header('location: /cashbox/?cart='.$mc_cur); exit(); } // әр вкладка өз кассасына бекітіледі
 		$cashbox = db::query("select * from retail_orders where id = '".(int)$mc_list[$mc_cur]['id']."'");
 	} elseif (@$_GET['id']) {
 		$cashbox_id = $_GET['id'];

@@ -42,8 +42,10 @@
 			return $list;
 		}
 
-		// Бос нөмір (1..max), жоқ болса 0
+		// Жаңа касса нөмірі: ең үлкен ашық нөмірден кейінгі (төленген касса нөмірі бірден қайталанбасын), сыймаса бос нөмір; жоқ болса 0
 		public static function free_no($list, $max) {
+			$n = $list ? max(array_keys($list)) + 1 : 1;
+			if ($n <= $max) return $n;
 			for ($i = 1; $i <= $max; $i++) if (!isset($list[$i])) return $i;
 			return 0;
 		}

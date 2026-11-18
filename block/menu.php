@@ -128,7 +128,7 @@
 		.mc_car{ font-size: 13px !important; margin-left: 2px; transition: .2s; }
 		.mc_dd_open .mc_car{ transform: rotate(180deg); }
 		.mc_dd_btn{ position: relative; overflow: hidden; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
-		.mc_dd_btn.mc_hold::after{ content: ''; position: absolute; left: 0; bottom: 0; height: 3px; width: 0; background: currentColor; opacity: .6; animation: mc_hold 5s linear forwards; }
+		.mc_dd_btn.mc_hold::after{ content: ''; position: absolute; left: 0; bottom: 0; height: 3px; width: 0; background: currentColor; opacity: .6; animation: mc_hold 1.5s linear forwards; }
 		@keyframes mc_hold{ from{ width: 0 } to{ width: 100% } }
 		.mc_dd{ display: none; position: absolute; top: calc(100% + 8px); left: 0; z-index: 9000; width: 330px; max-width: calc(100vw - 24px); background: #fff; border-radius: 14px; box-shadow: 0 12px 32px rgba(0,0,0,.16); padding: 8px; }
 		.mc_dd_on .mc_dd{ display: block; }
@@ -145,9 +145,9 @@
 		.mc_dd_full{ color: var(--bp-muted, #8a8f98); }
 	</style>
 	<script>
-		// «Жаңадан қосу»: бір басса — кәдімгі сілтеме; 5 секунд басып тұрса — ашық кассалар тізімі ашылады
+		// «Жаңадан қосу»: бір басса — кәдімгі сілтеме; 1,5 секунд басып тұрса — ашық кассалар тізімі ашылады
 		(function(){
-			var HOLD = 5000, tm = null, held = false
+			var HOLD = 1500, tm = null, held = false
 			function btn(){ return document.querySelector('.mc_dd_btn') }
 			function open(on){ var t = document.querySelector('.mp_top'), b = btn(); if (!t) return; t.classList.toggle('mc_dd_on', on); if (b) b.classList.toggle('mc_dd_open', on) }
 			function stop(){ if (tm) { clearTimeout(tm); tm = null } var b = btn(); if (b) b.classList.remove('mc_hold') }
