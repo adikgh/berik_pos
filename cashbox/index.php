@@ -1,5 +1,7 @@
 <? include "../config/core.php";
 	require_once "../config/loyalty.php";
+	require_once "../config/stop_list.php";
+	$stp = stopl::ids($company); // стоп-лист: тағам қосылмайды
 
 	// 
 	if (!$user_id) header('location: /');
@@ -63,7 +65,7 @@
 	// site setting
 	$menu_name = 'cashbox';
 	$site_set['swiper'] = true;
-	$css = ['cashbox', 'usr_info'];
+	$css = ['cashbox', 'usr_info', 'stop'];
 	$js = ['cashbox'];
 	if ($mc_max) { $css[] = 'carts'; $js[] = 'carts'; }
 	$lc_on = loyalty::on() && loyalty::any($company); // кэшбэк не сыйлық қосулы болса ғана
@@ -105,9 +107,9 @@
 						<? // $product = db::query("select * from product where catalog_id = '$catalog_id' order by number asc"); ?>
 						<? $product = db::query("select * from product where catalog_id = '$catalog_id' and arh = 0 order by name_kz asc"); ?>
 						<? while ($product_d = mysqli_fetch_assoc($product)): ?>
-							<div class="hup_rcbi cashbox_add" data-oid="<?=$cashbox_id?>" data-id="<?=$product_d['id']?>"<?=(!empty($product_d['description']) ? ' data-desc="'.htmlspecialchars($product_d['description']).'"' : '')?>>
+							<? $stp_k = $stp[(int)$product_d['id']] ?? 0; ?><div class="hup_rcbi <?=($stp_k ? 'cashbox_stop hup_rcbi_stop' : 'cashbox_add')?>" data-oid="<?=$cashbox_id?>" data-id="<?=$product_d['id']?>"<?=($stp_k ? ' data-stop="'.$stp_k.'"' : '')?><?=(!empty($product_d['description']) ? ' data-desc="'.htmlspecialchars($product_d['description']).'"' : '')?>>
 								<div class=""><?=(!empty($product_d['img']) ? '<img class="kph_img" loading="lazy" alt="" src="'.(preg_match('~^https?://~', $product_d['img']) ? htmlspecialchars($product_d['img']) : $pr_img_url.rawurlencode($product_d['img'])).'" onerror="this.remove()">' : '')?><?=$product_d['name_kz']?></div>
-								<div class=""><?=$product_d['price']?> тг</div>
+								<div class=""><?=$product_d['price']?> тг<?=($stp_k ? ' <span class="cb_stop">'.t::w('Stop', 'Стоп').'</span>' : '')?></div>
 							</div>
 						<? endwhile ?>
 					</div>

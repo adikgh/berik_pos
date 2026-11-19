@@ -11,7 +11,9 @@
 	$ref = ['company_staff', 'company_staff_positions', 'company_client',
 		'product', 'product_item', 'product_item_quantity', 'product_catalog', 'product_warehouses',
 		'product_item_color', 'product_item_size', 'product_ch_brand', 'product_ch_style', 'product_ch_country', 'product_ch_collection',
-		'retail_orders_status', 'retail_orders_type', 'site', 'site_word', 'site_menu', 'word_block', 'info'];
+		'retail_orders_status', 'retail_orders_type', 'site', 'site_word', 'site_menu', 'word_block', 'info',
+		// 2026-11-15: акциялар (кассадағы % жеңілдік), чек баптауы (админдегі «Чек»), клиент кабинеті баптауы
+		'company_promo', 'company_receipt', 'company_menu'];
 
 	// Бұл кестелерде пароль сияқты құпия бағандар кассаға жіберілмейді
 	$hide = ['user' => ['password', 'code'], 'company' => ['code', 'smsc_login', 'smsc_password', 'tg_token', 'kaspi_token']];

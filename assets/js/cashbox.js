@@ -9,6 +9,12 @@ $(document).ready(function() {
    });
 
 
+	// стоп-листтегі тағам: қосылмайды
+	$('html').on('click', '.cashbox_stop', function () {
+		mess($(this).attr('data-stop') == 2 ? w('Set item on stop', 'Сеттің ішіндегі тағам стопта') : (
+			$(this).attr('data-stop') == 3 ? w('Out of raw stop', 'Шикізаты бітті, тағам стопта') : w('Dish on stop', 'Бұл тағам стопта, сатылмайды')))
+	})
+
 	// cashbox_add
 	$('html').on('click', '.cashbox_add', function () {
       btn = $(this)
@@ -22,6 +28,7 @@ $(document).ready(function() {
          }),
          success: function(data){ 
             if (data == 'yes') cart_refresh();
+            else if (data == 'stop') mess(w('Dish on stop', 'Бұл тағам стопта, сатылмайды'));
             // else if (data == 0) mess(w('Out of stock', 'Тауар қалмады'));
             else console.log(data);
             // console.log(data);

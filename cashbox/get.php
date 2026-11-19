@@ -1,6 +1,7 @@
 <? include "../config/core.php";
    include_once "../orders/log.php";
    require_once "../config/loyalty.php";
+   require_once "../config/stop_list.php";
    
    
    // Касса қатарын жабу: тек өз, төленбеген және бос кассасы өшіріледі
@@ -22,6 +23,7 @@
 	if(isset($_GET['cashbox_add'])) {
       $pid = strip_tags($_POST['id']);
 		$oid = strip_tags($_POST['oid']);
+      if (stopl::is($company, (int)$pid)) exit('stop'); // стоп-листте
       $pitem_d = product::product($pid);
       if ($pitem_d['price']) $price = $pitem_d['price']; else $price = 0;
 

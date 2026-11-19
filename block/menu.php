@@ -81,6 +81,10 @@
 									<div class="menu_cin"><i class="fal fa-cash-register"></i></div>
 									<div class="menu_cih"><?=t::w('Close shift', 'Сменді жабу')?></div>
 								</a>
+								<a class="menu_ci" href="/pay/">
+									<div class="menu_cin"><i class="fal fa-wallet"></i></div>
+									<div class="menu_cih"><?=t::w('Plan payment', 'Оплата')?></div>
+								</a>
 								<a class="menu_ci acc_open" href="javascript:;">
 									<div class="menu_cin"><i class="fal fa-user"></i></div>
 									<div class="menu_cih"><?=t::w('Account', 'Аккаунт')?></div>

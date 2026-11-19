@@ -78,6 +78,10 @@
       if (isset($_SESSION['company'])) $company = $_SESSION['company'];
    }
 
+   // тариф: модульдер, лимиттер, жазылым мерзімі (config/plan.php). Әзірге тек ескерту жолағы.
+   require_once __DIR__.'/plan.php';
+   plan::load($company);
+
 
 
    // branch
