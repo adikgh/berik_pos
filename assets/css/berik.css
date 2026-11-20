@@ -1705,3 +1705,20 @@ body{ color: var(--bp-text); }
 
 /* Бір қозғалыс: түс/фон/opacity/transform, бір easing */
 .btn, .mp_topi, .form_im_slo_i, .uc_ui{ transition-timing-function: var(--bp-ease); }
+
+/* Unslop: мәзір жазуы қанығырақ (user 2026-11-20) */
+body .mp_topc .mp_topi:not(.mp_topi_act){ color: #1c1f1d; font-weight: 500; }
+body .mp_topc .mp_topi:not(.mp_topi_act) i{ color: #3f4541; }
+body .mp_topc .mp_topi_act, body .mp_topc .mp_topi_act:hover{ color: var(--bp-green-ink, #08794b); font-weight: 600; }
+body .mp_topc .mp_topi_act i{ color: var(--bp-green, #0EA768); }
+body .mc_dd .mc_dd_i{ color: #1c1f1d; }
+body .mc_dd .mc_dd_i i{ color: #3f4541; }
+body .mc_dd .mc_dd_i:not(.mc_dd_full):hover{ background: #e3f5ec; color: var(--bp-green-ink, #08794b); }
+body .mc_dd .mc_dd_i:not(.mc_dd_full):hover i{ color: var(--bp-green, #0EA768); }
+body .acc_menu .menu_ci:not(.acc_exit) .menu_cih{ color: #1c1f1d; font-weight: 500; }
+body .acc_menu .menu_ci:not(.acc_exit) .menu_cin{ color: #3f4541; }
+body .acc_menu .menu_ci:not(.acc_exit):hover{ background: #e3f5ec; }
+body .acc_menu .menu_ci:not(.acc_exit):hover .menu_cih{ color: var(--bp-green-ink, #08794b); }
+body .acc_menu .menu_ci:not(.acc_exit):hover .menu_cin{ color: var(--bp-green, #0EA768); }
+body .pmenu_c .pmenu_i:not(.pmenu_i_act){ color: #3f4541; }
+body .pmenu_c .pmenu_i:not(.pmenu_i_act) span{ color: #1c1f1d; font-weight: 500; }
