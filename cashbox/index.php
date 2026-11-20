@@ -98,12 +98,13 @@
 					<div class="hup_rct">
 						<? $catalog = db::query("select * from product_catalog where company_id = '$company' and type = 'main' and arh is null order by number asc"); ?>
 						<? while ($catalog_d = mysqli_fetch_assoc($catalog)): ?>
+							<? if ($catalog_d['id'] == $catalog_id) $cc_act = $catalog_d['color']; ?>
 							<div class="hup_rcti catalog_ubd <?=($catalog_d['id']==$catalog_id?'hup_rcti_act':'')?>" data-cashbox-id="<?=$cashbox_id?>" data-id="<?=$catalog_d['id']?>"  style="background:<?=$catalog_d['color']?>"><?=$catalog_d['name_'.$lang]?></div>
 						<? endwhile ?>
 					</div>
 				</div>
 				<div class="">
-					<div class="hup_rcb">
+					<div class="hup_rcb"<?=(!empty($cc_act) ? ' style="--cc:'.htmlspecialchars($cc_act).'"' : '')?>>
 						<? // $product = db::query("select * from product where catalog_id = '$catalog_id' order by number asc"); ?>
 						<? $product = db::query("select * from product where catalog_id = '$catalog_id' and arh = 0 order by name_kz asc"); ?>
 						<? while ($product_d = mysqli_fetch_assoc($product)): ?>

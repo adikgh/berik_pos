@@ -1,27 +1,27 @@
 /* Кассадағы «Тұтынушы жайлы» блогы: кэшбэк, бүгінгі заказ, соңғы заказдар, сыйлық */
 .pop_usr_info{display:flex;flex-direction:column;right:580px;width:480px;height:auto;min-height:300px;max-height:calc(100vh - 40px)}
-.pop_usr_info_c{flex:1;overflow-y:auto;padding:20px 40px 30px!important}
-.ui_h{margin:18px 0 8px;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.03em;opacity:.55}
+.pop_usr_info_c{flex:1;overflow-y:auto;padding:20px 40px 32px!important}
+.ui_h{margin:20px 0 8px;font-size:13px;font-weight:600;opacity:.55}
 .ui_h:first-child{margin-top:0}
-.ui_h_today{color:#c0392b;opacity:1}
-.ui_cb{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-radius:12px;background:rgba(40,167,69,.12);color:#1e7e34;font-size:15px}
+.ui_h_today{color:#dc2626;opacity:1}
+.ui_cb{display:flex;justify-content:space-between;align-items:center;padding:16px 16px;border-radius:12px;background:rgba(40,167,69,.12);color:#1e7e34;font-size:15px}
 .ui_cb i{margin-right:4px}
 .ui_cb b{font-size:22px}
 .ui_o{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--gr2)}
 .ui_o:last-of-type{border-bottom:0}
-.ui_o_nmb{flex:0 0 44px;height:44px;border-radius:8px;background:var(--cm);color:var(--wh);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px}
+.ui_o_nmb{flex:0 0 44px;height:44px;border-radius:8px;background:var(--cm);color:var(--wh);display:flex;align-items:center;justify-content:center;font-weight: 600;font-size:17px}
 .ui_o_c{flex:1;min-width:0}
 .ui_o_top{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .ui_o_st{font-size:12px;padding:3px 8px;border-radius:20px;background:var(--gr1);white-space:nowrap}
 .ui_o_items{font-size:14px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ui_o_meta{font-size:12px;opacity:.6;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ui_gift{padding:12px 14px;border-radius:12px;border:1px solid var(--gr2)}
+.ui_gift{padding:12px 16px;border-radius:12px;border:1px solid var(--gr2)}
 .ui_gift_due{background:rgba(255,184,0,.14);border-color:rgba(240,173,0,.5)}
 .ui_gift_t{font-size:14px}
 .ui_gift_t i{color:#f0ad00;margin-right:4px}
 .ui_stamps{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .ui_stamp{width:24px;height:24px;border-radius:50%;border:2px dashed rgba(0,0,0,.2)}
-.ui_stamp_on{border:2px solid #28a745;background:rgba(40,167,69,.15)}
+.ui_stamp_on{border:2px solid #0EA768;background:rgba(40,167,69,.15)}
 .ui_stamp_gift{border-style:solid;border-color:#f0ad00;display:flex;align-items:center;justify-content:center;font-size:11px;color:#f0ad00}
 .ui_stamp_gift.ui_stamp_on{background:#f0ad00;color:#fff}
 .ui_gift_s{font-size:12px;opacity:.6;margin-top:8px}
@@ -30,27 +30,27 @@
 .ui_tiers{margin-top:10px;padding-top:8px;border-top:1px dashed rgba(0,0,0,.15);display:flex;flex-direction:column;gap:3px;font-size:12px}
 .ui_tiers span{display:inline-block;min-width:64px;opacity:.6}
 .ui_stamp{display:inline-flex;align-items:center;justify-content:center;font-size:11px;color:rgba(0,0,0,.35);box-sizing:border-box}
-.ui_stamp_on{background:#28a745;border:2px solid #28a745;color:#fff;font-size:13px;font-weight:700}
-.ui_stamp_now{border:2px solid #f0ad00;color:#f0ad00;font-weight:700}
+.ui_stamp_on{background:#0EA768;border:2px solid #0EA768;color:#fff;font-size:13px;font-weight: 600}
+.ui_stamp_now{border:2px solid #f0ad00;color:#f0ad00;font-weight: 600}
 .ui_stamp_gift.ui_stamp_on{background:#f0ad00;border-color:#f0ad00}
-.ui_stamps{gap:5px;margin-bottom:12px}
+.ui_stamps{gap:4px;margin-bottom:12px}
 .ui_stamp_gift{position:relative}
 .ui_stamp_gift small{position:absolute;bottom:-14px;left:0;right:0;text-align:center;font-size:9px;color:#f0ad00}
-.ui_stamp_gift.ui_stamp_on{background:#28a745;border-color:#28a745;color:#fff}
+.ui_stamp_gift.ui_stamp_on{background:#0EA768;border-color:#0EA768;color:#fff}
 .ui_stamp_gift.ui_stamp_now{background:#f0ad00;border-color:#f0ad00;color:#fff}
 /* Толық цикл: 10 бағандық тор (20 тапсырыс = 2 қатар) */
-.ui_stamps{display:grid;grid-template-columns:repeat(10,1fr);gap:10px 6px;margin:10px 0 14px}
+.ui_stamps{display:grid;grid-template-columns:repeat(10,1fr);gap:10px 6px;margin:10px 0 16px}
 .ui_stamps .ui_stamp{width:100%;max-width:34px;height:auto;aspect-ratio:1;justify-self:center;font-size:11px}
 .ui_stamps .ui_stamp_on{font-size:14px}
 .ui_stamps .ui_stamp_gift i{font-size:13px}
-.ui_stamp_got::after{content:'✓';position:absolute;top:-5px;right:-5px;width:15px;height:15px;border-radius:50%;background:#fff;color:#28a745;border:1.5px solid #28a745;font-size:9px;line-height:12px;text-align:center;font-weight:700}
+.ui_stamp_got::after{content:'✓';position:absolute;top:-5px;right:-5px;width:15px;height:15px;border-radius:50%;background:#fff;color:#0EA768;border:1.5px solid #0EA768;font-size:9px;line-height:12px;text-align:center;font-weight: 600}
 /* Сыйлық тізімі: екі баған, арасы ашық (2026-11-03) */
 .ui_tiers{gap:0;font-size:13px}
-.ui_tiers > div{display:grid;grid-template-columns:max-content 1fr;column-gap:14px;align-items:baseline;padding:6px 0;border-bottom:1px solid rgba(0,0,0,.05)}
+.ui_tiers > div{display:grid;grid-template-columns:max-content 1fr;column-gap:16px;align-items:baseline;padding:6px 0;border-bottom:1px solid rgba(0,0,0,.05)}
 .ui_tiers > div:last-child{border-bottom:0;padding-bottom:0}
-.ui_tiers span{display:inline-flex;align-items:center;gap:6px;min-width:78px;opacity:1;color:#8a94a3;font-weight:600}
+.ui_tiers span{display:inline-flex;align-items:center;gap:6px;min-width:78px;opacity:1;color:#767c78;font-weight:600}
 .ui_tiers span::before{content:'\f06b';font-family:'Font Awesome 5 Pro','Font Awesome 6 Pro','Font Awesome 5 Free';font-weight:400;color:#e9a23b;font-size:12px}
-.ui_tiers > div{font-weight:700;color:#1d2433}
+.ui_tiers > div{font-weight: 600;color:#1c1f1d}
 /* 2026-11-10: «Өзгерту» ашылғанда блок «Сақтау» терезесі жабық тұрса да шығып кетті және тар экранда сол жақтан асып кетті.
    Енді тек «Сақтау» терезесі ашық болса көрінеді, ені экранға сыяды. */
 .pop_bl:not(.pop_bl_act) .pop_usr_info{visibility:hidden;opacity:0;pointer-events:none}
@@ -58,7 +58,7 @@
 /* Нөмір жанындағы «Тұтынушы жайлы» белгісі (2026-11-10) */
 .tf_phone .form_im{position:relative}
 .tf_phone .btype_phone{padding-right:56px}
-.ui_open{position:absolute;right:8px;bottom:6px;width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#8a94a3;cursor:pointer;transition:.2s}
+.ui_open{position:absolute;right:8px;bottom:6px;width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#767c78;cursor:pointer;transition:.2s}
 .ui_open:hover{background:var(--gr1);color:var(--cm)}
 .ui_open_has{color:#f0ad00}
 .ui_open_has::after{content:'';position:absolute;top:7px;right:7px;width:8px;height:8px;border-radius:50%;background:#f0ad00}

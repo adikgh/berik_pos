@@ -22,7 +22,7 @@
 	display: flex;
 	justify-content: space-between;
 	padding-top: 44px;
-	padding: 49px 0 5px 0;
+	padding: 49px 0 4px 0;
 }
 
 @media (max-width: 768px) {
@@ -53,7 +53,7 @@
 	width: 100%;
 	border-radius: 20px;
 	border: 1px solid var(--gr2);
-	transition: .3s;
+	transition: background-color .3s, border-color .3s, color .3s, opacity .3s, transform .3s, visibility .3s;
 }
 .uc_upop{
 	border: 0;
@@ -84,7 +84,7 @@
 	min-height: 44px;
 	font-size: 16px;
 	/* border: 0; */
-	padding: 0 30px 0 83px;
+	padding: 0 32px 0 83px;
 }
 /* .uc_usn input:hover, .uc_usn input:focus{background:var(--tr)} */
 /* .uc_usn input::placeholder{font-size:14px} */
@@ -133,7 +133,7 @@
 	justify-content: space-between;
 	align-items: center;
 	border-bottom: 1px solid var(--gr2);
-	transition: .3s;
+	transition: background-color .3s, border-color .3s, color .3s, opacity .3s, transform .3s, visibility .3s;
 	font-size: 12px;
 }
 .uc_upop .uc_uh{
@@ -160,7 +160,7 @@
 .uc_uh_date{width:calc((100% - 40% - 60px) / 4)}
 
 .uc_uh_cn{width:44px}
-.uc_uh_cn:nth-last-child(1n + 2){margin-right:5px}
+.uc_uh_cn:nth-last-child(1n + 2){margin-right:4px}
 
 
 
@@ -170,7 +170,7 @@
 .uc_ub{
 	position: relative;
 	width: 100%;
-	padding: 20px 30px 30px 30px;
+	padding: 20px 32px 32px 32px;
 }
 .uc_upop .uc_ub{
 	padding: 10px 15px 10px 20px;
@@ -186,9 +186,9 @@
 	position: relative;
 	width: 100%;
 	min-height: 64px;
-	transition: .3s;
+	transition: background-color .3s, border-color .3s, color .3s, opacity .3s, transform .3s, visibility .3s;
 	padding: 10px 25px 10px 35px;
-	padding: 5px 10px 5px 15px;
+	padding: 4px 10px 4px 15px;
 	border-bottom: 1px solid var(--gr1);
 	display: flex;
 	justify-content: flex-start;
@@ -337,7 +337,7 @@ a.uc_ui{cursor:pointer}
 	-webkit-line-clamp: 1;
 	-webkit-box-orient: vertical;
 	white-space: break-spaces;
-	transition: .3s;
+	transition: background-color .3s, border-color .3s, color .3s, opacity .3s, transform .3s, visibility .3s;
 	overflow: hidden;
 }
 .uc_ui_name:last-child{
@@ -364,7 +364,7 @@ a.uc_ui{cursor:pointer}
 	position: relative;
 	width: 100%;
 	height: 16px;
-	margin-top: 5px;
+	margin-top: 4px;
 	display: flex;
 	justify-content: flex-start;
 	align-items: center;
@@ -415,8 +415,8 @@ a.uc_ui{cursor:pointer}
 	width: 50%;
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
-	grid-gap: 5px;
-	padding-left: 5px;
+	grid-gap: 4px;
+	padding-left: 4px;
 
 	display: flex;
 	justify-content: space-between;
@@ -444,14 +444,14 @@ a.uc_ui{cursor:pointer}
 	font-size: 16px;
 }
 .cashbox_qn{
-	font-weight: 700;
+	font-weight: 600;
 }
 
 .cashbox_sum{
 	margin-top: 10px;
 	width: 100% !important;
 	font-size: 22px !important;
-	font-weight: 700 !important;
+	font-weight: 600 !important;
 	text-align: right;
 }
 
@@ -481,7 +481,7 @@ a.uc_ui{cursor:pointer}
 	line-height: 24px;
 }
 .uc_uin_other:last-child{
-	padding-right: 5px;
+	padding-right: 4px;
 }
 .uc_upop .uc_uin_other{width:calc((100% - 40px) / 2)}
 
@@ -494,10 +494,10 @@ a.uc_ui{cursor:pointer}
 .disp_full{cursor:pointer}
 .disp_full i{
 	display: inline-block;
-	margin-left: 5px;
+	margin-left: 4px;
 	font-size: 14px;
 	opacity: 0;
-	transition: .3s;
+	transition: background-color .3s, border-color .3s, color .3s, opacity .3s, transform .3s, visibility .3s;
 	cursor: pointer;
 }
 .uc_ui:hover .disp_full i{opacity:1}
@@ -747,12 +747,12 @@ input.uc_uin_calc_q:focus{border:1px solid var(--bl	)}
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	transition: .3s;
+	transition: background-color .3s, border-color .3s, color .3s, opacity .3s, transform .3s, visibility .3s;
 	border-radius: 50%;
 	cursor: pointer;
 	background: var(--cl);
 	color: var(--wh);
-	/* margin-top: 7px; */
+	/* margin-top: 8px; */
 	font-size: 14px;
 }
 .uc_uin_cn:hover{background:var(--cl7)}
@@ -770,7 +770,7 @@ input.uc_uin_calc_q:focus{border:1px solid var(--bl	)}
 	position: relative;
 	width: 44px;
 	height: 44px;
-	transition: .3s;
+	transition: background-color .3s, border-color .3s, color .3s, opacity .3s, transform .3s, visibility .3s;
 }
 .uc_uibo{
 	position: relative;
@@ -780,7 +780,7 @@ input.uc_uin_calc_q:focus{border:1px solid var(--bl	)}
 	justify-content: center;
 	align-items: center;
 	border-radius: 50%;
-	transition: .3s;
+	transition: background-color .3s, border-color .3s, color .3s, opacity .3s, transform .3s, visibility .3s;
 	cursor: pointer;
 	font-size: 20px;
 }
@@ -831,7 +831,7 @@ input.uc_uin_calc_q:focus{border:1px solid var(--bl	)}
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	transition: .3s;
+	transition: background-color .3s, border-color .3s, color .3s, opacity .3s, transform .3s, visibility .3s;
 	border: 1px solid var(--gr2);
 	font-size: 14px;
 	overflow: hidden;
@@ -943,7 +943,7 @@ input.uc_uin_calc_q:focus{border:1px solid var(--bl	)}
 	display: flex;
 	justify-content: flex-end;
 	align-items: center;
-	padding: 20px 30px 30px 30px;
+	padding: 20px 32px 32px 32px;
 }
 
 
@@ -1183,7 +1183,7 @@ input.uc_uin_calc_q:focus{border:1px solid var(--bl	)}
 	justify-content: center;
 	align-items: center;
 	border-radius: 5px;
-	transition: .3s;
+	transition: background-color .3s, border-color .3s, color .3s, opacity .3s, transform .3s, visibility .3s;
 	cursor: pointer;
 	color: var(--bl);
 	background: var(--gr05);
@@ -1277,7 +1277,7 @@ input.uc_uin_calc_q:focus{border:1px solid var(--bl	)}
 .cash_bl1_lqi{
 	position: relative;
 	width: 180px;
-	padding: 20px 5px 5px 5px;
+	padding: 20px 4px 4px 4px;
 	background: var(--gr2);
 	margin-right: 20px;
 	display: flex;
@@ -1285,7 +1285,7 @@ input.uc_uin_calc_q:focus{border:1px solid var(--bl	)}
 	align-items: center;
 	text-align: center;
 	flex-direction: column;
-	transition: .3s;
+	transition: background-color .3s, border-color .3s, color .3s, opacity .3s, transform .3s, visibility .3s;
 	cursor: pointer;
 }
 .cash_bl1_lqi:hover{background:var(--cl1)}
@@ -1296,7 +1296,7 @@ input.uc_uin_calc_q:focus{border:1px solid var(--bl	)}
 	min-height: 40px;
 	font-size: 14px;
 	line-height: 20px;
-	margin-top: 5px;
+	margin-top: 4px;
 }
 .cash_bl1_lqic{
 	position: relative;
@@ -1363,7 +1363,7 @@ input.uc_uin_calc_q:focus{border:1px solid var(--bl	)}
 	padding: 20px;
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
-	grid-gap: 30px 20px;
+	grid-gap: 32px 20px;
 }
 @media(max-width:1440px){.bs_w{grid-template-columns:repeat(2, 1fr)}}
 @media(max-width:768px){.bs_w{grid-template-columns:repeat(1, 1fr)}}
@@ -1554,10 +1554,10 @@ input.uc_uin_calc_q:focus{border:1px solid var(--bl	)}
 .cash_bl1_rb{
 	position: fixed;
 	z-index: 4990;
-	padding: 0 35px 0 30px;
+	padding: 0 35px 0 32px;
 	min-height: 74px;
 	height: 74px;
-	transition: .3s;
+	transition: background-color .3s, border-color .3s, color .3s, opacity .3s, transform .3s, visibility .3s;
 	bottom: 0;
 	right: 0;
 	width: 50%;
@@ -1578,7 +1578,7 @@ input.uc_uin_calc_q:focus{border:1px solid var(--bl	)}
 		min-height: 69px;
 		border: 0;
 		border-top: 1px solid var(--gr3);
-		padding-bottom: 5px;
+		padding-bottom: 4px;
 		padding: 0 15px;
    }
 }
@@ -1651,7 +1651,7 @@ input.uc_uin_calc_q:focus{border:1px solid var(--bl	)}
 
 .cash_btn{
    height: 64px;
-   padding: 14px 60px;
+   padding: 16px 60px;
    font-size: 18px;
    border-radius: 16px;
 }
@@ -1693,7 +1693,7 @@ input.uc_uin_calc_q:focus{border:1px solid var(--bl	)}
 	width: 100%;
 	height: 0;
 	padding-top: 0;
-	transition: .3s;
+	transition: background-color .3s, border-color .3s, color .3s, opacity .3s, transform .3s, visibility .3s;
    visibility: hidden;
 	opacity: 0;
    overflow: hidden;
@@ -1743,7 +1743,7 @@ input.uc_uin_calc_q:focus{border:1px solid var(--bl	)}
 	justify-content: flex-start;
 
 	background: var(--wh);
-	padding: 5px;
+	padding: 4px;
 
 	border-radius: 8px;
 
@@ -1758,13 +1758,13 @@ input.uc_uin_calc_q:focus{border:1px solid var(--bl	)}
 	justify-content: center;
 	align-items: center;
 
-	margin-right: 5px;
+	margin-right: 4px;
 
 	font-size: 14px;
 
 	cursor: pointer;
 	border-radius: 8px;
-	transition: .3s;
+	transition: background-color .3s, border-color .3s, color .3s, opacity .3s, transform .3s, visibility .3s;
 }
 .hup_rcti:hover{
 	transform: scale(1.05);
@@ -1779,14 +1779,14 @@ input.uc_uin_calc_q:focus{border:1px solid var(--bl	)}
 .hup_rcb{
 	position: relative;
 	width: 100%;
-	margin-top: 5px;
+	margin-top: 4px;
 	display: grid;
 
 	grid-template-columns: repeat(5, minmax(0, 1fr));
-	grid-gap: 5px;
+	grid-gap: 4px;
 
 	background: var(--wh);
-	padding: 5px;
+	padding: 4px;
 
 	padding-bottom: 150px;
 	border-radius: 8px;
@@ -1800,11 +1800,11 @@ input.uc_uin_calc_q:focus{border:1px solid var(--bl	)}
 
 	background: var(--gr5);
 	min-height: 64px;
-	padding: 5px;
+	padding: 4px;
 	font-size: 14px;
 
 	cursor: pointer;
-	transition: .3s;
+	transition: background-color .3s, border-color .3s, color .3s, opacity .3s, transform .3s, visibility .3s;
 	border-radius: 8px;
 }
 .hup_rcbi:hover{
@@ -1851,7 +1851,7 @@ input.uc_uin_calc_q:focus{border:1px solid var(--bl	)}
 	justify-content: center;
 	align-items: center;
 	border-radius: 5px;
-	transition: .3s;
+	transition: background-color .3s, border-color .3s, color .3s, opacity .3s, transform .3s, visibility .3s;
 	cursor: pointer;
 	color: var(--bl);
 	background: var(--gr05);
@@ -1891,7 +1891,7 @@ input.uc_uin_calc_q:focus{border:1px solid var(--bl	)}
 	top: 0;
 	border-radius: 12px 0 0 12px;
 	visibility: hidden;
-	transition: .3s;
+	transition: background-color .3s, border-color .3s, color .3s, opacity .3s, transform .3s, visibility .3s;
 	opacity: 0;
 	transform: translateX(calc(100% + 50px));
 }
@@ -1908,7 +1908,7 @@ input.uc_uin_calc_q:focus{border:1px solid var(--bl	)}
 
 
 .pop_usr_info .head_c {
-    padding: 5px 26px 0 40px;
+    padding: 4px 28px 0 40px;
     height: 84px;
     display: flex;
     justify-content: space-between;
@@ -1968,7 +1968,7 @@ input.uc_uin_calc_q:focus{border:1px solid var(--bl	)}
    align-items: center;
    justify-content: center;
    font-size: 20px;
-   font-weight: 700;
+   font-weight: 600;
    color: var(--wh);
 }
 
@@ -1982,7 +1982,7 @@ input.uc_uin_calc_q:focus{border:1px solid var(--bl	)}
    width: 100%;
 }
 .uc_uil2_date div:last-child{
-   margin-top: 7px;
+   margin-top: 8px;
 }
 
 
@@ -1990,9 +1990,9 @@ input.uc_uin_calc_q:focus{border:1px solid var(--bl	)}
 .hup_search{
 	position: relative;
 	width: 100%;
-	margin-bottom: 5px;
+	margin-bottom: 4px;
 	background: var(--wh);
-	padding: 5px;
+	padding: 4px;
 	border-radius: 8px;
 }
 .hup_search .hup_search_inp{
@@ -2036,7 +2036,7 @@ input.uc_uin_calc_q:focus{border:1px solid var(--bl	)}
 .hup_rct_off .hup_rcti_act{ box-shadow: none; }
 .hup_search_empty{
 	grid-column: 1 / -1;
-	padding: 30px 10px;
+	padding: 32px 10px;
 	text-align: center;
 	opacity: .6;
 	font-size: 14px;

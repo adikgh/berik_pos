@@ -58,6 +58,7 @@ $(document).ready(function() {
 
             $('.catalog_ubd').removeClass('hup_rcti_act')
             btn.addClass('hup_rcti_act')
+            var hr = document.querySelector('.hup_rcb'); if (hr) hr.style.setProperty('--cc', btn.css('background-color'))   // тауар плиткалары санат түсімен
          },
          beforeSend: function(){ },
          error: function(data){ }
@@ -911,7 +912,7 @@ $(document).ready(function() {
 					if (data == 'yes') {
 						mess('Успешно')
 						setTimeout(function() { location.reload(); }, 500);
-					} else mess('Ошибка!'); console.log(data);
+					} else mess(typeof w == 'function' ? w('Something went wrong', 'Қате шықты') : 'Қате шықты'); console.log(data);
 				},
 				beforeSend: function(){ mess('Отправка..') },
 				error: function(data){ }

@@ -20,7 +20,7 @@
 .onn{
 	position: relative;
 	overflow: hidden;
-	padding: 14px 16px 18px 16px;
+	padding: 16px 16px 20px 16px;
 	background: var(--bp-card);
 	border-radius: 18px;
 	box-shadow: 0 18px 50px rgba(0,0,0,.25), 0 0 0 1px rgba(16,169,106,.15);
@@ -32,9 +32,9 @@
 	gap: 8px;
 	color: var(--bp-green);
 	font-size: 13px;
-	font-weight: 800;
-	letter-spacing: .3px;
-	text-transform: uppercase;
+	font-weight: 600;
+	
+	
 }
 .onn_t > i{ flex: none; font-size: 16px; animation: onn_bell 1s ease-in-out infinite; }
 .onn_tt{ flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
@@ -53,9 +53,9 @@
 	cursor: pointer;
 }
 .onn_x:hover{ background: var(--bp-pill); color: var(--bp-text); }
-.onn_n{ margin: 6px 0 2px; color: var(--bp-text); font-size: 24px; font-weight: 900; }
+.onn_n{ margin: 6px 0 2px; color: var(--bp-text); font-size: 24px; font-weight: 600; }
 .onn_d{ color: #333; font-size: 15px; }
-.onn_d b{ font-weight: 800; }
+.onn_d b{ font-weight: 600; }
 .onn_m{ margin-top: 4px; color: #777; font-size: 13px; }
 .onn_m:empty{ display: none; }
 
@@ -63,10 +63,10 @@
 .onn_b{ display: flex; gap: 8px; margin-top: 12px; }
 .onn_b span{
 	flex: 1;
-	padding: 11px;
+	padding: 12px;
 	border-radius: 11px;
 	font-size: 15px;
-	font-weight: 800;
+	font-weight: 600;
 	text-align: center;
 	cursor: pointer;
 	transition: transform .1s;
@@ -79,7 +79,7 @@
 
 /* Таймер: астындағы жолақ */
 .onn_tm{ position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: #e7f7ef; }
-.onn_tm i{ display: block; height: 100%; width: 100%; background: linear-gradient(90deg, var(--bp-green), #3ddc97); transition: width .25s linear; }
+.onn_tm i{ display: block; height: 100%; width: 100%; background: var(--bp-green); transition: width .25s linear; }
 /* Бет белсенді емес (терезе артта не тышқан бетте жоқ): таймер сұр, тоқтап тұр */
 .onn_pause .onn_tm i{ background: #ccc; }
 
@@ -113,7 +113,7 @@
 	box-shadow: 0 0 0 2px #fff;
 	color: #fff;
 	font-size: 12px;
-	font-weight: 900;
+	font-weight: 600;
 	line-height: 22px;
 	text-align: center;
 	animation: onn_pulse 1.6s ease-in-out infinite;
@@ -142,20 +142,20 @@
 	color: #fff;
 	font-size: 14px;
 }
-.onn_perm b{ flex: 1; font-weight: 700; }
-.onn_perm span{ padding: 7px 12px; background: var(--bp-green); border-radius: 9px; font-weight: 800; white-space: nowrap; cursor: pointer; }
+.onn_perm b{ flex: 1; font-weight: 600; }
+.onn_perm span{ padding: 8px 12px; background: var(--bp-green); border-radius: 8px; font-weight: 600; white-space: nowrap; cursor: pointer; }
 .onn_perm i{ padding: 0 4px; font-style: normal; opacity: .7; cursor: pointer; }
 
 /* ---------- Тапсырыстар тізімі ---------- */
 .or_src{
 	display: inline-block;
 	margin-left: 6px;
-	padding: 2px 7px;
+	padding: 2px 8px;
 	border-radius: 7px;
 	background: #e7f7ef;
 	color: var(--bp-green);
 	font-size: 11px;
-	font-weight: 800;
+	font-weight: 600;
 	vertical-align: middle;
 	white-space: nowrap;
 }

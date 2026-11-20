@@ -7,7 +7,7 @@
 
 	/* Жоғарғы мәзір ықшамдау */
 	.mp_topi{ padding: 0 16px; font-size: 15px; gap: 8px; }
-	.ub1_lt{ padding: 0 5px 0 16px; }
+	.ub1_lt{ padding: 0 4px 0 16px; }
 	.ub1_lx{ margin-left: 8px; }
 
 	/* Касса: себет ені тұрақты, тауарлар қалған орынды алады */
@@ -41,7 +41,7 @@
 	.cash_bl1_rbl div{ font-size: 20px; }
 	.cash_bl1_rblin{ margin-right: 10px; }
 	.cash_bl1_rbr{ flex-shrink: 0; }
-	.cash_bl1_rbr .btn{ width: auto; min-width: 130px; padding: 0 18px; }
+	.cash_bl1_rbr .btn{ width: auto; min-width: 130px; padding: 0 20px; }
 
 	/* Тапсырыстар: сүзгілер тең бөлініп, қатарға сыйып тұрады */
 	.uc_ui69{ display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
@@ -49,14 +49,14 @@
 	.uc_ui69 select, .uc_ui69 input.form_dt, .uc_ui69 .pre_tab{ width: 100%; }
 	.uc_ui69 .pre_tab{ justify-content: center; height: 56px; }
 	.uc_ui69 .uc_us{ width: 100%; grid-column: span 2; }
-	.bl_orm .uc_u{ gap: 14px; }
+	.bl_orm .uc_u{ gap: 16px; }
 }
 
 /* ---------- 1180px-ке дейін: профильде тек аватар (іздеу мәзірдің астына кірмеуі үшін) ---------- */
 @media (min-width: 769px) and (max-width: 1180px){
 	.ub1_ltf{ display: none; }
-	.ub1_lt{ padding: 0 5px; }
-	.mp_topi{ padding: 0 14px; }
+	.ub1_lt{ padding: 0 4px; }
+	.mp_topi{ padding: 0 16px; }
 }
 
 /* ---------- 1100px-ке дейін: тапсырыстар 2 баған ---------- */
@@ -71,7 +71,7 @@
 	.mp_topi i{ font-size: 17px; }
 	.cash_bl1_rbl div{ font-size: 18px; }
 	.cash_bl1_rblin{ margin-right: 8px; }
-	.cash_bl1_rbr .btn{ min-width: 110px; padding: 0 14px; }
+	.cash_bl1_rbr .btn{ min-width: 110px; padding: 0 16px; }
 	.cash_bl1{ width: 340px; }
 	.hup_r{ width: calc(100% - 340px - 10px); }
 	.hup_rcb{ grid-template-columns: repeat(3, minmax(0, 1fr)); grid-gap: 6px; }

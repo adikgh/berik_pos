@@ -83,7 +83,7 @@
 
 
 <!-- css -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;600;700;800;900&display=swap" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;900&display=swap" />
 <link rel="stylesheet" href="/assets/pl/fontawesome/css/all.min.css" />
 <link rel="stylesheet" type="text/css" href="/assets/css/anim.css?v=<?=$ver?>" />
 <? if (@$site_set['swiper'] == true): ?> <link rel="stylesheet" href="/assets/pl/swiper-bundle.min.css" /> <? endif ?>
@@ -112,6 +112,6 @@
 <? if (@$site_set['plyr'] == true): ?> <script src="/assets/pl/plyr.polyfilled.js"></script> <? endif ?>
 <? if (@$site_set['aos'] == true): ?> <script src="/assets/pl/aos.js"></script> <? endif ?>
 <? if (@$site_set['autosize'] == true): ?> <script src="/assets/pl/autosize.min.js"></script> <? endif ?>
-<script src="/assets/js/fun.js?v=<?=$ver?>"></script>
+<script src="/assets/js/fun.js?v=<?=$ver?>.<?=@filemtime($_SERVER['DOCUMENT_ROOT'].'/assets/js/fun.js')?>"></script>
 <script>var W = <?=json_encode(t::all(), JSON_UNESCAPED_UNICODE)?>; function w(k, d){ return (W && W[k]) ? W[k] : (d || k) }</script>
 

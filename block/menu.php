@@ -136,17 +136,17 @@
 		@keyframes mc_hold{ from{ width: 0 } to{ width: 100% } }
 		.mc_dd{ display: none; position: absolute; top: calc(100% + 8px); left: 0; z-index: 9000; width: 330px; max-width: calc(100vw - 24px); background: #fff; border-radius: 14px; box-shadow: 0 12px 32px rgba(0,0,0,.16); padding: 8px; }
 		.mc_dd_on .mc_dd{ display: block; }
-		.mc_dd_h{ margin: 6px 10px 8px; font-size: 12px; color: var(--bp-muted, #8a8f98); text-transform: uppercase; letter-spacing: .5px; font-weight: 700; }
+		.mc_dd_h{ margin: 6px 10px 8px; font-size: 12px; color: var(--bp-muted, #767c78);   font-weight: 600; }
 		.mc_dd_l{ max-height: 360px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
-		.mc_dd_i{ display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 12px; border-radius: 10px; color: var(--bp-text, #222); text-decoration: none; font-size: 15px; }
-		.mc_dd_i:hover{ background: var(--bp-pill, #f5f5f5); }
+		.mc_dd_i{ display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 12px; border-radius: 10px; color: var(--bp-text, #1c1f1d); text-decoration: none; font-size: 15px; }
+		.mc_dd_i:hover{ background: var(--bp-pill, #f1f3f0); }
 		.mc_dd_cur, .mc_dd_cur:hover{ background: #e3f5ec; }
-		.mc_dd_i b{ min-width: 76px; font-weight: 800; }
-		.mc_dd_i span{ flex: 1; color: var(--bp-muted, #8a8f98); font-size: 14px; }
-		.mc_dd_i em{ font-style: normal; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
-		.mc_dd_new, .mc_dd_full{ margin-top: 6px; border-top: 1px solid var(--bp-line, #e7e7e7); border-radius: 0 0 10px 10px; font-weight: 800; }
+		.mc_dd_i b{ min-width: 76px; font-weight: 600; }
+		.mc_dd_i span{ flex: 1; color: var(--bp-muted, #767c78); font-size: 14px; }
+		.mc_dd_i em{ font-style: normal; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+		.mc_dd_new, .mc_dd_full{ margin-top: 6px; border-top: 1px solid var(--bp-line, #e6e8e4); border-radius: 0 0 10px 10px; font-weight: 600; }
 		.mc_dd_new{ color: var(--bp-green, #10a96a); }
-		.mc_dd_full{ color: var(--bp-muted, #8a8f98); }
+		.mc_dd_full{ color: var(--bp-muted, #767c78); }
 	</style>
 	<script>
 		// «Жаңадан қосу»: бір басса — кәдімгі сілтеме; 1,5 секунд басып тұрса — ашық кассалар тізімі ашылады

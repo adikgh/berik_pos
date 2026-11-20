@@ -28,21 +28,21 @@
 		html, body{ height: 100%; }
 		body{
 			min-height: 100%; display: flex; align-items: center; justify-content: center;
-			padding: 24px 16px; background: #f6f6f6; color: #222;
+			padding: 24px 16px; background: #f6f7f5; color: #1c1f1d;
 			font-family: 'Nunito', -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
 			-webkit-user-select: none; user-select: none;
 		}
-		.mb_c{ width: 100%; max-width: 420px; padding: 32px 24px 28px; background: #fff; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,.08); text-align: center; }
-		.mb_ic{ position: relative; width: 88px; height: 88px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; border-radius: 24px; background: #e7f6ef; color: #0EA768; font-size: 40px; }
+		.mb_c{ width: 100%; max-width: 420px; padding: 32px 24px 28px; background: #fff; border-radius: 20px; box-shadow: 0 8px 24px rgba(0,0,0,.06), 0 0 0 1px rgba(28,31,29,.06); text-align: center; }
+		.mb_ic{ position: relative; width: 88px; height: 88px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; border-radius: 24px; background: #e3f5ec; color: #0EA768; font-size: 40px; }
 		.mb_ic i + i{ position: absolute; right: -6px; bottom: -6px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #0EA768; color: #fff; font-size: 16px; border: 3px solid #fff; }
-		h1{ font-size: 22px; font-weight: 800; line-height: 1.25; }
-		p{ margin-top: 12px; font-size: 15px; line-height: 1.5; color: #555; }
-		.mb_ok{ margin-top: 20px; padding: 14px 16px; display: flex; gap: 12px; align-items: center; text-align: left; border-radius: 14px; background: #eef6fb; color: #1f75a8; font-size: 14px; font-weight: 700; line-height: 1.4; }
+		h1{ font-size: 22px; font-weight: 600; line-height: 1.25; }
+		p{ margin-top: 12px; font-size: 15px; line-height: 1.5; color: #545a56; }
+		.mb_ok{ margin-top: 20px; padding: 14px 16px; display: flex; gap: 12px; align-items: center; text-align: left; border-radius: 14px; background: #e3f5ec; color: #08794b; font-size: 14px; font-weight: 600; line-height: 1.4; }
 		.mb_ok i{ font-size: 22px; }
-		.mb_ru{ margin-top: 18px; padding-top: 16px; border-top: 1px dashed #e7e7e7; font-size: 13px; color: #8a8f98; }
-		.mb_back{ display: none; margin-top: 20px; height: 54px; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; background: #0EA768; color: #fff; font-size: 16px; font-weight: 800; text-decoration: none; }
+		.mb_ru{ margin-top: 18px; padding-top: 16px; border-top: 1px dashed #e6e8e4; font-size: 13px; color: #767c78; }
+		.mb_back{ display: none; margin-top: 20px; height: 54px; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; background: #0EA768; color: #fff; font-size: 16px; font-weight: 600; text-decoration: none; }
 		.mb_back_on{ display: flex; }
-		.mb_go{ margin-top: 20px; height: 54px; display: flex; align-items: center; justify-content: center; gap: 10px; border-radius: 12px; background: #0EA768; color: #fff; font-size: 16px; font-weight: 800; text-decoration: none; }
+		.mb_go{ margin-top: 20px; height: 54px; display: flex; align-items: center; justify-content: center; gap: 10px; border-radius: 12px; background: #0EA768; color: #fff; font-size: 16px; font-weight: 600; text-decoration: none; }
 		.mb_back{ background: #fff; color: #0EA768; border: 2px solid #0EA768; }
 	</style>
 </head>

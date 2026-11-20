@@ -1,5 +1,5 @@
 /* Кассадағы лоялдық блогы: кэшбэк және сыйлық */
-.lc_box{margin:12px 0 4px;padding:12px 14px;border:1px solid var(--gr2);border-radius:12px;display:flex;flex-direction:column;gap:10px}
+.lc_box{margin:12px 0 4px;padding:12px 16px;border:1px solid var(--gr2);border-radius:12px;display:flex;flex-direction:column;gap:10px}
 .lc_row{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14px}
 .lc_lbl{font-weight:600}
 .lc_lbl i{margin-right:4px;opacity:.7}
@@ -12,7 +12,7 @@
 .lc_lbl{display:flex;align-items:center;gap:8px}
 .lc_lbl i{margin:0;width:16px;text-align:center;color:#0EA768;opacity:1}
 .lc_box .form_im_slo{margin:0}
-.lc_box .lc_cb, .lc_box .lc_gift{display:inline-flex;align-items:center;gap:10px;height:48px;padding:0 18px;margin:0;border:1px solid var(--bp-line,#e3e7ec);background:var(--bp-card,#fff);border-radius:10px;font-size:15px;font-weight:700;color:var(--bp-text,#1d2433);cursor:pointer;user-select:none;transition:.2s}
+.lc_box .lc_cb, .lc_box .lc_gift{display:inline-flex;align-items:center;gap:10px;height:48px;padding:0 20px;margin:0;border:1px solid var(--bp-line,#e3e7ec);background:var(--bp-card,#fff);border-radius:10px;font-size:15px;font-weight: 600;color:var(--bp-text,#1c1f1d);cursor:pointer;user-select:none;transition:.2s}
 .lc_box .lc_cb:hover, .lc_box .lc_gift:hover{border-color:#0EA768}
 .lc_box .lc_cb .pay_ic, .lc_box .lc_gift .pay_ic{margin:0;font-size:17px;color:#0EA768}
 .lc_box .lc_gift .pay_ic{color:#e9a23b}
