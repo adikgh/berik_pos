@@ -205,8 +205,20 @@
       $log_before = order_row($id); // тарих үшін: өзгеріске дейінгі күйі
       if ($type == 'ubd' && in_array((int)@$log_before['order_status'], [4, 5, 6, 10])) { echo 'locked'; exit(); } // жабық тапсырыс өзгертілмейді
 
+      // Өзгерткенде предзаказ басқа жұмыс күніне ауысса (мыс. кеше жасалған тапсырыс бүгінге предзаказ болды),
+      // нөмірі сол күннің ретімен қайта беріледі. Әйтпесе кешегі нөмір (19) бүгінгі ретке кіріп, бүгін 20-дан басталып кетеді.
+      $renum = false;
+      $old_dt = $type == 'ubd' && $preorder ? (string)@mysqli_fetch_assoc(db::query("SELECT `ins_dt` FROM `retail_orders` WHERE `id` = '".(int)$id."'"))['ins_dt'] : '';
+      if ($old_dt) {
+         $bd_old = date('Y-m-d', strtotime($old_dt) - 6 * 3600);
+         $bd_new = date('Y-m-d', strtotime($ins_dt) - 6 * 3600);
+         $renum = ($bd_old != $bd_new);
+      }
+
       if ($type != 'ubd') {
          $upd = db::query("UPDATE `retail_orders` SET `number` = '$cashbox_number', `branch_id` = '$order_branch', `paid` = 1, `total` = '$total', `ins_dt` = '$ins_dt', `upd_dt` = '$datetime' WHERE `id`='$id'");
+      } elseif ($renum) {
+         $upd = db::query("UPDATE `retail_orders` SET `number` = '$cashbox_number', `paid` = 1, `total` = '$total', `ubd` = `ubd` + 1, `upd_dt` = '$datetime' WHERE `id`='$id'");
       } else {
          $upd = db::query("UPDATE `retail_orders` SET `paid` = 1, `total` = '$total', `ubd` = `ubd` + 1, `upd_dt` = '$datetime' WHERE `id`='$id'");
       }
