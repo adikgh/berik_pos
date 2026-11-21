@@ -32,8 +32,15 @@ $(document).ready(function() {
 	})
 
 	// cashbox_add
+	// Бір тағам үшін бір сұраныс: жауап келгенше сол карточка қайта басылмайды (интернет баяу болса екі-үш рет қосылып кетпесін).
+	// Басқа тағамды бірден басуға болады.
+	var add_busy = {}
 	$('html').on('click', '.cashbox_add', function () {
       btn = $(this)
+      var ak = String(btn.data('id'))
+      if (add_busy[ak]) return
+      add_busy[ak] = 1; btn.addClass('cb_busy')
+      var b = btn, free = function(){ delete add_busy[ak]; b.removeClass('cb_busy') }; setTimeout(free, 8000)
       $.ajax({
          url: "/cashbox/get.php?cashbox_add",
          type: "POST",
@@ -42,6 +49,7 @@ $(document).ready(function() {
             id: btn.data('id'),
             oid: btn.data('oid'),
          }),
+         complete: function(){ cart_after(free) },
          success: function(data){ 
             if (data == 'yes') cart_refresh();
             else if (data == 'stop') mess(w('Dish on stop', 'Бұл тағам стопта, сатылмайды'));
@@ -205,11 +213,11 @@ $(document).ready(function() {
 		var free = function(){ cart_lock = false; b.removeClass('cb_busy') }; setTimeout(free, 5000)
       $.ajax({
          url: "/cashbox/get.php?cashbox_remove",
-         error: free,
          type: "POST",
          dataType: "html",
          data: ({ id: btn.data('id'), }),
-         success: function(data){ free(); 
+         complete: function(){ cart_after(free) },
+         success: function(data){ 
             if (data == 'yes') cart_refresh();
             else console.log(data);
          },
@@ -219,12 +227,15 @@ $(document).ready(function() {
 
    // cashbox_remove
 	$('html').on('click', '.cashbox_plus', function () {
-		btn = $(this)
+		if (cart_lock) return // сұраныс біткенше қайта басылмайды (бұрын «+» құлыпсыз еді: баяу интернетте саны көбейіп кететін)
+		var b = $(this); btn = b; cart_lock = true; b.addClass('cb_busy')
+		var free = function(){ cart_lock = false; b.removeClass('cb_busy') }; setTimeout(free, 5000)
       $.ajax({
          url: "/cashbox/get.php?cashbox_plus",
          type: "POST",
          dataType: "html",
          data: ({ id: btn.data('id'), }),
+         complete: function(){ cart_after(free) },
          success: function(data){ 
             if (data == 'yes') cart_refresh();
             else console.log(data);
@@ -241,11 +252,11 @@ $(document).ready(function() {
 		var free = function(){ cart_lock = false; b.removeClass('cb_busy') }; setTimeout(free, 5000)
       $.ajax({
          url: "/cashbox/get.php?cashbox_minus",
-         error: free,
          type: "POST",
          dataType: "html",
          data: ({ id: btn.data('id'), }),
-         success: function(data){ free(); 
+         complete: function(){ cart_after(free) },
+         success: function(data){ 
             if (data == 'yes') cart_refresh();
             else console.log(data);
          },
@@ -1011,11 +1022,17 @@ $(document).ready(function() {
 
 
    // ---------- Себетті бетті жаңартпай фонда жаңарту ----------
-   var cart_busy = 0
+   // Әр жаңарту нөмірленеді: тек ЕҢ СОҢҒЫ сұраныстың жауабы қолданылады. Бұрын соңғы КЕЛГЕН жауап қолданылатын —
+   // баяу интернетте ескі жауап кейін келсе себетте ескі сан көрініп, кассир қайта басып саны көбейіп кететін.
+   var cart_busy = 0, cart_seq = 0, cart_wait = []
+   // Себет жаңарып болғанша +/−/қосу батырмаларын босатпаймыз: экрандағы сан әрқашан базадағымен бірдей болсын
+   function cart_after(fn) { if (cart_busy > 0) cart_wait.push(fn); else fn() }
+   function cart_done() { var w = cart_wait; cart_wait = []; $.each(w, function(i, f){ f() }) }
    function cart_refresh() {
       cart_busy++
-      $.ajax({ url: location.href, cache: false, dataType: 'html', success: function(html){
-         if (--cart_busy > 0) return // бірнеше рет тез басылса, тек соңғысын қолданамыз
+      var my = ++cart_seq
+      $.ajax({ url: location.href, cache: false, dataType: 'html', complete: function(){ if (--cart_busy <= 0) { cart_busy = 0; cart_done() } }, success: function(html){
+         if (my != cart_seq) return // кейін тағы сұраныс жіберілген — тек соңғысын қолданамыз
          var $h = $('<div>').append($.parseHTML(html))
          // Беттегі себет ауысып кетсе (бұл тапсырыс басқа жерде сақталды), батырмалардағы ескі id қалмасын — бетті толық жаңартамыз
          var nid = $h.find('.cashbox_pay2').first().attr('data-id'), cid = $('.cashbox_pay2').first().attr('data-id')

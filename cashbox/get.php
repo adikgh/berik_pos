@@ -46,9 +46,14 @@
       $pitem_d = product::product($pid);
       if ($pitem_d['price']) $price = $pitem_d['price']; else $price = 0;
 
-      $retailop = db::query("select * from retail_orders_products where order_id = '$oid' and product_id = '$pid'");
-      if (mysqli_num_rows($retailop)) $upd = db::query("UPDATE `retail_orders_products` SET quantity = quantity + 1 WHERE `order_id`='$oid' and product_id = '$pid'");
-      else $ins = db::query("INSERT INTO `retail_orders_products`(`order_id`, `product_id`, `quantity`, `price`) VALUES ('$oid', '$pid', 1, $price)");
+      // Бір тапсырысқа қатар келген сұраныстар кезекпен (екі сұраныс бір уақытта келсе, тағам екі жол болып қосылмасын)
+      $oid = (int)$oid; $pid = (int)$pid;
+      db::query("SELECT GET_LOCK('cart_$oid', 5)");
+      // Тағам себетте бар болса — тек СОЛ БІР жолдың саны +1 (бұрын бірдей тағамның барлық жолы бірден көбейетін)
+      $retailop = mysqli_fetch_assoc(db::query("select id from retail_orders_products where order_id = '$oid' and product_id = '$pid' order by id asc limit 1"));
+      if ($retailop) $upd = db::query("UPDATE `retail_orders_products` SET quantity = quantity + 1 WHERE `id` = '".(int)$retailop['id']."'");
+      else $ins = db::query("INSERT INTO `retail_orders_products`(`order_id`, `product_id`, `quantity`, `price`) VALUES ('$oid', '$pid', 1, ".(int)$price.")");
+      db::query("SELECT RELEASE_LOCK('cart_$oid')");
       if (@$upd || @$ins) echo 'yes';
       
       exit();
@@ -73,8 +78,8 @@
             $quantity = mysqli_fetch_array($quantity);
             $quantity_id = $quantity['id'];
 
-            $retailop = db::query("select * from retail_orders_products where order_id = '$oid' and product_id = '$product_id' and product_item_id = '$pitem_id'");
-            if (mysqli_num_rows($retailop))  $upd = db::query("UPDATE `retail_orders_products` SET quantity = quantity + 1 WHERE `order_id`='$oid' and `product_id`='$product_id' and product_item_id = '$pitem_id'");
+            $retailop = db::query("select id from retail_orders_products where order_id = '$oid' and product_id = '$product_id' and product_item_id = '$pitem_id' order by id asc limit 1");
+            if (mysqli_num_rows($retailop))  $upd = db::query("UPDATE `retail_orders_products` SET quantity = quantity + 1 WHERE `id` = '".(int)mysqli_fetch_assoc($retailop)['id']."'");
             else $ins = db::query("INSERT INTO `retail_orders_products`(`order_id`, `product_id`, `product_item_id`, `quantity`, `price`) VALUES ('$oid', '$product_id', '$pitem_id', 1, $price)");
             if ($upd || $ins) echo 'yes';
          } else echo 0;
