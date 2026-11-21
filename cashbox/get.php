@@ -2,6 +2,23 @@
    include_once "../orders/log.php";
    require_once "../config/loyalty.php";
    require_once "../config/stop_list.php";
+
+   // Себетке тағам қосу/өзгерту тек ашық себетке (төленбеген тапсырыс, paid = 0) жүреді.
+   // Төленген тапсырыс тек «Өзгерту» бетінде (?id=..&type=ubd, JS cb_edit=1 жібереді) және жабық болмаса өзгереді.
+   // Себеп (2026-11-21): сақтау жауабы кешіксе бет жаңармай қалып, батырмалардағы ескі oid арқылы
+   // тағамдар бұрынғы төленген тапсырысқа қосылып кеткен (чекте артық тағам), ескі себеттен өшіру — төленген тапсырыстан өшірген.
+   function cart_guard($oid) {
+      $oid = (int)$oid;
+      $o = $oid ? mysqli_fetch_assoc(db::query("select paid, order_status from retail_orders where id = '$oid' limit 1")) : null;
+      if (!$o) return 'none';
+      if (in_array((int)$o['order_status'], [4, 5, 6, 10])) return 'locked';
+      if ((int)$o['paid'] == 1 && (int)@$_POST['cb_edit'] != 1) return 'paid';
+      return '';
+   }
+   function cart_guard_row($row_id) {
+      $r = mysqli_fetch_assoc(db::query("select order_id from retail_orders_products where id = '".(int)$row_id."' limit 1"));
+      return $r ? cart_guard($r['order_id']) : 'none';
+   }
    
    
    // Касса қатарын жабу: тек өз, төленбеген және бос кассасы өшіріледі
@@ -23,6 +40,7 @@
 	if(isset($_GET['cashbox_add'])) {
       $pid = strip_tags($_POST['id']);
 		$oid = strip_tags($_POST['oid']);
+      if ($g = cart_guard($oid)) exit($g);
       if (stopl::is($company, (int)$pid)) exit('stop'); // стоп-листте
       $pitem_d = product::product($pid);
       if ($pitem_d['price']) $price = $pitem_d['price']; else $price = 0;
@@ -39,6 +57,7 @@
    if(isset($_GET['cashbox_search'])) {
 		$search = strip_tags($_POST['inp']);
 		$oid = strip_tags($_POST['oid']);
+      if ($g = cart_guard($oid)) exit($g);
 
       $pitem = db::query("select * from product_item where (barcode = '$search' and barcode is not null) or (article = '$search' and article is not null)");
       if (mysqli_num_rows($pitem)) {
@@ -66,6 +85,7 @@
    // cashbox_remove
 	if(isset($_GET['cashbox_remove'])) {
 		$id = strip_tags($_POST['id']);
+      if ($g = cart_guard_row($id)) exit($g);
       $del = db::query("DELETE FROM `retail_orders_products` where id = '$id'");
       if ($del) echo 'yes';
 
@@ -87,6 +107,7 @@
 	if(isset($_GET['cashbox_pr'])) {
 		$id = strip_tags($_POST['id']);
 		$pr = strip_tags($_POST['pr']);
+      if ($g = cart_guard_row($id)) exit($g);
       $upd = db::query("UPDATE `retail_orders_products` SET price = '$pr' WHERE `id`='$id'");
       if ($upd) echo 'yes'; else echo 'none';
 
@@ -97,6 +118,7 @@
 	if(isset($_GET['cashbox_qn'])) {
 		$id = strip_tags($_POST['id']);
 		$qn = max(1, (int)strip_tags($_POST['qn'])); // 0 не теріс сан болмайды
+      if ($g = cart_guard_row($id)) exit($g);
       $retailop_d = fun::retailop($id);
       $pitem_id = $retailop_d['product_id'];
       $pitem_d = product::product($pitem_id);
@@ -118,6 +140,7 @@
    // cashbox_plus
 	if(isset($_GET['cashbox_plus'])) {
 		$id = strip_tags($_POST['id']);
+      if ($g = cart_guard_row($id)) exit($g);
       $upd1 = db::query("UPDATE `retail_orders_products` SET `quantity` = `quantity` + 1 WHERE id = '$id';");
       if ($upd1) echo 'yes'; else echo 'none';
       exit();
@@ -126,6 +149,7 @@
    // cashbox_minus
 	if(isset($_GET['cashbox_minus'])) {
 		$id = strip_tags($_POST['id']);
+      if ($g = cart_guard_row($id)) exit($g);
       // 1-ден төмен түспейді (интернет баяу болып бірнеше рет басылса да)
       $upd1 = db::query("UPDATE `retail_orders_products` SET `quantity` = `quantity` - 1 WHERE id = '".(int)$id."' and `quantity` > 1;");
       if ($upd1) echo 'yes'; else echo 'none';
@@ -154,6 +178,8 @@
 		if (!preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/', $preorder)) $preorder = '';
 		if ($preorder && substr($preorder, 0, 10) > date('Y-m-d', strtotime('+7 day'))) $preorder = ''; // ең көбі 1 апта
 		$type = @strip_tags($_POST['type']);
+      // Бір себет екі рет сақталмайды (жауап кешігіп қайта басылса не ескі бетте қалса): нөмір қайта берілмейді, тарих екі рет жазылмайды
+      if ($type != 'ubd' && (int)@mysqli_fetch_assoc(db::query("select paid from retail_orders where id = '".(int)$id."' limit 1"))['paid'] == 1) exit('paid');
 		$order_type = @strip_tags($_POST['order_type']);
 		$order_branch = @strip_tags($_POST['order_branch']);
 		// Адрес тек курьер жеткізуге (1) керек: Собой, Кафе, Сервисте адрес жазылмайды
@@ -481,6 +507,7 @@
 		$price = strip_tags($_POST['price']);
       $oid = strip_tags($_POST['oid']);
 		$name = strip_tags($_POST['name']);
+      if ($g = cart_guard($oid)) exit($g);
 		$warehouses_id = 5;
 		
       $id = (mysqli_fetch_assoc(db::query("SELECT max(id) FROM `product`")))['max(id)'] + 1;

@@ -1,6 +1,22 @@
 // start jquery
 $(document).ready(function() {
 
+   // Себет қорғанысы (2026-11-21): «Өзгерту» бетінде (?id=) сервер төленген тапсырысты өзгертуге рұқсат етеді (cb_edit=1).
+   // Сервер «paid» не «locked» қайтарса — бұл бет ескі (тапсырыс сақталып қойған), бетті жаңартып, жаңа себетке өтеміз.
+   var cb_edit = /[?&]id=/.test(location.search) ? 1 : 0
+   $.ajaxPrefilter(function (o) {
+      if (cb_edit && o.url && o.url.indexOf('/cashbox/get.php') === 0) o.data = (o.data ? o.data + '&' : '') + 'cb_edit=1'
+   })
+   var cb_stale = false
+   $(document).ajaxSuccess(function (e, xhr, o, data) {
+      if (cb_stale || !o.url || o.url.indexOf('/cashbox/get.php') !== 0) return
+      if (data === 'paid' || data === 'locked') {
+         cb_stale = true
+         mess(data === 'paid' ? w('Order already saved', 'Бұл тапсырыс сақталып қойған, бет жаңартылады') : w('Closed order cannot be edited', 'Жабық тапсырысты өзгертуге болмайды'))
+         setTimeout(function () { if (cb_edit) location.href = '/orders/'; else location.reload() }, 1200)
+      }
+   })
+
 
    // 
    var cash_bl1_lq = new Swiper(".cash_bl1_lq", {
@@ -781,7 +797,9 @@ $(document).ready(function() {
                console.log(data);
             },
             beforeSend: function(){ },
-            error: function(data){ }
+            // Жауап келмесе (интернет баяу): сервер сақтап үлгеруі мүмкін, сондықтан ескі бетте қалмаймыз —
+            // жаңартқанда сақталса жаңа себет, сақталмаса сол себет өз тағамдарымен ашылады
+            error: function(data){ mess(w('Connection lost, reloading', 'Байланыс үзілді, бет жаңартылады')); setTimeout(function(){ if (btn.attr('data-type') == 'ubd') location.href = '/orders/'; else location.reload() }, 1500) }
          })
          clc++;
       } else mess(w('Please wait', 'Күтіңіз, тапсырма орындалуда'))
@@ -999,6 +1017,9 @@ $(document).ready(function() {
       $.ajax({ url: location.href, cache: false, dataType: 'html', success: function(html){
          if (--cart_busy > 0) return // бірнеше рет тез басылса, тек соңғысын қолданамыз
          var $h = $('<div>').append($.parseHTML(html))
+         // Беттегі себет ауысып кетсе (бұл тапсырыс басқа жерде сақталды), батырмалардағы ескі id қалмасын — бетті толық жаңартамыз
+         var nid = $h.find('.cashbox_pay2').first().attr('data-id'), cid = $('.cashbox_pay2').first().attr('data-id')
+         if (nid && cid && nid != cid) { location.reload(); return }
          var sc = $('.cash_bl1_rc').scrollTop()
          $('.cash_bl1').html($h.find('.cash_bl1').html())
          $('.cash_bl1_rc').scrollTop(sc)
