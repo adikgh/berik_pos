@@ -1,20 +1,8 @@
 <? include "config/core.php";
 
-	// sign in code
-	if(isset($_GET['code'])) {
-		$code = strip_tags($_POST['code']);
-		$user_mn = db::query("SELECT * FROM user_management WHERE code = '$code'");
-		if (mysqli_num_rows($user_mn)) {
-			$user_mnd = mysqli_fetch_assoc($user_mn);
-			$id = $user_mnd['user_id'];
-			$user = db::query("SELECT * FROM user WHERE id = '$id'");
-			$user_d = mysqli_fetch_assoc($user);
-			$_SESSION['uph'] = $user_d['phone'];
-			$_SESSION['ups'] = $user_d['password'];
-			echo 'yes';
-		} else echo 'none';
-		exit();
-	}
+	// sign in code: 2026-11-21 жабылды. Ешбір бет шақырмайды (кіру ?sign арқылы), логинсіз ашылатын,
+	// code SQL-ге экрандалмай кіретін (SQL injection), сәтті болса сессияға телефон мен пароль хэші жазылатын.
+	if(isset($_GET['code'])) { echo 'none'; exit(); }
 
 
 	// sign in phone
