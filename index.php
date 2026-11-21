@@ -4,6 +4,23 @@
    if ($user_id) header('location: /cashbox');
 
 
+   // ?code=n990 — компания id емес, company.code арқылы кіру (базада #n990), админдегі ?company= сияқты.
+   // Табылса id сессия/cookie-ге жазылады да, сілтеме тазаланады. Ескі ?c=9 әзірге жұмыс істей береді.
+   if (isset($_GET['code'])) {
+      $gc = '#'.preg_replace('/[^a-z0-9]/', '', strtolower((string)$_GET['code']));
+      $cid = 0;
+      if ($gc !== '#') {
+         $gcs = mysqli_real_escape_string(db::$connect, $gc);
+         $cid = (int)@mysqli_fetch_row(db::query("select id from company where lower(code) = '$gcs' limit 1"))[0];
+      }
+      if ($cid) {
+         $_SESSION['c'] = $cid;
+         setcookie('c', (string)$cid, time() + 3600*24*30*6, '/');
+         header('location: /');
+         exit;
+      }
+   }
+
    $staff = [];
    if (@$_GET['c'] || @$_COOKIE['c'] || @$_SESSION['c']) {
       if (@$_GET['c']) {
@@ -11,8 +28,7 @@
          $_SESSION['c'] = $comp;
          setcookie('c', $comp, time() + 3600*24*30*6, '/');
       } else {
-         $comp = @$_SESSION['c'];
-         $comp = @$_COOKIE['c'];
+         $comp = @$_SESSION['c'] ?: @$_COOKIE['c'];
       }
       $comp = (int)$comp;
 
