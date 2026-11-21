@@ -1,5 +1,9 @@
 <? include "../config/core.php";
-   
+   if (!$user_id) { echo 'none'; exit(); } // тек кірген қызметкер
+   // Ескі әрекеттер (2026-11-21 өшірілді): ешбір бет шақырмайды, тексерісі жоқ — логинсіз тапсырыс өшіру/статус өзгерту мүмкін еді.
+   // Тапсырыстарды өзгерту orders/get.php арқылы (статус ережелерімен) жүреді.
+   foreach (['return_sn', 'delete', 'change_status', 'change_type', 'cashbox_pay'] as $k) if (isset($_GET[$k])) { echo 'none'; exit(); }
+
    // returns
 	if(isset($_GET['return_sn'])) {
 		$id = strip_tags($_POST['id']);

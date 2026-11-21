@@ -1,4 +1,5 @@
 <? include "../config/core.php";
+   if (!$user_id) { echo 'none'; exit(); } // тек кірген қызметкер (бұрын логинсіз тапсырыс өшіруге/өзгертуге болатын)
    require_once "../config/loyalty.php";
    if ($user_id) loyalty::sync($company); // кэшбэк: аяқталған/отказ тапсырыстарды реттеу (15 секундта бір рет)
    
@@ -26,6 +27,9 @@
 
    // returns
 	if(isset($_GET['return_sn'])) {
+      // 2026-11-21 өшірілді: батырмасы ешбір бетте жоқ, retail_orders.returned бағаны базада жоқ —
+      // әр шақыру қайтару жазып, қалдықты көбейтетін (қайта басса — тағы), тапсырыс белгіленбейтін
+      echo 'none'; exit();
 		$id = strip_tags($_POST['id']);
       $order_d = fun::retailo($id);
       $total = $order_d['total'];
@@ -72,8 +76,9 @@
    // 
 	if(isset($_GET['delete'])) {
       $id = strip_tags($_POST['id']);
-      $del = db::query("DELETE FROM `retail_orders` where id = '$id'");
-      if ($del) echo 'yes';
+      // Тек өз компаниясының төленбеген тапсырысы (төленген тапсырыс есептен жоғалмасын)
+      $del = db::query("DELETE FROM `retail_orders` where id = '".(int)$id."' and company_id = '".(int)$company."' and paid = 0");
+      echo ($del && mysqli_affected_rows(db::$connect) > 0) ? 'yes' : 'none';
 
       exit();
 	}

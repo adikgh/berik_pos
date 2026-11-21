@@ -1,4 +1,5 @@
 <? include "../config/core.php";
+   if (!$user_id) { echo 'none'; exit(); } // тек кірген қызметкер
    include_once "../orders/log.php";
    require_once "../config/loyalty.php";
    require_once "../config/stop_list.php";
@@ -9,8 +10,8 @@
    // тағамдар бұрынғы төленген тапсырысқа қосылып кеткен (чекте артық тағам), ескі себеттен өшіру — төленген тапсырыстан өшірген.
    function cart_guard($oid) {
       $oid = (int)$oid;
-      $o = $oid ? mysqli_fetch_assoc(db::query("select paid, order_status from retail_orders where id = '$oid' limit 1")) : null;
-      if (!$o) return 'none';
+      $o = $oid ? mysqli_fetch_assoc(db::query("select paid, order_status, company_id from retail_orders where id = '$oid' limit 1")) : null;
+      if (!$o || (int)$o['company_id'] != (int)$GLOBALS['company']) return 'none'; // басқа компанияның тапсырысы өзгертілмейді
       if (in_array((int)$o['order_status'], [4, 5, 6, 10])) return 'locked';
       if ((int)$o['paid'] == 1 && (int)@$_POST['cb_edit'] != 1) return 'paid';
       return '';
@@ -242,7 +243,9 @@
       }
 
       if ($type != 'ubd') {
-         $upd = db::query("UPDATE `retail_orders` SET `number` = '$cashbox_number', `branch_id` = '$order_branch', `paid` = 1, `total` = '$total', `ins_dt` = '$ins_dt', `upd_dt` = '$datetime' WHERE `id`='$id'");
+         $upd = db::query("UPDATE `retail_orders` SET `number` = '$cashbox_number', `branch_id` = '$order_branch', `paid` = 1, `total` = '$total', `ins_dt` = '$ins_dt', `upd_dt` = '$datetime' WHERE `id`='$id' and `paid` = 0");
+         // Екі сұраныс қатар келсе (екі рет басу): тек біреуі өтеді, екіншісі нөмір, тарих, чат хабарын қайталамайды
+         if (!$upd || mysqli_affected_rows(db::$connect) < 1) exit('paid');
       } elseif ($renum) {
          $upd = db::query("UPDATE `retail_orders` SET `number` = '$cashbox_number', `paid` = 1, `total` = '$total', `ubd` = `ubd` + 1, `upd_dt` = '$datetime' WHERE `id`='$id'");
       } else {
