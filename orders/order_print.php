@@ -1,5 +1,6 @@
 <? include "../config/core.php";
 
+    // Басу саны: бірінші (негізгі) чекте белгі жоқ, қайта басқанда «РАСПЕЧАТАНО · 2», 3, 4...
     $print = 0;
 
     if (@$_GET['orderID']) {
@@ -9,7 +10,7 @@
         if (mysqli_num_rows($cashbox)) {
             $cashbox_d = mysqli_fetch_assoc($cashbox);
             $upd = db::query("UPDATE `retail_orders` SET `print` = `print` + 1 WHERE `id`='$orderID'");
-            if  ($cashbox_d['print'] > 0) $print = 1;
+            $print = (int)$cashbox_d['print'] + 1; // осы басудың реті (1 = негізгі чек)
 
             $branch_d = fun::branch($cashbox_d['branch_id']);
 
@@ -75,9 +76,9 @@
             <div class="pred_order">
                 <div>ИЗМЕНЕНО-РАСП.</div>
             </div>
-        <? elseif ($print == 1): ?>
+        <? elseif ($print > 1): ?>
             <div class="pred_order">
-                <div>РАСПЕЧАТАНО</div>
+                <div>РАСПЕЧАТАНО · <?=$print?></div>
             </div>
         <? endif ?>
     </div>
