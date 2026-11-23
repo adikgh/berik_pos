@@ -75,5 +75,5 @@
    $cab_url = preg_match('~gprog\.kz$~i', (string)@$_SERVER['HTTP_HOST']) ? 'https://myb.gprog.kz' : 'http://my.berik.c';
 
    // token telegram
-   $token = "1581082911:AAEKW20w_-5V0Wx9tzhyThV2pjCgZtCjyc8";
+   $token = ''; // Telegram бот токені базада (sys_setting.tg_token, dev ▸ Telegram бот): core.php-да толтырылады
 
