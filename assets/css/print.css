@@ -195,3 +195,10 @@ body.b58{ width: 50mm; padding: 2px; font-size: 12px; }
 .p58.ts_l .branch_name { font-size: 28px; }
 .p58 .rc_htxt { font-size: 11px; }
 .p58 .rc_foot { font-size: 12px; margin-top: 12px; }
+
+
+/* Кухня чегі (order_print.php, .kc): бағасыз, ірі, бөлек параққа */
+.kc_brk { page-break-before: always; break-before: page; }
+.kc .tr td { padding: 5px 0; border-bottom: 1px dashed #000; }
+.kc .san { font-size: 1.4em; }
+.kc .kc_note { font-weight: 700; border: 2px solid #000; padding: 4px 6px; }
