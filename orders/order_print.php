@@ -1,7 +1,9 @@
 <? include "../config/core.php";
 
     // Басу саны: бірінші (негізгі) чекте белгі жоқ, қайта басқанда «РАСПЕЧАТАНО · 2», 3, 4...
+    // Клиент чегі retail_orders.print, кухня чегі retail_orders.print_kc бойынша бөлек саналады
     $print = 0;
+    $kind = @$_GET['kind'] == 'kitchen' ? 'kitchen' : 'client'; // ?kind=client | kitchen
 
     if (@$_GET['orderID']) {
         $orderID = $_GET['orderID'];
@@ -9,8 +11,16 @@
         $cashbox = db::query("select * from retail_orders where id = '$orderID'");
         if (mysqli_num_rows($cashbox)) {
             $cashbox_d = mysqli_fetch_assoc($cashbox);
-            $upd = db::query("UPDATE `retail_orders` SET `print` = `print` + 1 WHERE `id`='$orderID'");
-            $print = (int)$cashbox_d['print'] + 1; // осы басудың реті (1 = негізгі чек)
+            if ($kind == 'kitchen') {
+                // print_kc бағаны жоқ болса (SQL әлі іске қосылмаған) — кухня чегі белгісіз шығады
+                if (array_key_exists('print_kc', $cashbox_d)) {
+                    $upd = db::query("UPDATE `retail_orders` SET `print_kc` = `print_kc` + 1 WHERE `id`='".(int)$cashbox_d['id']."'");
+                    $print = (int)$cashbox_d['print_kc'] + 1;
+                } else $print = 1;
+            } else {
+                $upd = db::query("UPDATE `retail_orders` SET `print` = `print` + 1 WHERE `id`='$orderID'");
+                $print = (int)$cashbox_d['print'] + 1; // осы басудың реті (1 = негізгі чек)
+            }
 
             $branch_d = fun::branch($cashbox_d['branch_id']);
 
@@ -49,9 +59,6 @@
     if ($pw != 58) $pw = 80;
 
     $number = 1;
-
-    // Қай чек: client (клиентке), kitchen (кухняға), both. ?kind= болмаса баптаудан: кухня чегі қосулы болса екеуі
-    $kind = in_array(@$_GET['kind'], ['client', 'kitchen', 'both']) ? $_GET['kind'] : ($on('kitchen') ? 'both' : 'client');
 
     // Тағамдар (екі чекке ортақ)
     $items = [];
@@ -223,8 +230,8 @@
 </div>
 <? endif ?>
 
-<? if ($kind != 'client' && @$cashbox_d): // ===== Кухня чегі: бағасыз, клиентсіз, ірі ===== ?>
-<div class="app kc p<?=$pw?> fs_<?=$rc['k_font']?><?=($kind == 'both' ? ' kc_brk' : '')?>">
+<? if ($kind == 'kitchen' && @$cashbox_d): // ===== Кухня чегі: бағасыз, клиентсіз, ірі ===== ?>
+<div class="app kc p<?=$pw?> fs_<?=$rc['k_font']?>">
     <div class="head">
         <div class="branch_name"><?=htmlspecialchars(trim((string)$rc['k_title']) !== '' ? $rc['k_title'] : 'КУХНЯ')?></div>
         <? if ($cashbox_d['preorder_dt']): ?>

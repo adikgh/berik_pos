@@ -72,6 +72,8 @@
 	if ($lc_on) { $css[] = 'loyalty'; $js[] = 'loyalty'; }
 	// Акциялар: админ жасаған % жеңілдік (бүгін белсенділері). Өзгертуде бұрынғы акция өшірілсе де тізімде қалады.
 	require_once "../config/promo.php";
+	require_once "../config/receipt.php";
+	$rc_kinds = implode(',', receipt::kinds($company)); // «...чек шығару»: қосулы чек түрлері (админ ▸ Чек)
 	$pr_list = promo::active($company);
 	$pr_cur = promo::on() ? (int)@$cashbox_d['promo_id'] : 0;
 	if ($pr_cur && !in_array($pr_cur, array_map('intval', array_column($pr_list, 'id')))) $pr_list[] = ['id' => $pr_cur, 'name' => $cashbox_d['promo_name'], 'percent' => $cashbox_d['promo_percent']];
@@ -607,10 +609,10 @@
 						<? if (@$_GET['id']): ?>
 							<div class="btn btn_cl cashbox_pay2" data-id="<?=$cashbox_id?>" data-type="ubd"><i class="far fa-check"></i><span><?=t::w('Edit', 'Өзгерту')?></span></div>
 							<? if ($cmp['print'] == 1): ?>
-								<div class="btn cashbox_pay2" data-id="<?=$cashbox_id?>" data-type="ubd" data-print="1"><i class="far fa-check-double"></i><span><?=t::w('Sell and print', 'Сату және чек шығару')?></span></div>
+								<div class="btn cashbox_pay2" data-id="<?=$cashbox_id?>" data-type="ubd" data-print="1" data-kinds="<?=$rc_kinds?>"><i class="far fa-check-double"></i><span><?=t::w('Sell and print', 'Сату және чек шығару')?></span></div>
 							<? endif ?>
 						<? else: ?>
-							<div class="btn cashbox_pay2" data-id="<?=$cashbox_id?>" data-type="check" data-print="<?=$cmp['print']?>"><i class="far fa-check-double"></i><span><?=t::w('Save and print', 'Сақтау және чек шығару')?></span></div>
+							<div class="btn cashbox_pay2" data-id="<?=$cashbox_id?>" data-type="check" data-print="<?=$cmp['print']?>" data-kinds="<?=$rc_kinds?>"><i class="far fa-check-double"></i><span><?=t::w('Save and print', 'Сақтау және чек шығару')?></span></div>
 						<? endif ?>
 					</div>
 					</div>

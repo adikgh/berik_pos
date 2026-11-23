@@ -227,7 +227,9 @@
 									<div class="uc_uil2_raz or_btns">
 										<div class="uc_uil2_mib">
 											<? if (in_array((int)$buy_d['order_status'], [4, 5, 6, 10])): // Аяқталды / Отказ: өзгертуге болмайды ?><span class="btn btn_cl on_ubd btn_lock" title="<?=t::w('Closed order', 'Жабық тапсырыс')?>"><?=t::w('Edit', 'Өзгерту')?></span><? else: ?><a class="btn btn_cl on_ubd" data-id="<?=$buy_d['id']?>" href="/cashbox/?id=<?=$buy_d['id']?>&type=ubd"><?=t::w('Edit', 'Өзгерту')?></a><? endif ?>
-											<div class="btn  on_print" data-id="<?=$buy_d['id']?>"><?=t::w('Print', 'Печать')?></div>
+											<? require_once __DIR__.'/../config/receipt.php'; $rc_kinds = receipt::kinds($company); // админ ▸ Чек: қосулы чек түрлері ?>
+											<? if (in_array('client', $rc_kinds)): ?><div class="btn  on_print" data-id="<?=$buy_d['id']?>" data-kind="client"><?=(count($rc_kinds) > 1 ? t::w('Client', 'Клиентке') : t::w('Print', 'Печать'))?></div><? endif ?>
+											<? if (in_array('kitchen', $rc_kinds)): ?><div class="btn  on_print" data-id="<?=$buy_d['id']?>" data-kind="kitchen"><?=t::w('Kitchen', 'Кухняға')?></div><? endif ?>
 										</div>
 									</div>
 								</div>
