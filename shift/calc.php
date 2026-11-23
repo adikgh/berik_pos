@@ -57,3 +57,22 @@
 		$res['cnt'] = $res['pre_cnt'] + $res['cafe_cnt'];
 		return $res;
 	}
+
+	// Смена есебінің Telegram мәтіні (config/tg_report.php: tgr_head, tgr_money, tgr_h)
+	function shift_tg_text($s, $company, $branch, $number, $cashier, $start, $end, $comment = '') {
+		$t = tgr_head('🧾', 'Смена жабылды №' . (int)$number, $company, $branch, $end);
+		$t .= "<b>Кассир:</b> " . tgr_h($cashier) . "\n";
+		$t .= "<b>Ашылды:</b> " . date('d.m H:i', strtotime($start)) . " · <b>Жабылды:</b> " . date('d.m H:i', strtotime($end)) . "\n\n";
+		$t .= "<b>Тапсырыс:</b> " . (int)$s['cnt'] . ((int)$s['pre_cnt'] || (int)$s['cafe_cnt'] ? " (предоплата " . (int)$s['pre_cnt'] . ", кафе " . (int)$s['cafe_cnt'] . ")" : '') . "\n";
+		foreach (['cash' => 'Қолма-қол', 'qr' => 'Kaspi QR', 'transfer' => 'Аударым', 'red' => 'RED'] as $k => $nm)
+			if ((int)$s[$k]) $t .= "  • $nm: " . tgr_money($s[$k]) . "\n";
+		$t .= "<b>Барлығы (кассирде):</b> " . tgr_money($s['my']) . "\n";
+		if ((int)$s['srv_cnt']) {
+			$t .= "\n<b>Сервис:</b> " . (int)$s['srv_cnt'] . ' · ' . tgr_money($s['srv_sum']) . "\n";
+			foreach ($s['srv'] as $nm => $v) $t .= '  • ' . tgr_h($nm) . ': ' . (int)$v['cnt'] . ' · ' . tgr_money($v['sum']) . "\n";
+		}
+		if ((int)$s['off']) $t .= "<b>Отказ:</b> " . (int)$s['off'] . "\n";
+		$comment = trim(strip_tags((string)$comment));
+		if ($comment !== '') $t .= "\n<b>Түсініктеме:</b> " . tgr_h(mb_substr($comment, 0, 300)) . "\n";
+		return $t;
+	}

@@ -21,5 +21,13 @@
 			db::query("UPDATE `retail_shifts` SET `pay_service` = '".(int)$s['srv_sum']."' WHERE `id` = '$sid'");
 		}
 		echo $ins ? 'yes' : 'none';
+
+		// Telegram: смена есебі есеп тобына. Жауап алдымен кетеді, Telegram кідіртпейді.
+		if ($ins) {
+			if (session_status() == PHP_SESSION_ACTIVE) session_write_close();
+			if (function_exists('fastcgi_finish_request')) fastcgi_finish_request();
+			include_once "../config/tg_report.php";
+			tg_report_send($company, shift_tg_text($s, $company, $branch, $number, $user['name'] ?? '', $start, $end, @$_POST['comment']));
+		}
 		exit();
 	}
