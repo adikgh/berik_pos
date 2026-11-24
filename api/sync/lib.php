@@ -9,7 +9,7 @@
 	header('Content-Type: application/json; charset=utf-8');
 	header('Cache-Control: no-store');
 
-	const SYNC_API_VER = 1;
+	const SYNC_API_VER = 2; // 2: state.php (соңғы заказдар мен сменалар), клиенттер тартылмайды
 
 	function out($data, $code = 200) {
 		http_response_code($code);
