@@ -471,7 +471,7 @@
 					<div class="form_im form_imss tf_red">
 						<!-- <div class="form_span">Тип оплаты:</div> -->
 						<div class="form_im_slo " data-type-name="RED" data-nall="">
-							<div class="form_im_slo_i form_im_slo_red btype_red " data-type="<?=$red_pct?>"><i class="far fa-percent pay_ic"></i>RED <?=$red_pct?>%</div>
+							<div class="form_im_slo_i form_im_slo_red btype_red " data-type="<?=$red_pct?>" data-init="<?=(!empty($cashbox_d['paid']) && ((int)@$cashbox_d['pay_red'] > 0 || (in_array((int)@$cashbox_d['order_type'], [1, 2]) && (string)@$cashbox_d['prepay_method'] == 'red' && (int)@$cashbox_d['pay_prepay'] > 0)) ? 1 : 0)?>"><i class="far fa-percent pay_ic"></i>RED <?=$red_pct?>%</div>
 						</div>
 					</div>
 					<? endif ?>

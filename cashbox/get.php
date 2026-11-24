@@ -203,6 +203,12 @@
 		$red = (int)@$_POST['red'];
 		$prepay_method = @trim($_POST['prepay_method']);
 		if (!in_array($prepay_method, ['transfer', 'qr', 'cash', 'red', 'mix'], true)) $prepay_method = '';
+		// RED предоплата (Жеткізу / Өзімен) тек толық сомаға: клиент тағам + жеткізу + RED % бәрін Kaspi RED арқылы төлейді.
+		// Қалғаны «курьерге нал» болып қалмайды (#87: 550 тг налға кеткен) — бәрі pay_qr-ға, предоплата = жалпы сома.
+		if ($prepay_method == 'red' && $prepay > 0 && in_array((int)$order_type, [1, 2])) {
+			$qr = (int)$total - (int)$transfer; $cash = 0; $prepay = (int)$total;
+			if ($payment_method !== '' && $payment_method !== 'unpaid') $payment_method = $transfer > 0 ? 'mixed' : 'qr';
+		}
 		// $ynd = @strip_tags($_POST['ynd']);
 
 		$phone = @strip_tags($_POST['phone']);

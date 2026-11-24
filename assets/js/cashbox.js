@@ -684,6 +684,7 @@ $(document).ready(function() {
 
 
    $('.form_im_slo_red').click(function(){
+      var r_old = Number($('.cashbox_pay_btotol_c').attr('data-val')) || 0 // RED басылғанға дейінгі жалпы сома
 		// $('.form_im_slo_red').removeClass('form_im_slo_act')
       // $('.form_im_slo').attr('data-type-name', $(this).attr('data-type'))
 		// $(this).addClass('form_im_slo_act')
@@ -709,7 +710,25 @@ $(document).ready(function() {
       }
 
 		$(this).toggleClass('form_im_slo_act')
+      // Жеткізу / Өзімен: RED предоплата тек толық сомаға — предоплата RED пайызымен бірге жаңарады,
+      // әйтпесе үстеме (10%) «курьерге қолма-қол» болып қалып қояды. Толық предоплата RED алынғанда да жалпы сомаға түседі.
+      var rt = Number($('.sel_type').attr('data-val')) || 1
+      if (rt == 1 || rt == 2) {
+         var r_new = Number($('.cashbox_pay_btotol_c').attr('data-val')) || 0, r_pre = Number($('.btype_qr').attr('data-val')) || 0
+         if (r_pre > 0 && ($('.sel_qrm').attr('data-val') == 'red' || r_pre == r_old)) {
+            $('.btype_qr').val(r_new).attr('data-val', r_new)
+            $('.sel_qr .form_im_slo_i').removeClass('form_im_slo_act'); $('.sel_qr_full').addClass('form_im_slo_act'); $('.qr_inp').addClass('dsp_n')
+            $('.btype_cash').html('0 тг').attr('data-val', 0)
+         } else $('.btype_cash').html((r_new - r_pre) + ' тг').attr('data-val', r_new - r_pre)
+      }
 	})
+   // «Өзгерту»: тапсырыс RED-пен сақталған болса (pay_red > 0), RED батырмасы қосулы ашылады — әйтпесе сақтағанда RED үстемесі өшіп кетеді
+   setTimeout(function(){
+      var rb = $('.form_im_slo_red')
+      if (rb.attr('data-init') != '1' || rb.hasClass('form_im_slo_act')) return
+      try { if (localStorage.getItem(draft_key)) return } catch (e) {} // жоба (draft) бар — оны draft_restore қалпына келтіреді
+      rb.click()
+   }, 30)
    // Кафе: RED таңдалса, басқа төлем түрлері өшеді (RED ақшасы Kaspi арқылы — qr болып жазылады)
    $('.form_im_slo_red').click(function(){
       if ($('.sel_type').attr('data-val') != 4) return
