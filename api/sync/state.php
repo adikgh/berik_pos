@@ -3,6 +3,8 @@
 	// Программа интернет бар кезде минут сайын шақырады: интернет үзілсе, касса жергілікті режимде
 	// ашық заказдар мен сменадан жалғастырады (QR/сайт заказдары, курьер статустары да келеді).
 	// Клиенттердің деректері жіберілмейді (user 2026-11-24).
+	// 2026-11-24: бұрынғы заказдар да (бүкіл тарих) бөліп-бөліп жіберіледі: касса before_id береді, 300-300 ескіге қарай
+	// («интернет бар кезде заказдардың бәрі көрінсін» — user).
 	require __DIR__.'/lib.php';
 
 	$dev = device();
@@ -24,22 +26,40 @@
 		AND (ins_dt >= '$from' OR (ins_dt >= '$old' AND (order_status IS NULL OR order_status NOT IN ($closed))))";
 	give_uuid('retail_orders', $w);
 
-	$orders = [];
-	foreach (rows("SELECT * FROM retail_orders WHERE $w ORDER BY id") as $o) {
-		$oid = (int)$o['id'];
-		$prod = rows("SELECT * FROM retail_orders_products WHERE order_id = '$oid' ORDER BY id");
-		foreach ($prod as &$p) unset($p['id'], $p['order_id']); unset($p);
-		$log = [];
-		if (table_exists('retail_orders_log')) {
-			give_uuid('retail_orders_log', "order_id = '$oid'");
-			foreach (rows("SELECT * FROM retail_orders_log WHERE order_id = '$oid' ORDER BY id") as $l) {
-				$l['uuid'] = $l['offline_uuid']; unset($l['id'], $l['order_id'], $l['offline_uuid']); $log[] = $l;
+	function order_items($sql) {
+		$orders = [];
+		foreach (rows($sql) as $o) {
+			$oid = (int)$o['id'];
+			$prod = rows("SELECT * FROM retail_orders_products WHERE order_id = '$oid' ORDER BY id");
+			foreach ($prod as &$p) unset($p['id'], $p['order_id']); unset($p);
+			$log = [];
+			if (table_exists('retail_orders_log')) {
+				give_uuid('retail_orders_log', "order_id = '$oid'");
+				foreach (rows("SELECT * FROM retail_orders_log WHERE order_id = '$oid' ORDER BY id") as $l) {
+					$l['uuid'] = $l['offline_uuid']; unset($l['id'], $l['order_id'], $l['offline_uuid']); $log[] = $l;
+				}
 			}
+			$u = $o['offline_uuid'];
+			unset($o['offline_uuid'], $o['device_id']);
+			$o['server_id'] = $oid; unset($o['id']);
+			$orders[] = ['uuid' => $u, 'order' => $o, 'products' => $prod, 'log' => $log];
 		}
-		$u = $o['offline_uuid'];
-		unset($o['offline_uuid'], $o['device_id']);
-		$o['server_id'] = $oid; unset($o['id']);
-		$orders[] = ['uuid' => $u, 'order' => $o, 'products' => $prod, 'log' => $log];
+		return $orders;
+	}
+	$orders = order_items("SELECT * FROM retail_orders WHERE $w ORDER BY id");
+
+	// Тарих: before_id-ден ескі заказдар (жоғарыдағы терезеге кірмегендері), 300-ден
+	$history = []; $hist_next = 0;
+	if (isset($b['before_id'])) {
+		$before = (int)$b['before_id'];
+		$hw = "company_id = '$company' AND branch_id = '$branch' AND paid = 1 AND NOT ($w)".($before > 0 ? " AND id < '$before'" : '');
+		$ids = [];
+		foreach (rows("SELECT id FROM retail_orders WHERE $hw ORDER BY id DESC LIMIT 300") as $r) $ids[] = (int)$r['id'];
+		if ($ids) {
+			give_uuid('retail_orders', "id IN (".implode(',', $ids).")");
+			$history = order_items("SELECT * FROM retail_orders WHERE id IN (".implode(',', $ids).") ORDER BY id DESC");
+			$hist_next = count($ids) == 300 ? min($ids) : 0;
+		}
 	}
 
 	// Сменалар: соңғы 10 жабылған (смена есебі «соңғы жабылған сменадан бері» есептеледі)
@@ -59,5 +79,6 @@
 
 	// Өзгеріс болмаса, деректі қайта жібермейміз
 	$hash = md5(json_encode([$orders, $shifts]));
-	if (@$b['hash'] === $hash) out(['ok' => true, 'same' => true, 'hash' => $hash]);
-	out(['ok' => true, 'hash' => $hash, 'time' => date('Y-m-d H:i:s'), 'from' => $from, 'orders' => $orders, 'shifts' => $shifts]);
+	$hist = isset($b['before_id']) ? ['history' => $history, 'hist_next' => $hist_next] : [];
+	if (@$b['hash'] === $hash) out(['ok' => true, 'same' => true, 'hash' => $hash] + $hist);
+	out(['ok' => true, 'hash' => $hash, 'time' => date('Y-m-d H:i:s'), 'from' => $from, 'orders' => $orders, 'shifts' => $shifts] + $hist);
