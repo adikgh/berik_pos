@@ -421,19 +421,12 @@
 
          // Тауарлар тізімі
          $items = ''; $items_sum = 0;
-         $has_comp = mysqli_num_rows(db::query("SHOW COLUMNS FROM `product_item` LIKE 'comp_id'")) > 0;
          $op = db::query("select * from retail_orders_products where order_id = '$id' order by ins_dt asc");
          while ($op_d = mysqli_fetch_assoc($op)) {
             $pr_d = product::product($op_d['product_id']);
             $line_sum = (int)$op_d['price'] * (int)$op_d['quantity'];
             $items_sum += $line_sum;
             $items .= "• ".$tg($pr_d['name_kz'] ?: $pr_d['name_ru']).": ".(int)$op_d['quantity']." × ".$tg_sum($op_d['price'])." = ".$tg_sum($line_sum)."\n";
-            // Сеттің құрамы (product_item: comp_id × quantity)
-            $pi = $has_comp ? db::query("select * from product_item where product_id = '".(int)$op_d['product_id']."' and comp_id is not null") : false;
-            while ($pi && $pi_d = mysqli_fetch_assoc($pi)) {
-               $comp_d = product::product($pi_d['comp_id']);
-               if ($comp_d) $items .= "      ◦ ".$tg($comp_d['name_kz'] ?: $comp_d['name_ru']).((int)$pi_d['quantity'] > 1 ? " × ".(int)$pi_d['quantity'] : "")."\n";
-            }
          }
 
          $txt = "<b>Тапсырыс:</b> #".$tg($cashbox_number)."\n";
