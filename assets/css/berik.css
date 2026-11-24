@@ -1356,7 +1356,7 @@ body:has(.cash_bl1) .tst_box{ right: auto; left: 16px; }
 .tf_preorder .pre_time_im{ flex: 1 1 100%; width: 100%; margin-top: 4px; padding: 12px; background: #fff; border: 1px solid #e6e8e4; border-radius: 12px; }
 .pre_tm_head{ display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: #545a56; }
 .pre_tm_val{ min-width: 84px; padding: 4px 12px; border-radius: 8px; background: #eef6f1; color: var(--bp-blue, #0c8f59); font-size: 20px; font-weight: 600; text-align: center;  }
-.pre_parts{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 4px; margin-bottom: 10px; border-radius: 10px; background: var(--bp-pill, #f1f3f0); }
+.pre_parts{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; padding: 4px; margin-bottom: 10px; border-radius: 10px; background: var(--bp-pill, #f1f3f0); }
 .pre_pt{ display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 8px 4px; border-radius: 8px; cursor: pointer; user-select: none; transition: background-color .12s, border-color .12s, color .12s, opacity .12s, transform .12s, visibility .12s; }
 .pre_pt b{ font-size: 15px; font-weight: 600; color: var(--bp-text, #1c1f1d); }
 .pre_pt small{ font-size: 11px; font-weight: 600; color: #767c78; }

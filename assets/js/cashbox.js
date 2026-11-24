@@ -1113,6 +1113,10 @@ $(document).ready(function() {
 
 
    // Предзаказ: күн (Бүгін / Ертең / Басқа күн) + уақыт → btype_preorder = «YYYY-MM-DD HH:MM»
+   // Күн 06:00-де ауысады (заказ нөмірі сияқты): Бүгін = 06:00-ден ертеңгі 06:00-ге дейін
+   function pre_t2m(t){ return +t.substr(0, 2) * 60 + +t.substr(3, 2) }
+   function pre_bm(m){ return (m - 360 + 1440) % 1440 } // жұмыс күні басынан (06:00) бергі минут
+   function pre_add_day(d, n){ var x = new Date(d + 'T12:00:00Z'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().substr(0, 10) }
    function pre_sync() {
       var day = $('.sel_pre_day').attr('data-day') || $('.sel_pre_day .form_im_slo_act').attr('data-type')
       if (day == 'other') {
@@ -1126,10 +1130,10 @@ $(document).ready(function() {
       var tm = $('.pre_time').val()
       // Уақыт слоттары: бүгін болса өткен уақыт өшірулі, таңдалғаны белгіленеді
       $('.pre_tm_val').text(tm || '--:--')
-      var now = new Date(), now_m = now.getHours() * 60 + now.getMinutes()
+      // Жұмыс күні 06:00-ден келесі 06:00-ге дейін: 00:00–05:30 слоттары сол күннің соңы (Түнгі)
+      var now = new Date(), now_m = pre_bm(now.getHours() * 60 + now.getMinutes())
       var is_today = day == $('.sel_pre_day .form_im_slo_i').first().attr('data-type')
-      var t2m = function(t){ return +t.substr(0, 2) * 60 + +t.substr(3, 2) }
-      $('.pre_s').each(function(){ $(this).toggleClass('pre_off', is_today && t2m($(this).attr('data-t')) <= now_m).toggleClass('pre_act', $(this).attr('data-t') == tm) })
+      $('.pre_s').each(function(){ $(this).toggleClass('pre_off', is_today && pre_bm(pre_t2m($(this).attr('data-t'))) <= now_m).toggleClass('pre_act', $(this).attr('data-t') == tm) })
       // Қай бөлік ашық тұрады: таңдалған уақыттікі, әйтпесе бос слоты бар алғашқы бөлік
       var pp = $('.pre_parts'), p = pp.attr('data-p')
       if (p === '' || p === undefined) {
@@ -1141,7 +1145,8 @@ $(document).ready(function() {
          $(this).toggleClass('pre_act', $(this).attr('data-p') == p).toggleClass('pre_off', !free)
       })
       $('.pre_s').each(function(){ $(this).toggleClass('dsp_n', $(this).attr('data-p') != p) })
-      var v = (day && tm) ? day + ' ' + tm : ''
+      // 06:00-ге дейінгі уақыт келесі күнтізбе күніне жазылады (мыс. Бүгін 24.11, 01:00 → 2026-11-25 01:00)
+      var v = (day && tm) ? (pre_t2m(tm) < 360 ? pre_add_day(day, 1) : day) + ' ' + tm : ''
       $('.btype_preorder').val(v).attr('data-val', v || 0)
       var today = $('.sel_pre_day .form_im_slo_i').first().attr('data-type')
       $('.pre_note').toggleClass('dsp_n', !(v && day > today))
@@ -1173,6 +1178,7 @@ $(document).ready(function() {
       var v = $('.btype_preorder').val()
       if (!v || v.length < 16) return
       var day = v.substr(0, 10), tm = v.substr(11, 5)
+      if (pre_t2m(tm) < 360) day = pre_add_day(day, -1) // түнгі уақыт алдыңғы жұмыс күніне жатады
       var chip = $('.sel_pre_day .form_im_slo_i[data-type="' + day + '"]')
       if (chip.length) chip.click(); else { $('.pre_date').val(day); $('.sel_pre_day .sel_pre_other').click() }
       $('.pre_time').val(tm); pre_sync()

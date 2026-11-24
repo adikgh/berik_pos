@@ -402,19 +402,21 @@
 					<br>
 
 					<div class="tf_preorder opt_off">
+						<? // Жұмыс күні 06:00-де ауысады: түнгі 00:00–06:00 аралығында «Бүгін» әлі кешегі күн, «Ертең» — бүгінгі күн
+							$pre_bt = strtotime(date('Y-m-d', time() - 6 * 3600)); ?>
 						<div class="form_im form_imss sel_pre_day">
 							<div class="form_span pre_head"><i class="far fa-clock"></i><span><?=t::w('Preorder', 'Предзаказ')?><small><?=t::w('Pre-order for a set time', 'Алдын-ала тапсырыс, уақытын таңдаңыз')?></small></span><em class="pre_close" title="<?=t::w('Close', 'Жабу')?>"><i class="fal fa-minus"></i></em></div>
-							<div class="form_im_slo "><div class="form_im_slo_i form_im_slo_act" data-type="<?=date('Y-m-d')?>"><b><?=t::w('Today', 'Бүгін')?></b><small><?=date('d.m')?></small></div></div>
-							<div class="form_im_slo "><div class="form_im_slo_i" data-type="<?=date('Y-m-d', strtotime('+1 day'))?>"><b><?=t::w('Tomorrow', 'Ертең')?></b><small><?=date('d.m', strtotime('+1 day'))?></small></div></div>
+							<div class="form_im_slo "><div class="form_im_slo_i form_im_slo_act" data-type="<?=date('Y-m-d', $pre_bt)?>"><b><?=t::w('Today', 'Бүгін')?></b><small><?=date('d.m', $pre_bt)?></small></div></div>
+							<div class="form_im_slo "><div class="form_im_slo_i" data-type="<?=date('Y-m-d', strtotime('+1 day', $pre_bt))?>"><b><?=t::w('Tomorrow', 'Ертең')?></b><small><?=date('d.m', strtotime('+1 day', $pre_bt))?></small></div></div>
 							<div class="form_im_slo "><div class="form_im_slo_i sel_pre_other" data-type="other"><b><i class="fal fa-calendar-alt"></i>&nbsp; <?=t::w('Another day', 'Басқа күн')?></b><small><?=t::w('up to 7 days', '7 күнге дейін')?></small></div></div>
 						</div>
 						<div class="pre_dt_row">
 							<div class="form_im pre_date_im dsp_n">
 								<? // Басқа күн: браузер күнтізбесі емес, келесі 6 күн батырмамен (ең көбі 1 апта алдыға) ?>
-								<input type="hidden" class="pre_date" min="<?=date('Y-m-d')?>" max="<?=date('Y-m-d', strtotime('+7 day'))?>" value="<?=date('Y-m-d', strtotime('+2 day'))?>">
+								<input type="hidden" class="pre_date" min="<?=date('Y-m-d', $pre_bt)?>" max="<?=date('Y-m-d', strtotime('+7 day', $pre_bt))?>" value="<?=date('Y-m-d', strtotime('+2 day', $pre_bt))?>">
 								<div class="pre_days">
 									<? $wd = [1 => 'Дс', 2 => 'Сс', 3 => 'Ср', 4 => 'Бс', 5 => 'Жм', 6 => 'Сб', 7 => 'Жс']; ?>
-									<? for ($pd_i = 2; $pd_i <= 7; $pd_i++): $pd_t = strtotime('+'.$pd_i.' day'); ?>
+									<? for ($pd_i = 2; $pd_i <= 7; $pd_i++): $pd_t = strtotime('+'.$pd_i.' day', $pre_bt); ?>
 										<div class="pre_day_i <?=($pd_i == 2 ? 'pre_day_act' : '')?>" data-date="<?=date('Y-m-d', $pd_t)?>"><small><?=$wd[(int)date('N', $pd_t)]?></small><b><?=date('d', $pd_t)?></b><small><?=date('m', $pd_t)?></small></div>
 									<? endfor ?>
 								</div>
@@ -423,7 +425,7 @@
 								<? // Уақыт: тәулік бөлігі (Таңғы / Түскі / Кешкі) + 30 минут сайынғы слоттар ?>
 								<input type="hidden" class="pre_time" value="">
 								<div class="pre_tm_head"><span><?=t::w('Time', 'Уақыты')?></span><b class="pre_tm_val">--:--</b></div>
-								<? $pre_parts = [[8, 12, t::w('Morning', 'Таңғы')], [12, 17, t::w('Afternoon', 'Түскі')], [17, 24, t::w('Evening', 'Кешкі')]]; ?>
+								<? $pre_parts = [[8, 12, t::w('Morning', 'Таңғы')], [12, 17, t::w('Afternoon', 'Түскі')], [17, 24, t::w('Evening', 'Кешкі')], [0, 6, t::w('Night', 'Түнгі')]]; // Түнгі 00–06 сол күнге жатады (келесі күнтізбе күні) ?>
 								<div class="pre_parts" data-p="">
 									<? foreach ($pre_parts as $pp_i => $pp): ?><div class="pre_pt" data-p="<?=$pp_i?>"><b><?=$pp[2]?></b><small><?=sprintf('%02d', $pp[0])?>–<?=sprintf('%02d', $pp[1])?></small></div><? endforeach ?>
 								</div>

@@ -182,7 +182,7 @@
 		$floor_apt = implode(', ', array_filter([$floor !== '' ? $floor.' этаж' : '', $apt !== '' ? $apt.' кв' : '']));
 		$preorder = @trim(strip_tags($_POST['preorder']));
 		if (!preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/', $preorder)) $preorder = '';
-		if ($preorder && substr($preorder, 0, 10) > date('Y-m-d', strtotime('+7 day'))) $preorder = ''; // ең көбі 1 апта
+		if ($preorder && date('Y-m-d', strtotime($preorder) - 6 * 3600) > date('Y-m-d', strtotime('+7 day', time() - 6 * 3600))) $preorder = ''; // ең көбі 1 апта (жұмыс күні 06:00-де ауысады)
 		$type = @strip_tags($_POST['type']);
       // Бір себет екі рет сақталмайды (жауап кешігіп қайта басылса не ескі бетте қалса): нөмір қайта берілмейді, тарих екі рет жазылмайды
       if ($type != 'ubd' && (int)@mysqli_fetch_assoc(db::query("select paid from retail_orders where id = '".(int)$id."' limit 1"))['paid'] == 1) exit('paid');
@@ -220,7 +220,7 @@
       $pre_today = true;
       if ($preorder) {
          $ins_dt = $preorder.':00';
-         $pre_today = substr($ins_dt, 0, 10) == date('Y-m-d') || ($ins_dt >= $start_cdate && $ins_dt < $end_cdate);
+         $pre_today = ($ins_dt >= $start_cdate && $ins_dt < $end_cdate); // бүгінгі жұмыс күні: 06:00 – ертеңгі 06:00
          if (!$pre_today) {
             $n_start = date('Y-m-d 06:00:00', strtotime($ins_dt.' -6 hours'));
             $n_end = date('Y-m-d 06:00:00', strtotime($n_start.' +1 day'));
