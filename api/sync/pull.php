@@ -8,12 +8,17 @@
 	$branch = (int)$dev['branch_id'];
 
 	// Деректері толық тартылатын кестелер (company_id бағаны болса, тек осы компанияныкі)
-	$ref = ['company_staff', 'company_staff_positions', 'company_client',
+	// Клиенттердің деректері (company_client, клиент user) кассаға тартылмайды (user 2026-11-24)
+	$ref = ['company_staff', 'company_staff_positions',
 		'product', 'product_item', 'product_item_quantity', 'product_catalog', 'product_warehouses',
 		'product_item_color', 'product_item_size', 'product_ch_brand', 'product_ch_style', 'product_ch_country', 'product_ch_collection',
 		'retail_orders_status', 'retail_orders_type', 'site', 'site_word', 'site_menu', 'word_block', 'info',
 		// 2026-11-15: акциялар (кассадағы % жеңілдік), чек баптауы (админдегі «Чек»), клиент кабинеті баптауы
-		'company_promo', 'company_receipt', 'company_menu'];
+		'company_promo', 'company_receipt', 'company_menu',
+		// 2026-11-24: толық касса — жеткізу аймақтары, стоп-лист, сет құрамы, себес/шикізат, тариф
+		'company_delivery_zone', 'company_stop_list', 'company_stop_setting', 'product_set_item',
+		'product_comp', 'product_comp_part', 'product_raw', 'product_raw_stock',
+		'company_sub', 'company_tariff', 'company_tariff_module', 'company_plan_conf'];
 
 	// Бұл кестелерде пароль сияқты құпия бағандар кассаға жіберілмейді
 	$hide = ['user' => ['password', 'code'], 'company' => ['code', 'smsc_login', 'smsc_password', 'tg_token', 'kaspi_token']];
@@ -41,11 +46,10 @@
 		$w = has_col($t, 'company_id') ? " WHERE company_id = '$company' OR company_id IS NULL" : '';
 		$data[$t] = clean($t, rows("SELECT * FROM `$t`$w"), $hide);
 	}
-	// user: тек осы компанияның қызметкерлері мен клиенттері
+	// user: тек осы компанияның қызметкерлері (клиенттер жоқ)
 	$uids = [];
 	foreach ((array)@$data['company_staff'] as $r) if ((int)@$r['user_id']) $uids[(int)$r['user_id']] = 1;
-	foreach ((array)@$data['company_client'] as $r) if ((int)@$r['user_id']) $uids[(int)$r['user_id']] = 1;
 	$data['user'] = $uids ? clean('user', rows("SELECT * FROM user WHERE id IN (".implode(',', array_keys($uids)).")"), $hide) : [];
 
-	out(['ok' => true, 'api' => SYNC_API_VER, 'time' => date('Y-m-d H:i:s'), 'company_id' => $company, 'branch_id' => $branch,
+	out(['ok' => true, 'api' => SYNC_API_VER, 'no_clients' => true, 'time' => date('Y-m-d H:i:s'), 'company_id' => $company, 'branch_id' => $branch,
 		'device_id' => (int)$dev['id'], 'schema' => $schema, 'data' => $data]);

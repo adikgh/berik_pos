@@ -248,7 +248,8 @@ $(document).ready(function() {
 
 
    $('html').on('click', '.on_print', function () {
-      window.open("/orders/" + "order_print.php?" + "&orderID=" + $(this).attr('data-id'), "mywin","width=570,height=570,left=250,top=50");
+      var kind = $(this).attr('data-kind') || 'client' // клиент чегі / кухня чегі (админ ▸ Чек)
+      window.open("/orders/order_print.php?orderID=" + $(this).attr('data-id') + "&kind=" + kind, kind == 'kitchen' ? "mywin_kc" : "mywin", "width=570,height=570,left=250,top=50");
 	})
 
 

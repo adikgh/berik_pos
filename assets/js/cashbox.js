@@ -799,7 +799,13 @@ $(document).ready(function() {
                if (data == 'yes') {
                   draft_clear()
                   if (btn.attr('data-print') == '1') {
-                     window.open("/orders/" + "order_print.php?" + "&orderID=" + btn.attr('data-id'), "mywin","width=570,height=570,left=250,top=50");
+                     // Чек түрлері (админ ▸ Чек): браузерде біріншісі ғана (қалғаны «Тапсырыстар»-дағы батырмадан),
+                     // Berik POS программасында қосулының бәрі өз принтеріне өзі шығады
+                     var kinds = (btn.attr('data-kinds') || 'client').split(',')
+                     var app = !!(window.chrome && window.chrome.webview)
+                     ;(app ? kinds : kinds.slice(0, 1)).forEach(function (k) {
+                        window.open("/orders/order_print.php?orderID=" + btn.attr('data-id') + "&kind=" + k, k == 'kitchen' ? "mywin_kc" : "mywin", "width=570,height=570,left=250,top=50");
+                     })
                   }
                   if (btn.attr('data-type') == 'ubd') location.href = '/orders/';
                   else location.reload();
@@ -833,7 +839,7 @@ $(document).ready(function() {
    // }
    
 	$('.pay_print').on('click', function () {
-      window.open("/orders/" + "order_print.php?" + "&orderID=" + $(this).attr('data-id'), "mywin","width=570,height=570,left=250,top=50");
+      window.open("/orders/order_print.php?orderID=" + $(this).attr('data-id') + "&kind=" + ($(this).attr('data-kind') || 'client'), "mywin","width=570,height=570,left=250,top=50");
       // orderPrint($(this).attr('data-id'), 'order_print.php?')
       // location.reload();
 	})
